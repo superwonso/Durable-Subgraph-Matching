@@ -1,0 +1,17 @@
+bitcoin-temporal https://www.cs.cornell.edu/~arb/data/temporal-bitcoin/
+#Node: 48,098,591
+#Timestamped Edges: 113,100,979
+#Static Edges: 86,798,226
+Time span: 7.08Y
+Ref: 
+Sampling Methods for Counting Temporal Motifs.
+Paul Liu, Austin R. Benson, and Moses Charikar.
+Proceedings of the ACM International Conference on Web Search and Data Mining (WSDM), 2019. [bibtex]
+Inferring the interplay between network structure and market effects in Bitcoin.
+Dániel Kondor, István Csabai, János Szüle, Márton Pósfai and Gábor Vattay.
+New Journal of Physics, 2014. [bibtex]
+
+---
+
+
+
