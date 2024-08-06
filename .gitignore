@@ -30,3 +30,10 @@
 *.exe
 *.out
 *.app
+
+# Visual Studio Code conf
+.vscode
+
+# Large File
+*.zip
+bitcoin-*.*
