@@ -53,9 +53,31 @@ bool non_tree_edge_test(int v, TreeNode* node) {
 }
 
 // Placeholder function for TS and intersection of TS
+// Function to get the time instances of the edge between two vertices
 set<int> TS(int v1, int v2) {
-    // Implement the actual logic here
-    return set<int>();
+    set<int> result;
+
+    // Find the edges for v1 in the graph
+    if (g.edges.find(v1) != g.edges.end()) {
+        for (const TimeEdge& edge : g.edges[v1]) {
+            // Check if the edge connects v1 and v2
+            if (edge.v2 == v2) {
+                result.insert(edge.time_instances.begin(), edge.time_instances.end());
+            }
+        }
+    }
+
+    // Find the edges for v2 in the graph (to account for undirected edges)
+    if (g.edges.find(v2) != g.edges.end()) {
+        for (const TimeEdge& edge : g.edges[v2]) {
+            // Check if the edge connects v2 and v1
+            if (edge.v2 == v1) {
+                result.insert(edge.time_instances.begin(), edge.time_instances.end());
+            }
+        }
+    }
+
+    return result;
 }
 
 // Function prototypes

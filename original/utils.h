@@ -21,8 +21,18 @@ struct TreeNode {
     BloomFilter* bloom_filter; // Add BloomFilter here
 };
 
-struct Graph {
+struct TimeEdge {
+    int v1;
+    int v2;
+    set<int> time_instances;
+};
+
+class Graph {
+public:
     unordered_map<int, TreeNode> nodes;
+    unordered_map<int, vector<TimeEdge>> edges; // Map from node to a list of edges
+
+    void add_edge(int v1, int v2, int timeinstance);
 };
 
 struct Tree {
