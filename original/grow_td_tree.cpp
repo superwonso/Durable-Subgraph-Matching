@@ -11,6 +11,9 @@
 
 using namespace std;
 
+// Global variables
+int k = 3; // Threshold
+
 // Placeholder functions for tree_edge_test and non_tree_edge_test
 bool tree_edge_test(int v1, int v2, TreeNode* node, TreeNode* parent) {
     // Get the nodes from the graphs
@@ -193,7 +196,6 @@ int main() {
     Graph G = read_graph_from_file("../Dataset/bitcoin-temporal-timeinstance.txt");
     Graph Q = read_graph_from_file("../Dataset/query.txt");
     Tree* T = new Tree;
-    int k = 3; // Threshold
 
     Tree* result = GrowTDTree(G, Q, T, k);
 

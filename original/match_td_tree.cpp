@@ -3,23 +3,9 @@
 #include <set>
 #include <unordered_set>
 #include <algorithm>
-
+#include "utils.h"
 using namespace std;
 
-// Placeholder structures for Graph, TreeNode, and Tree
-struct Graph {
-    vector<vector<int>> edges;
-};
-
-struct TreeNode {
-    set<int> V_cand;
-    TreeNode* parent;
-    vector<TreeNode*> children;
-};
-
-struct Tree {
-    TreeNode* root;
-};
 
 // Placeholder functions for gen_order, backward_edge_test, and duration_test
 vector<int> gen_order(Tree* T) {
