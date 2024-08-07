@@ -1,6 +1,6 @@
 # Enhanced Durable Subgraph Matching
 
----
+
 
 This repository is the implementation code about DongHyeon Cha’s Master Degree Thesis
 
@@ -18,13 +18,13 @@ g++(Built by MSYS2 project) 14.2.0, x64
 
 # Requirements
 
----
+
 
 g++ (c++17)
 
 # Compared algorithms
 
----
+
 
 | Algorithm | Paper |
 | --- | --- |
@@ -33,7 +33,7 @@ g++ (c++17)
 
 # Datasets
 
----
+
 
 | Datasets | link |
 | --- | --- |
