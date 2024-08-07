@@ -7,7 +7,7 @@
 #include <sstream>
 #include <algorithm>
 #include <string>
-#include <bloom_filter.cpp>
+#include "bloom_filter.h"
 
 using namespace std;
 
@@ -193,11 +193,10 @@ Graph read_graph_from_file(const string& filename) {
 }
 
 int main() {
-    // Example usage
-    Graph G = read_graph_from_file("graph.txt");
-    Graph Q = read_graph_from_file("query.txt");
+    Graph G = read_graph_from_file("../Dataset/bitcoin-temporal-timeinstance.txt");
+    Graph Q = read_graph_from_file("../Dataset/query.txt");
     Tree* T = new Tree;
-    int k = 3;
+    int k = 3; // Threshold
 
     Tree* result = GrowTDTree(G, Q, T, k);
 
