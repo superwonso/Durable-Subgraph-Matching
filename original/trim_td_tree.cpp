@@ -3,22 +3,18 @@
 #include <set>
 #include <unordered_set>
 #include <algorithm>
-
+#include "utils.h"
 using namespace std;
-
-// Assume appropriate definitions for these are provided elsewhere
-struct TreeNode {
-    set<int> V_cand;
-    vector<TreeNode*> children;
-};
-
-struct Tree {
-    TreeNode* root;
-};
 
 // Placeholder functions for non_edge_edge_test and remove_block
 bool non_edge_edge_test(int v, TreeNode* u) {
-    // Implement the actual test logic here
+    TreeNode* current = u;
+    while (current != nullptr) {
+        if (current->bloom_filter->possiblyContains(to_string(v))) {
+            return false;
+        }
+        current = current->parent;
+    }
     return true;
 }
 
