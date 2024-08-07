@@ -7,34 +7,9 @@
 #include <sstream>
 #include <algorithm>
 #include <string>
-#include "bloom_filter.h"
+#include "utils.h"
 
 using namespace std;
-
-// Structure definitions
-struct TreeNode {
-    int label;
-    int degree;
-    unordered_set<int> neighbor_labels;
-    int duration;
-    TreeNode* parent;
-    vector<TreeNode*> children;
-    set<int> V_cand;  // Candidate vertices
-    BloomFilter* bloom_filter; // Add BloomFilter here
-};
-
-struct Graph {
-    unordered_map<int, TreeNode> nodes;
-};
-
-struct Tree {
-    TreeNode* root;
-};
-
-// Global variables
-Graph g;
-Graph q;
-int k;
 
 // Placeholder functions for tree_edge_test and non_tree_edge_test
 bool tree_edge_test(int v1, int v2, TreeNode* node, TreeNode* parent) {
