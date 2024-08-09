@@ -75,7 +75,6 @@ int main() {
     Graph G;
     Graph Q;
     Tree* T = new Tree;
-    int k = 3;
 
     Match(G, Q, T, k);
 

@@ -12,7 +12,7 @@
 using namespace std;
 
 // Global variables
-int k = 3; // Threshold
+extern int k;
 
 // Placeholder functions for tree_edge_test and non_tree_edge_test
 bool tree_edge_test(int v1, int v2, TreeNode* node, TreeNode* parent) {
