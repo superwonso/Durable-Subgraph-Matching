@@ -123,15 +123,15 @@ void expand(vector<int>& M, int i, vector<int>& Pos, vector<int>& O, Tree* T, Gr
     }
 }
 
-int main() {
-    // Example usage
-    Graph G;
-    Graph Q;
-    Tree* T = new Tree;
+// int main() {
+//     // Example usage
+//     Graph G;
+//     Graph Q;
+//     Tree* T = new Tree;
 
-    Match(G, Q, T, k);
+//     Match(G, Q, T, k);
 
-    // Further processing
+//     // Further processing
 
-    return 0;
-}
+//     return 0;
+// }
