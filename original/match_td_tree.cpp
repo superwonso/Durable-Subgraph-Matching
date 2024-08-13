@@ -6,16 +6,69 @@
 #include "utils.h"
 using namespace std;
 
+// Function to perform DFS and generate the order of nodes
+void dfs(TreeNode* node, vector<int>& order) {
+    if (node == nullptr) return;
+
+    // Add the current node's ID to the order
+    order.push_back(node->id);
+
+    // Recursively visit all children
+    for (TreeNode* child : node->children) {
+        dfs(child, order);
+    }
+}
 
 // Placeholder functions for gen_order, backward_edge_test, and duration_test
-vector<int> gen_order(Tree* T) {
-    // Implement the actual generation order logic here
-    return vector<int>();
+// Function to generate the DFS order of nodes in the tree
+vector<int> gen_order(TreeNode* root) {
+    vector<int> order;
+
+    // Perform DFS starting from the root
+    dfs(root, order);
+
+    return order;
 }
+
 
 bool backward_edge_test(int v, vector<int>& M) {
     // Implement the actual test logic here
     return true;
+}
+
+// Function to calculate the cardinality of a given path in the tree
+int calculate_cardinality(TreeNode* node) {
+    int cardinality = 0;
+
+    // Traverse the tree path from the node to the leaf node
+    while (node != nullptr) {
+        // Add the size of V_cand to the cardinality
+        cardinality += node->V_cand.size();
+        
+        // Move to the first child (assuming this is part of a path)
+        if (!node->children.empty()) {
+            node = node->children[0];
+        } else {
+            node = nullptr; // Reached a leaf node
+        }
+    }
+
+    return cardinality;
+}
+
+vector<int> calculate_all_cardinalities(TreeNode* root) {
+    vector<int> cardinalities;
+
+    // Traverse all paths from root to leaves
+    for (TreeNode* child : root->children) {
+        int card = calculate_cardinality(child);
+        cardinalities.push_back(card);
+    }
+
+    // Sort the cardinalities in decreasing order
+    sort(cardinalities.rbegin(), cardinalities.rend());
+
+    return cardinalities;
 }
 
 bool duration_test(set<int>& TS, vector<int>& Pos) {
@@ -28,9 +81,9 @@ void expand(vector<int>& M, int i, vector<int>& Pos, vector<int>& O, Tree* T, Gr
 
 // Algorithm 3: Match
 void Match(Graph& G, Graph& Q, Tree* T, int k) {
-    vector<int> O = gen_order(T);
-    vector<int> M(Q.edges.size());
-    vector<int> Pos(Q.edges.size());
+    vector<int> O = gen_order(T->root);
+    vector<int> M(Q.nodes.size());  // Assuming this is the number of nodes in Q
+    vector<int> Pos(Q.nodes.size());
 
     for (int v : T->root->V_cand) {
         M[0] = v;

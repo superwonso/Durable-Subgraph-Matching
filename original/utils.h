@@ -11,6 +11,7 @@ using namespace std;
 
 // Structure definitions
 struct TreeNode {
+    int id;
     int label;
     int degree;
     unordered_set<int> neighbor_labels;
