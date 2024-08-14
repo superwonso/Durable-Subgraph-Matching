@@ -6,19 +6,17 @@ This repository is the implementation code about DongHyeon Cha’s Master Degree
 
 # Experiments Spec
 
-Intel Core i7-9700KF @ 3.60Ghz - Hyperthread on
+AMD Ryzen Threadripper PRO 5955WX
 
-DDR4 64GB @ 3200Mhz, Dual Channal
+DDR4 ECC 128GB @ 3200Mhz, Octa Channal
 
-Samsung SSD 970 EVO Plus 500GB
+Samsung SSD 990 Pro
 
-Microsoft Windows 11 Education 23H2
+Ubuntu 23.04 LTS
 
-g++(Built by MSYS2 project) 14.2.0, x64
+g++ 14.2.0, x64
 
 # Requirements
-
-
 
 g++ (c++17)
 
