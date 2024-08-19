@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ctime>
 #include "bloom_filter.h"
 #include "utils.h"
 #include "grow_td_tree.h"
@@ -10,13 +11,16 @@ using namespace std;
 extern int k;  // Global variable k
 
 int main() {
+    clock_t start, finish;
+    double duration;
+
     // Load the graph data from files
     Graph G = read_graph_from_file("../Dataset/bitcoin-temporal-timeinstance-unique.txt");
     Graph Q = read_graph_from_file("../Dataset/Query.txt");
 
     // Initialize the tree
     Tree* T = new Tree;
-
+    start = clock();
     // Phase 1: Query Decomposition
     cout << "Phase 1: Query Decomposition..." << endl;
     // This would involve creating a spanning tree T and identifying non-tree edges.
@@ -38,6 +42,10 @@ int main() {
     cout << "Trimming TD-Tree for optimization..." << endl;
     T = TrimTDTree(T);
     cout << "TD-Tree trimming completed." << endl;
+
+    finish = clock();
+    duration = (double)(finish - start);
+    cout << duration << "ms to run code" << endl;
 
     // Further processing with the trimmed TD-Tree or output results
     // ...
