@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <algorithm>
 #include "utils.h"
+#include "trim_td_tree.h"
 using namespace std;
 
 // Placeholder functions for non_edge_edge_test and remove_block

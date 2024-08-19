@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <limits>
 #include "utils.h"
+#include "decompose_query.h"
 
 using namespace std;
 

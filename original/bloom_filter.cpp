@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <functional>
+#include <bloom_filter.h>
 
 using namespace std;
 

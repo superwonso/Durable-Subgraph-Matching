@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <algorithm>
 #include "utils.h"
+#include "match_td_tree.h"
 using namespace std;
 
 // Function to perform DFS and generate the order of nodes

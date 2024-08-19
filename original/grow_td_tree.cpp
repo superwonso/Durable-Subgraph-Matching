@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <string>
 #include "utils.h"
-
+#include "grow_td_tree.h"
 using namespace std;
 
 // Global variables
@@ -192,14 +192,14 @@ Graph read_graph_from_file(const string& filename) {
     return G;
 }
 
-int main() {
-    Graph G = read_graph_from_file("../Dataset/bitcoin-temporal-timeinstance.txt");
-    Graph Q = read_graph_from_file("../Dataset/query.txt");
-    Tree* T = new Tree;
+// int main() {
+//     Graph G = read_graph_from_file("../Dataset/bitcoin-temporal-timeinstance.txt");
+//     Graph Q = read_graph_from_file("../Dataset/query.txt");
+//     Tree* T = new Tree;
 
-    Tree* result = GrowTDTree(G, Q, T, k);
+//     Tree* result = GrowTDTree(G, Q, T, k);
 
-    // Further processing with result
+//     // Further processing with result
 
-    return 0;
-}
+//     return 0;
+// }
