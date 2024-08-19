@@ -41,7 +41,7 @@ int main() {
 
     // Further processing with the trimmed TD-Tree or output results
     // ...
-
+    save_tree_to_file(T, "output.txt");
     // Clean up memory
     delete T;
 
