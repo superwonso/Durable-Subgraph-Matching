@@ -7,12 +7,12 @@
 #include "decompose_query.h"
 using namespace std;
 
-int k = 3;  // Global variable k
+extern int k;  // Global variable k
 
 int main() {
     // Load the graph data from files
-    Graph G = read_graph_from_file("graph.txt");
-    Graph Q = read_graph_from_file("query.txt");
+    Graph G = read_graph_from_file("../Dataset/bitcoin-temporal-timeinstance-unique.txt");
+    Graph Q = read_graph_from_file("../Dataset/Query.txt");
 
     // Initialize the tree
     Tree* T = new Tree;

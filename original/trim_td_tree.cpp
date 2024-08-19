@@ -118,13 +118,13 @@ void remove_block(TreeNode* b, TreeNode* u) {
     }
 }
 
-int main() {
-    // Example usage
-    Tree* T = new Tree;
+// int main() {
+//     // Example usage
+//     Tree* T = new Tree;
 
-    Tree* result = TrimTDTree(T);
+//     Tree* result = TrimTDTree(T);
 
-    // Further processing with result
+//     // Further processing with result
 
-    return 0;
-}
+//     return 0;
+// }
