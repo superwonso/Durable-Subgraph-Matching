@@ -20,6 +20,10 @@ struct TreeNode {
     vector<TreeNode*> children;
     set<int> V_cand;  // Candidate vertices
     BloomFilter* bloom_filter; // Add BloomFilter here
+    unordered_set<int> backward_edges;  // A set of valid backward edges for this node
+    set<int> TS;  // Time instances associated with this node
+    vector<TreeNode*> children;
+
 };
 
 struct TimeEdge {
@@ -44,5 +48,6 @@ struct Tree {
 extern Graph g;
 extern Graph q;
 extern int k;
-
+extern Graph G;
+extern Graph Q;
 #endif // UTILS_H

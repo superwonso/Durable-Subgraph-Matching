@@ -31,8 +31,22 @@ vector<int> gen_order(TreeNode* root) {
 }
 
 
-bool backward_edge_test(int v, vector<int>& M) {
-    // Implement the actual test logic here
+bool backward_edge_test(int v, const vector<int>& M, int i, TreeNode* node, Graph& G, Graph& Q) {
+    // Get the node in G corresponding to v
+    TreeNode* g_node = &G.nodes[v];
+
+    // Traverse through all backward edges (u_i+1, u_j) where j < i
+    for (int j = 0; j < i; ++j) {
+        int u_j = M[j];
+        TreeNode* q_node = &Q.nodes[u_j];
+
+        // Check if there is an edge from v to u_j in G
+        if (g_node->backward_edges.find(u_j) == g_node->backward_edges.end()) {
+            return false;
+        }
+    }
+
+    // If all backward edges are valid
     return true;
 }
 
@@ -72,8 +86,7 @@ vector<int> calculate_all_cardinalities(TreeNode* root) {
 }
 
 bool duration_test(set<int>& TS, vector<int>& Pos) {
-    // Implement the actual test logic here
-    return true;
+    return TS.size() >= k;
 }
 
 // Function prototypes
@@ -95,31 +108,40 @@ void Match(Graph& G, Graph& Q, Tree* T, int k) {
 
 // expand function
 void expand(vector<int>& M, int i, vector<int>& Pos, vector<int>& O, Tree* T, Graph& G, Graph& Q, int k) {
-    if (i == Q.edges.size()) {
-        // Print the matching M
-        for (int v : M) {
-            cout << v << " ";
-        }
-        cout << endl;
-    } else {
-        TreeNode* u_p = T->root;  // Assuming root's parent is considered here
-        TreeNode* u_i = u_p->children[Pos[i - 1]];  // Accessing child node
+  TreeNode* ui_plus1 = T->root; // Replace with the actual way to get TreeNode from O[i]
 
-        for (TreeNode* b : u_i->children) {
-            for (int v : b->V_cand) {
-                if (backward_edge_test(v, M)) {
-                    if (u_i->children.empty()) {
-                        set<int> TS;  // Placeholder for TS, assuming it's available
-                        if (!duration_test(TS, Pos)) continue;
-                    }
-                    if (find(M.begin(), M.begin() + i, v) == M.begin() + i) {
-                        M[i] = v;
-                        Pos[i] = v;  // Assuming the block cell storing v is the index of v
-                        expand(M, i + 1, Pos, O, T, G, Q, k);
-                    }
-                }
+    for (int v : ui_plus1->V_cand) {
+        // Perform the backward edge test
+        if (!backward_edge_test(v, M, i, ui_plus1, G, Q)) {
+            continue;
+        }
+
+        // If ui+1 is a leaf node, perform the duration test
+        if (ui_plus1->children.empty()) {
+            // Calculate the TS set for ui+1
+            set<int> TS_v = ui_plus1->TS;
+            set<int> intersection_TS = TS_v;
+
+            for (int j = 0; j < i; ++j) {
+                TreeNode* uj = &T->root[j]; // Replace with actual node retrieval
+                set<int> Pos_TS = uj->TS;  // Assuming Pos[j] maps directly to uj
+                set<int> temp_intersection;
+                set_intersection(intersection_TS.begin(), intersection_TS.end(), Pos_TS.begin(), Pos_TS.end(),
+                                 inserter(temp_intersection, temp_intersection.begin()));
+                intersection_TS = temp_intersection;
+            }
+
+            // If the size of TS is less than k, skip this v
+            if (intersection_TS.size() < k) {
+                continue;
             }
         }
+
+        // If valid, set M[i] and Pos[i] and expand further
+        M[i] = v;
+        Pos[i] = v;  // Assuming this is the correct way to set Pos
+
+        expand(M, i + 1, Pos, O, T, G, Q, k);
     }
 }
 
