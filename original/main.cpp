@@ -32,7 +32,7 @@ int main() {
     cout << "Phase 2: Search for Candidate Vertex Matchings..." << endl;
     T = GrowTDTree(G, Q, T, k);
     cout << "Candidate Vertex Matchings found." << endl;
-
+    save_tree_to_file(T, "./candidates.txt");
     // Phase 3: Enumeration of Durable Subgraph Matchings
     cout << "Phase 3: Enumeration of Durable Subgraph Matchings..." << endl;
     Match(G, Q, T, k);
@@ -49,7 +49,7 @@ int main() {
 
     // Further processing with the trimmed TD-Tree or output results
     // ...
-    save_tree_to_file(T, "output.txt");
+    save_tree_to_file(T, "./output.txt");
     // Clean up memory
     delete T;
 

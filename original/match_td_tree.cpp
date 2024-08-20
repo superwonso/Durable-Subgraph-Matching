@@ -33,6 +33,9 @@ vector<int> gen_order(TreeNode* root) {
 
 
 bool backward_edge_test(int v, const vector<int>& M, int i, TreeNode* node, Graph& G, Graph& Q) {
+    clock_t start_bet, finish_bet;
+    double duration_bet;
+    start_bet = clock();
     // Get the node in G corresponding to v
     TreeNode* g_node = &G.nodes[v];
 
@@ -46,7 +49,9 @@ bool backward_edge_test(int v, const vector<int>& M, int i, TreeNode* node, Grap
             return false;
         }
     }
-
+    finish_bet = clock();
+    duration_bet = (double)(finish_bet - start_bet);
+    cout << duration_bet << "ms to run bet function" << endl;
     // If all backward edges are valid
     return true;
 }
@@ -100,6 +105,7 @@ void Match(Graph& G, Graph& Q, Tree* T, int k) {
     vector<int> Pos(Q.nodes.size());
 
     for (int v : T->root->V_cand) {
+        printf("Algorithm 3 for ");
         M[0] = v;
         // Assuming the block cell storing v is the index of v
         Pos[0] = v;
@@ -116,7 +122,7 @@ void expand(vector<int>& M, int i, vector<int>& Pos, vector<int>& O, Tree* T, Gr
         if (!backward_edge_test(v, M, i, ui_plus1, G, Q)) {
             continue;
         }
-
+        printf("Algorithm 3 expand for");
         // If ui+1 is a leaf node, perform the duration test
         if (ui_plus1->children.empty()) {
             // Calculate the TS set for ui+1
