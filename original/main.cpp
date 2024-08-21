@@ -15,9 +15,13 @@ int main() {
     double duration;
 
     // Load the graph data from files
+    cout << "Loading graph data..." << endl;
     Graph G = read_graph_from_file("../Dataset/bitcoin-temporal-timeinstance-unique.txt");
+    cout << "Graph data loaded." << endl;
+    cout << "Loading query data..." << endl;
     Graph Q = read_graph_from_file("../Dataset/Query.txt");
-
+    cout << "Query data loaded." << endl;
+    
     // Initialize the tree
     Tree* T = new Tree;
     start = clock();

@@ -172,40 +172,13 @@ Graph read_graph_from_file(const string& filename) {
         int node1, node2, duration;
         ss >> node1 >> node2 >> duration;
 
-        // Check if the node1 already exists in the graph
-        if (G.nodes.find(node1) == G.nodes.end()) {
-            G.nodes[node1] = TreeNode();
-        }
-
-        // Check if the node2 already exists in the graph
-        if (G.nodes.find(node2) == G.nodes.end()) {
-            G.nodes[node2] = TreeNode();
-        }
-
-        // Add node2 as a neighbor of node1, and vice versa
-        G.nodes[node1].neighbor_labels.insert(node2);
-        G.nodes[node2].neighbor_labels.insert(node1);
-
         // Add the edge with the time instance
-        bool edge_exists = false;
-        for (auto& edge : G.edges[node1]) {
-            if (edge.v2 == node2) {
-                edge.time_instances.insert(duration);
-                edge_exists = true;
-                break;
-            }
-        }
-
-        // If the edge does not exist, create a new TimeEdge
-        if (!edge_exists) {
-            TimeEdge new_edge = {node1, node2, {duration}};
-            G.edges[node1].push_back(new_edge);
-            G.edges[node2].push_back(new_edge);
-        }
+        G.add_edge(node1, node2, duration);
     }
 
     return G;
 }
+
 
 
 // int main() {

@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include "bloom_filter.h"
 
 using namespace std;
@@ -41,6 +42,7 @@ public:
 
     void add_edge(int v1, int v2, int timeinstance); // Function to add an edge to the graph
 };
+
 
 struct Tree {
     TreeNode* root; // Root of the tree

@@ -68,3 +68,35 @@ void save_tree_to_file(Tree* T, const string& filename) {
         cerr << "Failed to open file: " << filename << endl;
     }
 }
+
+void Graph::add_edge(int v1, int v2, int timeinstance) {
+    // Ensure nodes exist
+    if (nodes.find(v1) == nodes.end()) {
+        nodes[v1] = TreeNode();
+        nodes[v1].id = v1;
+    }
+    if (nodes.find(v2) == nodes.end()) {
+        nodes[v2] = TreeNode();
+        nodes[v2].id = v2;
+    }
+
+    // Check if the edge already exists using std::find_if
+    auto& edge_list = edges[v1];
+    auto it = std::find_if(edge_list.begin(), edge_list.end(), [v2](const TimeEdge& edge) {
+        return edge.v2 == v2;
+    });
+
+    if (it != edge_list.end()) {
+        // Edge exists, add the time instance
+        it->time_instances.insert(timeinstance);
+    } else {
+        // Edge doesn't exist, create a new TimeEdge
+        TimeEdge new_edge = {v1, v2, {timeinstance}};
+        edges[v1].push_back(new_edge);
+        edges[v2].push_back(new_edge);  // For undirected graph
+    }
+
+    // Add neighbor labels
+    nodes[v1].neighbor_labels.insert(v2);
+    nodes[v2].neighbor_labels.insert(v1);
+}
