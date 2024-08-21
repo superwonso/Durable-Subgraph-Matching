@@ -66,22 +66,14 @@ set<int> TS(int v1, int v2) {
             // Check if the edge connects v1 and v2
             if (edge.v2 == v2) {
                 result.insert(edge.time_instances.begin(), edge.time_instances.end());
-            }
-        }
-    }
-
-    // Find the edges for v2 in the graph (to account for undirected edges)
-    if (g.edges.find(v2) != g.edges.end()) {
-        for (const TimeEdge& edge : g.edges[v2]) {
-            // Check if the edge connects v2 and v1
-            if (edge.v2 == v1) {
-                result.insert(edge.time_instances.begin(), edge.time_instances.end());
+                break;  // Edge found, no need to search further
             }
         }
     }
 
     return result;
 }
+
 
 // Function prototypes
 void fill_node(TreeNode* c, int v, set<int> TS_set, Graph& G, int k);
@@ -99,7 +91,8 @@ Tree* GrowTDTree(Graph G, Graph Q, Tree* T, int k) {
 
     for (TreeNode* c : T->root->children) {
         for (int v : T->root->V_cand) {
-            fill_node(c, v, set<int>{1, 2, 3}, G, k);  // Assuming a set<int> {1, 2, 3} as TS set
+            set<int> TS_set = TS(c->id, v);
+            fill_node(c, v, TS_set, G, k);
         }
     }
     return T;
@@ -146,6 +139,7 @@ void fill_node(TreeNode* c, int v, set<int> TS_set, Graph& G, int k) {
     }
 }
 
+
 // fill_root function
 void fill_root(TreeNode* root) {
     // Implement the actual fill root logic here
@@ -172,25 +166,47 @@ Graph read_graph_from_file(const string& filename) {
     ifstream file(filename);
     Graph G;
     string line;
+
     while (getline(file, line)) {
         stringstream ss(line);
-        int vertex;
-        vector<int> edges;
-        while (ss >> vertex) {
-            edges.push_back(vertex);
+        int node1, node2, duration;
+        ss >> node1 >> node2 >> duration;
+
+        // Check if the node1 already exists in the graph
+        if (G.nodes.find(node1) == G.nodes.end()) {
+            G.nodes[node1] = TreeNode();
         }
-        // Assuming the first vertex in each line is the node and rest are its neighbors
-        if (!edges.empty()) {
-            int node = edges[0];
-            TreeNode tree_node;
-            for (size_t i = 1; i < edges.size(); ++i) {
-                tree_node.neighbor_labels.insert(edges[i]);
+
+        // Check if the node2 already exists in the graph
+        if (G.nodes.find(node2) == G.nodes.end()) {
+            G.nodes[node2] = TreeNode();
+        }
+
+        // Add node2 as a neighbor of node1, and vice versa
+        G.nodes[node1].neighbor_labels.insert(node2);
+        G.nodes[node2].neighbor_labels.insert(node1);
+
+        // Add the edge with the time instance
+        bool edge_exists = false;
+        for (auto& edge : G.edges[node1]) {
+            if (edge.v2 == node2) {
+                edge.time_instances.insert(duration);
+                edge_exists = true;
+                break;
             }
-            G.nodes[node] = tree_node;
+        }
+
+        // If the edge does not exist, create a new TimeEdge
+        if (!edge_exists) {
+            TimeEdge new_edge = {node1, node2, {duration}};
+            G.edges[node1].push_back(new_edge);
+            G.edges[node2].push_back(new_edge);
         }
     }
+
     return G;
 }
+
 
 // int main() {
 //     Graph G = read_graph_from_file("../Dataset/bitcoin-temporal-timeinstance.txt");

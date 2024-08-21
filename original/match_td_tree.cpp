@@ -51,7 +51,7 @@ bool backward_edge_test(int v, const vector<int>& M, int i, TreeNode* node, Grap
     }
     finish_bet = clock();
     duration_bet = (double)(finish_bet - start_bet);
-    cout << duration_bet << "ms to run bet function" << endl;
+    // cout << duration_bet << "ms to run bet function" << endl;
     // If all backward edges are valid
     return true;
 }
@@ -105,11 +105,14 @@ void Match(Graph& G, Graph& Q, Tree* T, int k) {
     vector<int> Pos(Q.nodes.size());
 
     for (int v : T->root->V_cand) {
-        printf("Algorithm 3 for ");
+        // printf("Algorithm 3 for ");
         M[0] = v;
+        // cout<< "Here 1" << endl;
         // Assuming the block cell storing v is the index of v
         Pos[0] = v;
+        // cout<< "Here 2" << endl;
         expand(M, 1, Pos, O, T, G, Q, k);
+        // cout<< "Expand Fin" << endl;
     }
 }
 
@@ -119,10 +122,11 @@ void expand(vector<int>& M, int i, vector<int>& Pos, vector<int>& O, Tree* T, Gr
 
     for (int v : ui_plus1->V_cand) {
         // Perform the backward edge test
-        if (!backward_edge_test(v, M, i, ui_plus1, G, Q)) {
-            continue;
-        }
-        printf("Algorithm 3 expand for");
+        // if (!backward_edge_test(v, M, i, ui_plus1, G, Q)) {
+        //     printf("Backward edge test : false");
+        //     continue;
+        // }
+        // printf("Algorithm 3 expand for");
         // If ui+1 is a leaf node, perform the duration test
         if (ui_plus1->children.empty()) {
             // Calculate the TS set for ui+1
