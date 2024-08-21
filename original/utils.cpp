@@ -12,24 +12,50 @@ int k = 3; // Threshold
 
 using namespace std;
 
-void save_graph_to_file(Graph G, const string& filename) {
+// void save_graph_to_file(Graph G, const string& filename) {
+//     ofstream file(filename);
+//     if (file.is_open()) {
+//         for (const auto& node : G.nodes) {
+//             file << node.first << " " << node.second.label << " " << node.second.degree << endl;
+//         }
+//         for (const auto& edge : G.edges) {
+//             for (const TimeEdge& time_edge : edge.second) {
+//                 file << edge.first << " " << time_edge.v2 << " ";
+//                 for (int time_instance : time_edge.time_instances) {
+//                     file << time_instance << " ";
+//                 }
+//                 file << endl;
+//             }
+//         }
+//         file.close();
+//     }
+// }
+
+void save_graph_to_file(const Graph& G, const string& filename) {
     ofstream file(filename);
     if (file.is_open()) {
+        // Save node information
         for (const auto& node : G.nodes) {
             file << node.first << " " << node.second.label << " " << node.second.degree << endl;
         }
-        for (const auto& edge : G.edges) {
-            for (const TimeEdge& time_edge : edge.second) {
-                file << edge.first << " " << time_edge.v2 << " ";
+
+        // Save edge information
+        for (const auto& edge_list : G.edges) {
+            int node1 = edge_list.first;
+            for (const auto& edge_pair : edge_list.second) {
+                const TimeEdge& time_edge = edge_pair.second;  // Extract the TimeEdge object
+                file << node1 << " " << time_edge.v2 << " ";
                 for (int time_instance : time_edge.time_instances) {
                     file << time_instance << " ";
                 }
                 file << endl;
             }
         }
+
         file.close();
     }
 }
+
 
 void save_tree_to_file(Tree* T, const string& filename) {
     ofstream file(filename);
@@ -69,6 +95,38 @@ void save_tree_to_file(Tree* T, const string& filename) {
     }
 }
 
+// void Graph::add_edge(int v1, int v2, int timeinstance) {
+//     // Ensure nodes exist
+//     if (nodes.find(v1) == nodes.end()) {
+//         nodes[v1] = TreeNode();
+//         nodes[v1].id = v1;
+//     }
+//     if (nodes.find(v2) == nodes.end()) {
+//         nodes[v2] = TreeNode();
+//         nodes[v2].id = v2;
+//     }
+
+//     // Check if the edge already exists using std::find_if
+//     auto& edge_list = edges[v1];
+//     auto it = std::find_if(edge_list.begin(), edge_list.end(), [v2](const TimeEdge& edge) {
+//         return edge.v2 == v2;
+//     });
+
+//     if (it != edge_list.end()) {
+//         // Edge exists, add the time instance
+//         it->time_instances.insert(timeinstance);
+//     } else {
+//         // Edge doesn't exist, create a new TimeEdge
+//         TimeEdge new_edge = {v1, v2, {timeinstance}};
+//         edges[v1].push_back(new_edge);
+//         edges[v2].push_back(new_edge);  // For undirected graph
+//     }
+
+//     // Add neighbor labels
+//     nodes[v1].neighbor_labels.insert(v2);
+//     nodes[v2].neighbor_labels.insert(v1);
+// }
+
 void Graph::add_edge(int v1, int v2, int timeinstance) {
     // Ensure nodes exist
     if (nodes.find(v1) == nodes.end()) {
@@ -80,20 +138,16 @@ void Graph::add_edge(int v1, int v2, int timeinstance) {
         nodes[v2].id = v2;
     }
 
-    // Check if the edge already exists using std::find_if
-    auto& edge_list = edges[v1];
-    auto it = std::find_if(edge_list.begin(), edge_list.end(), [v2](const TimeEdge& edge) {
-        return edge.v2 == v2;
-    });
-
-    if (it != edge_list.end()) {
+    // Check if the edge already exists in the unordered_map
+    if (edges[v1].find(v2) != edges[v1].end()) {
         // Edge exists, add the time instance
-        it->time_instances.insert(timeinstance);
+        edges[v1][v2].time_instances.insert(timeinstance);
+        edges[v2][v1].time_instances.insert(timeinstance); // Symmetric edge
     } else {
         // Edge doesn't exist, create a new TimeEdge
         TimeEdge new_edge = {v1, v2, {timeinstance}};
-        edges[v1].push_back(new_edge);
-        edges[v2].push_back(new_edge);  // For undirected graph
+        edges[v1][v2] = new_edge;
+        edges[v2][v1] = new_edge;  // For undirected graph
     }
 
     // Add neighbor labels

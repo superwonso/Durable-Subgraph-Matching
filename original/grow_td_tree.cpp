@@ -57,23 +57,40 @@ bool non_tree_edge_test(int v, TreeNode* node) {
 
 // Placeholder function for TS and intersection of TS
 // Function to get the time instances of the edge between two vertices
+// set<int> TS(int v1, int v2) {
+//     set<int> result;
+
+//     // Find the edges for v1 in the graph
+//     if (g.edges.find(v1) != g.edges.end()) {
+//         for (const TimeEdge& edge : g.edges[v1]) {
+//             // Check if the edge connects v1 and v2
+//             if (edge.v2 == v2) {
+//                 result.insert(edge.time_instances.begin(), edge.time_instances.end());
+//                 break;  // Edge found, no need to search further
+//             }
+//         }
+//     }
+
+//     return result;
+// }
+
 set<int> TS(int v1, int v2) {
     set<int> result;
 
     // Find the edges for v1 in the graph
     if (g.edges.find(v1) != g.edges.end()) {
-        for (const TimeEdge& edge : g.edges[v1]) {
-            // Check if the edge connects v1 and v2
-            if (edge.v2 == v2) {
-                result.insert(edge.time_instances.begin(), edge.time_instances.end());
-                break;  // Edge found, no need to search further
-            }
+        const auto& edge_map = g.edges[v1];  // This is unordered_map<int, TimeEdge>
+
+        // Find if there is an edge between v1 and v2
+        auto it = edge_map.find(v2);
+        if (it != edge_map.end()) {
+            // Edge found, add all time instances to result
+            result.insert(it->second.time_instances.begin(), it->second.time_instances.end());
         }
     }
 
     return result;
 }
-
 
 // Function prototypes
 void fill_node(TreeNode* c, int v, set<int> TS_set, Graph& G, int k);

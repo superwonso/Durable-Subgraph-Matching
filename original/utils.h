@@ -35,14 +35,21 @@ struct TreeNode {
     set<int> TS;  // Time instances associated with this node
 };
 
+// class Graph {
+// public:
+//     unordered_map<int, TreeNode> nodes; // Nodes in the graph
+//     unordered_map<int, vector<TimeEdge>> edges; // Edges in the graph, mapping from node to a list of edges
+
+//     void add_edge(int v1, int v2, int timeinstance); // Function to add an edge to the graph
+// };
+
 class Graph {
 public:
-    unordered_map<int, TreeNode> nodes; // Nodes in the graph
-    unordered_map<int, vector<TimeEdge>> edges; // Edges in the graph, mapping from node to a list of edges
+    unordered_map<int, TreeNode> nodes;
+    unordered_map<int, unordered_map<int, TimeEdge>> edges;
 
-    void add_edge(int v1, int v2, int timeinstance); // Function to add an edge to the graph
+    void add_edge(int v1, int v2, int timeinstance);
 };
-
 
 struct Tree {
     TreeNode* root; // Root of the tree
