@@ -22,7 +22,7 @@ g++ (c++17)
 
 # Build Command
 
-g++ -Wall -Wextra -g3 main.cpp utils.cpp grow_td_tree.cpp match_td_tree.cpp trim_td_tree.cpp decompose_query.cpp bloom_filter.cpp -o main.exe
+g++ -Wall -Wextra -g3 -O3 main.cpp utils.cpp grow_td_tree.cpp match_td_tree.cpp trim_td_tree.cpp decompose_query.cpp bloom_filter.cpp -o main.exe
 
 # Compared algorithms
 
