@@ -122,10 +122,10 @@ void expand(vector<int>& M, int i, vector<int>& Pos, vector<int>& O, Tree* T, Gr
 
     for (int v : ui_plus1->V_cand) {
         // Perform the backward edge test
-        // if (!backward_edge_test(v, M, i, ui_plus1, G, Q)) {
-        //     printf("Backward edge test : false");
-        //     continue;
-        // }
+        if (!backward_edge_test(v, M, i, ui_plus1, G, Q)) {
+            printf("Backward edge test : false");
+            continue;
+        }
         // printf("Algorithm 3 expand for");
         // If ui+1 is a leaf node, perform the duration test
         if (ui_plus1->children.empty()) {
