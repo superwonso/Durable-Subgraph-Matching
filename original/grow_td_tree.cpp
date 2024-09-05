@@ -7,6 +7,8 @@
 #include <sstream>
 #include <algorithm>
 #include <string>
+#include <cstdlib>
+#include <ctime>
 #include "utils.h"
 #include "grow_td_tree.h"
 using namespace std;
@@ -57,23 +59,6 @@ bool non_tree_edge_test(int v, TreeNode* node) {
 
 // Placeholder function for TS and intersection of TS
 // Function to get the time instances of the edge between two vertices
-// set<int> TS(int v1, int v2) {
-//     set<int> result;
-
-//     // Find the edges for v1 in the graph
-//     if (g.edges.find(v1) != g.edges.end()) {
-//         for (const TimeEdge& edge : g.edges[v1]) {
-//             // Check if the edge connects v1 and v2
-//             if (edge.v2 == v2) {
-//                 result.insert(edge.time_instances.begin(), edge.time_instances.end());
-//                 break;  // Edge found, no need to search further
-//             }
-//         }
-//     }
-
-//     return result;
-// }
-
 set<int> TS(int v1, int v2) {
     set<int> result;
 
@@ -178,34 +163,23 @@ Tree* init_tree(Tree* T) {
     return T;
 }
 
-// Function to read graph from file
-Graph read_graph_from_file(const string& filename) {
-    ifstream file(filename);
-    Graph G;
-    string line;
+int main() {
+    clock_t start, finish;
+    double duration;
+    Tree* T = new Tree;
 
-    while (getline(file, line)) {
-        stringstream ss(line);
-        int node1, node2, duration;
-        ss >> node1 >> node2 >> duration;
+    start = clock();
 
-        // Add the edge with the time instance
-        G.add_edge(node1, node2, duration);
-    }
+    Graph G = read_graph_from_file("../Dataset/testdata.txt");
+    Graph Q = read_graph_from_file("../Dataset/query.txt");
 
-    return G;
+    Tree* result = GrowTDTree(G, Q, T, k);
+    // Further processing with result
+
+    finish = clock();
+    duration = (double)(finish - start);
+    cout << duration << "ms to run code" << endl;
+    save_tree_to_file(result, "./grow_td_tree.txt");
+
+    return 0;
 }
-
-
-
-// int main() {
-//     Graph G = read_graph_from_file("../Dataset/bitcoin-temporal-timeinstance.txt");
-//     Graph Q = read_graph_from_file("../Dataset/query.txt");
-//     Tree* T = new Tree;
-
-//     Tree* result = GrowTDTree(G, Q, T, k);
-
-//     // Further processing with result
-
-//     return 0;
-// }

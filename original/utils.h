@@ -35,14 +35,6 @@ struct TreeNode {
     set<int> TS;  // Time instances associated with this node
 };
 
-// class Graph {
-// public:
-//     unordered_map<int, TreeNode> nodes; // Nodes in the graph
-//     unordered_map<int, vector<TimeEdge>> edges; // Edges in the graph, mapping from node to a list of edges
-
-//     void add_edge(int v1, int v2, int timeinstance); // Function to add an edge to the graph
-// };
-
 class Graph {
 public:
     unordered_map<int, TreeNode> nodes;
@@ -65,5 +57,7 @@ extern Graph Q;
 // Function declarations
 void save_graph_to_file(Graph G, const string& filename);
 void save_tree_to_file(Tree* T, const string& filename);
+Graph read_graph_from_file(const string& filename);
+Graph read_query_graph_from_file(const string& filename);
 
 #endif // UTILS_H

@@ -21,6 +21,22 @@ using namespace std;
 //     return static_cast<double>(label_count) / Q.nodes.at(vertex).degree;
 // }
 
+// double calculate_selectivity(int vertex, const Graph& G, const Graph& Q) {
+//     int label_count = 0;
+//     auto it = Q.nodes.find(vertex);
+//     if (it != Q.nodes.end()) {
+//         int vertex_label = it->second.label;
+//         for (const auto& node : G.nodes) {
+//             if (node.second.label == vertex_label) {
+//                 label_count++;
+//             }
+//         }
+//         return static_cast<double>(label_count) / it->second.degree;
+//     } else {
+//         cerr << "Vertex " << vertex << " not found in query graph Q." << endl;
+//         return numeric_limits<double>::max(); // Returns the maximum value to prevent it from being selected
+//     }
+// }
 double calculate_selectivity(int vertex, const Graph& G, const Graph& Q) {
     int label_count = 0;
     auto it = Q.nodes.find(vertex);
@@ -30,6 +46,10 @@ double calculate_selectivity(int vertex, const Graph& G, const Graph& Q) {
             if (node.second.label == vertex_label) {
                 label_count++;
             }
+        }
+        // If label_count is zero, it means this label is not present in G
+        if (label_count == 0) {
+            cerr << "Label " << vertex_label << " of vertex " << vertex << " not found in data graph G." << endl;
         }
         return static_cast<double>(label_count) / it->second.degree;
     } else {

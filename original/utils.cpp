@@ -2,6 +2,8 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <sstream>
 #include "utils.h"
 // Define global variables
 Graph g;
@@ -12,24 +14,77 @@ int k = 3; // Threshold
 
 using namespace std;
 
-// void save_graph_to_file(Graph G, const string& filename) {
-//     ofstream file(filename);
-//     if (file.is_open()) {
-//         for (const auto& node : G.nodes) {
-//             file << node.first << " " << node.second.label << " " << node.second.degree << endl;
-//         }
-//         for (const auto& edge : G.edges) {
-//             for (const TimeEdge& time_edge : edge.second) {
-//                 file << edge.first << " " << time_edge.v2 << " ";
-//                 for (int time_instance : time_edge.time_instances) {
-//                     file << time_instance << " ";
-//                 }
-//                 file << endl;
-//             }
-//         }
-//         file.close();
-//     }
-// }
+// Function to read graph from file
+Graph read_graph_from_file(const string& filename) {
+    ifstream file(filename);
+    Graph G;
+    string line;
+
+    // Seed the random number generator
+    srand(static_cast<unsigned int>(time(0)));
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        int node1, node2, duration;
+        ss >> node1 >> node2 >> duration;
+
+        // Ensure node1 exists and assign a random label (1, 2, or 3)
+        if (G.nodes.find(node1) == G.nodes.end()) {
+            TreeNode node;
+            node.id = node1;
+            node.label = rand() % 3 + 1; // Random label between 1 and 3
+            G.nodes[node1] = node;
+        }
+
+        // Ensure node2 exists and assign a random label (1, 2, or 3)
+        if (G.nodes.find(node2) == G.nodes.end()) {
+            TreeNode node;
+            node.id = node2;
+            node.label = rand() % 3 + 1; // Random label between 1 and 3
+            G.nodes[node2] = node;
+        }
+
+        // Add the edge with the time instance
+        G.add_edge(node1, node2, duration);
+    }
+
+    return G;
+}
+
+//Function to read query graph from file
+Graph read_query_graph_from_file(const string& filename) {
+    ifstream file(filename);
+    Graph Q;
+    string line;
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        int node1, node2;
+        ss >> node1 >> node2;
+
+        // Ensure node1 exists and assign a random label (1, 2, or 3)
+        if (G.nodes.find(node1) == G.nodes.end()) {
+            TreeNode node;
+            node.id = node1;
+            node.label = rand() % 3 + 1; // Random label between 1 and 3
+            G.nodes[node1] = node;
+        }
+
+        // Ensure node2 exists and assign a random label (1, 2, or 3)
+        if (G.nodes.find(node2) == G.nodes.end()) {
+            TreeNode node;
+            node.id = node2;
+            node.label = rand() % 3 + 1; // Random label between 1 and 3
+            G.nodes[node2] = node;
+        }
+
+        // Add the edge with the time instance
+        G.add_edge(node1, node2, NULL);
+    }
+
+    return G;
+}
+
 
 void save_graph_to_file(const Graph& G, const string& filename) {
     ofstream file(filename);
@@ -94,38 +149,6 @@ void save_tree_to_file(Tree* T, const string& filename) {
         cerr << "Failed to open file: " << filename << endl;
     }
 }
-
-// void Graph::add_edge(int v1, int v2, int timeinstance) {
-//     // Ensure nodes exist
-//     if (nodes.find(v1) == nodes.end()) {
-//         nodes[v1] = TreeNode();
-//         nodes[v1].id = v1;
-//     }
-//     if (nodes.find(v2) == nodes.end()) {
-//         nodes[v2] = TreeNode();
-//         nodes[v2].id = v2;
-//     }
-
-//     // Check if the edge already exists using std::find_if
-//     auto& edge_list = edges[v1];
-//     auto it = std::find_if(edge_list.begin(), edge_list.end(), [v2](const TimeEdge& edge) {
-//         return edge.v2 == v2;
-//     });
-
-//     if (it != edge_list.end()) {
-//         // Edge exists, add the time instance
-//         it->time_instances.insert(timeinstance);
-//     } else {
-//         // Edge doesn't exist, create a new TimeEdge
-//         TimeEdge new_edge = {v1, v2, {timeinstance}};
-//         edges[v1].push_back(new_edge);
-//         edges[v2].push_back(new_edge);  // For undirected graph
-//     }
-
-//     // Add neighbor labels
-//     nodes[v1].neighbor_labels.insert(v2);
-//     nodes[v2].neighbor_labels.insert(v1);
-// }
 
 void Graph::add_edge(int v1, int v2, int timeinstance) {
     // Ensure nodes exist
