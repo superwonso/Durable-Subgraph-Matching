@@ -77,11 +77,50 @@ set<int> TS(int v1, int v2) {
     return result;
 }
 
-// Function prototypes
-void fill_node(TreeNode* c, int v, set<int> TS_set, Graph& G, int k);
-void fill_root(TreeNode* root);
-Tree* init_tree(Tree* T);
-Graph read_graph_from_file(const string& filename);
+// Decompose graph into tree and non-tree edge set
+Tree* convert_graph_to_tree(Graph G) {
+    Tree* T = new Tree();
+    T->root = new TreeNode();
+    T->root->label = 0;
+    T->root->parent = nullptr;
+    T->root->children = {};
+    T->root->V_cand = {};
+    T->root->bloom_filter = new BloomFilter(100, 3);
+    
+    // Initialize the root's candidate set
+    for (const auto& pair : G.nodes) {
+        T->root->V_cand.insert(pair.first);
+    }
+
+    for (const auto& pair : G.nodes) {
+        int v = pair.first;
+        TreeNode* parent = T->root;
+
+        for (int neighbor : pair.second.neighbor_labels) {
+            if (v < neighbor) {
+                TreeNode* child = new TreeNode();
+                child->label = neighbor;
+                child->parent = parent;
+                child->children = {};
+                child->V_cand = {};
+                child->bloom_filter = new BloomFilter(100, 3);
+
+                // Initialize the candidate set for the child node
+                for (const auto& pair : G.nodes) {
+                    if (pair.second.label == neighbor) {
+                        child->V_cand.insert(pair.first);
+                    }
+                }
+
+                parent->children.push_back(child);
+                parent = child;
+            }
+        }
+    }
+
+    return T;
+}
+
 
 // Algorithm 1: GrowTDTree
 Tree* GrowTDTree(Graph G, Graph Q, Tree* T, int k) {
@@ -89,6 +128,7 @@ Tree* GrowTDTree(Graph G, Graph Q, Tree* T, int k) {
     ::q = Q;
     ::k = k;
     T = init_tree(T);
+    cout << "Tree initialized" << endl;
     fill_root(T->root);
 
     for (TreeNode* c : T->root->children) {
@@ -115,8 +155,10 @@ void fill_node(TreeNode* c, int v, set<int> TS_set, Graph& G, int k) {
     TreeNode* b = new TreeNode;
     b->label = v;
     b->V_cand = {};
+    cout << "Def bloom filter" << endl;
     b->bloom_filter = new BloomFilter(100, 3); // Initialize BloomFilter for the new node
     c->children.push_back(b);
+    cout << "Def vars" << endl;
 
     for (int v_prime : G.nodes[v].neighbor_labels) {
         if (!tree_edge_test(v_prime, v, c, c->parent)) continue;
@@ -132,7 +174,7 @@ void fill_node(TreeNode* c, int v, set<int> TS_set, Graph& G, int k) {
         if (c->children.empty()) {
             // Assuming TS is a function that returns a set
             set<int> TS_result = TS(v, v_prime);
-            // Attach TS_result to v_prime (not shown, as implementation detail is missing)
+            // Attach TS_result to v_prime
         } else {
             for (TreeNode* c_prime : c->children) {
                 fill_node(c_prime, v_prime, TS_intersect, G, k);
@@ -153,15 +195,45 @@ void fill_root(TreeNode* root) {
     }
 }
 
-// init_tree function
-Tree* init_tree(Tree* T) {
-    // Initialize the tree T here
-    T->root = new TreeNode;
-    T->root->parent = nullptr;  // Root's parent is undefined
-    T->root->V_cand = {0, 1, 2};  // Example candidate vertices for the root
-    T->root->bloom_filter = new BloomFilter(100, 3); // Initialize BloomFilter for the root
-    return T;
+Tree* init_tree(const Tree* query_tree) {
+    // Create a new tree T (TD-tree) based on the structure of the input query tree
+    Tree* td_tree = new Tree();
+    
+    // Initialize the root node of the TD-tree based on the query tree's root
+    td_tree->root = new TreeNode();
+    td_tree->root->label = query_tree->root->label;
+    td_tree->root->parent = nullptr;
+    td_tree->root->children = {};
+    td_tree->root->V_cand = {}; // Candidate set will be filled later
+    td_tree->root->bloom_filter = new BloomFilter(100, 3); // Example BloomFilter initialization
+
+    // Recursive helper function to initialize the TD-tree based on the query tree
+    function<void(TreeNode*, TreeNode*)> init_subtree = [&](TreeNode* td_node, TreeNode* query_node) {
+        // For each child in the query tree, create the corresponding child in the TD-tree
+        for (TreeNode* query_child : query_node->children) {
+            // Create a new child node for the TD-tree
+            TreeNode* td_child = new TreeNode();
+            td_child->label = query_child->label;
+            td_child->parent = td_node;
+            td_child->children = {};
+            td_child->V_cand = {}; // Candidate set will be filled later
+            td_child->bloom_filter = new BloomFilter(100, 3); // Initialize BloomFilter for each child node
+
+            // Add the child node to the current TD-tree node
+            td_node->children.push_back(td_child);
+
+            // Recursively initialize the children of this node
+            init_subtree(td_child, query_child);
+        }
+    };
+
+    // Initialize the entire tree structure recursively
+    init_subtree(td_tree->root, query_tree->root);
+
+    return td_tree;
 }
+
+
 
 int main() {
     clock_t start, finish;
@@ -169,11 +241,13 @@ int main() {
     Tree* T = new Tree;
 
     start = clock();
-
+    cout << "Start" << endl;
     Graph G = read_graph_from_file("../Dataset/testdata.txt");
+    cout << "Graph G read" << endl;
     Graph Q = read_graph_from_file("../Dataset/query.txt");
-
+    cout << "Graph Q read" << endl;
     Tree* result = GrowTDTree(G, Q, T, k);
+    cout << "Tree grown" << endl;
     // Further processing with result
 
     finish = clock();

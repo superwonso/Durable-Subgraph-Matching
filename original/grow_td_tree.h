@@ -18,9 +18,9 @@ bool non_tree_edge_test(int v, TreeNode* node);
 set<int> TS(int v1, int v2);
 void fill_node(TreeNode* c, int v, set<int> TS_set, Graph& G, int k);
 void fill_root(TreeNode* root);
-Tree* init_tree(Tree* T);
-Graph read_graph_from_file(const string& filename);
+Tree* init_tree(const Tree* query_tree);
 Tree* GrowTDTree(Graph G, Graph Q, Tree* T, int k);
 set<int> custom_set_intersection(const set<int>& set1, const set<int>& set2);
+Tree* convert_graph_to_tree(Graph G);
 
 #endif // GROW_TD_TREE_H

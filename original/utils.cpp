@@ -78,7 +78,7 @@ Graph read_query_graph_from_file(const string& filename) {
             G.nodes[node2] = node;
         }
 
-        // Add the edge with the time instance
+        // Add the edge without the time instance
         G.add_edge(node1, node2, NULL);
     }
 
