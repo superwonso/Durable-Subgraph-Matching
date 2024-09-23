@@ -37,11 +37,14 @@ g++ -Wall -Wextra -g3 -O3 main.cpp utils.cpp grow_td_tree.cpp match_td_tree.cpp 
 
 
 
-| Datasets | link |
+| Datasets | Link |
 | --- | --- |
 | bitcoin-temporal | https://www.cs.cornell.edu/~arb/data/temporal-bitcoin/ |
 |  |  |
 
 # References
 
+| Elements | Link |
+| --- | --- |
 | TurboISO | https://github.com/bookug/siep |
+|  |  |
