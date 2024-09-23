@@ -15,7 +15,79 @@ int k = 3; // Threshold
 using namespace std;
 
 // Function to read graph from file
-Graph read_graph_from_file(const string& filename) {
+// Graph read_graph_from_file(const string& filename) {
+//     ifstream file(filename);
+//     Graph G;
+//     string line;
+
+//     // Seed the random number generator
+//     srand(static_cast<unsigned int>(time(0)));
+
+//     while (getline(file, line)) {
+//         stringstream ss(line);
+//         int node1, node2, duration;
+//         ss >> node1 >> node2 >> duration;
+
+//         // Ensure node1 exists and assign a random label (1, 2, or 3)
+//         if (G.nodes.find(node1) == G.nodes.end()) {
+//             TreeNode node;
+//             node.id = node1;
+//             node.label = rand() % 3 + 1; // Random label between 1 and 3
+//             G.nodes[node1] = node;
+//         }
+
+//         // Ensure node2 exists and assign a random label (1, 2, or 3)
+//         if (G.nodes.find(node2) == G.nodes.end()) {
+//             TreeNode node;
+//             node.id = node2;
+//             node.label = rand() % 3 + 1; // Random label between 1 and 3
+//             G.nodes[node2] = node;
+//         }
+
+//         // Add the edge with the time instance
+//         G.add_edge(node1, node2, duration);
+//     }
+
+//     return G;
+// }
+// Graph read_graph_from_file(const string& filename, const set<int>& available_labels) {
+//     ifstream file(filename);
+//     Graph G;
+//     string line;
+
+//     // Seed the random number generator
+//     srand(static_cast<unsigned int>(time(0)));
+
+//     while (getline(file, line)) {
+//         stringstream ss(line);
+//         int node1, node2, duration;
+//         ss >> node1 >> node2 >> duration;
+
+//         // Ensure node1 exists and assign a random label from the available_labels set
+//         if (G.nodes.find(node1) == G.nodes.end()) {
+//             TreeNode node;
+//             node.id = node1;
+//             // Randomly assign a label from available_labels
+//             node.label = *next(available_labels.begin(), rand() % available_labels.size());
+//             G.nodes[node1] = node;
+//         }
+
+//         // Ensure node2 exists and assign a random label from the available_labels set
+//         if (G.nodes.find(node2) == G.nodes.end()) {
+//             TreeNode node;
+//             node.id = node2;
+//             // Randomly assign a label from available_labels
+//             node.label = *next(available_labels.begin(), rand() % available_labels.size());
+//             G.nodes[node2] = node;
+//         }
+
+//         // Add the edge with the time instance
+//         G.add_edge(node1, node2, duration);
+//     }
+
+//     return G;
+// }
+Graph read_graph_from_file(const string& filename, const set<int>& available_labels) {
     ifstream file(filename);
     Graph G;
     string line;
@@ -31,16 +103,16 @@ Graph read_graph_from_file(const string& filename) {
         // Ensure node1 exists and assign a random label (1, 2, or 3)
         if (G.nodes.find(node1) == G.nodes.end()) {
             TreeNode node;
-            node.id = node1;
-            node.label = rand() % 3 + 1; // Random label between 1 and 3
+            node.id = node1;  // Node ID remains the original value
+            node.label = rand() % 3 + 1;  // Random label between 1 and 3
             G.nodes[node1] = node;
         }
 
         // Ensure node2 exists and assign a random label (1, 2, or 3)
         if (G.nodes.find(node2) == G.nodes.end()) {
             TreeNode node;
-            node.id = node2;
-            node.label = rand() % 3 + 1; // Random label between 1 and 3
+            node.id = node2;  // Node ID remains the original value
+            node.label = rand() % 3 + 1;  // Random label between 1 and 3
             G.nodes[node2] = node;
         }
 

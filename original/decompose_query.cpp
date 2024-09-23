@@ -37,6 +37,7 @@ using namespace std;
 //         return numeric_limits<double>::max(); // Returns the maximum value to prevent it from being selected
 //     }
 // }
+
 double calculate_selectivity(int vertex, const Graph& G, const Graph& Q) {
     int label_count = 0;
     auto it = Q.nodes.find(vertex);
@@ -50,6 +51,8 @@ double calculate_selectivity(int vertex, const Graph& G, const Graph& Q) {
         // If label_count is zero, it means this label is not present in G
         if (label_count == 0) {
             cerr << "Label " << vertex_label << " of vertex " << vertex << " not found in data graph G." << endl;
+        } else {
+            cout << "label count isnt zero" << endl;
         }
         return static_cast<double>(label_count) / it->second.degree;
     } else {
@@ -78,6 +81,7 @@ double calculate_selectivity(int vertex, const Graph& G, const Graph& Q) {
 //         }
 //     }
 // }
+
 void dfs_build_tree(int u, const Graph& Q, Tree* T, set<int>& visited, unordered_set<int>& non_tree_edges) {
     visited.insert(u);
 

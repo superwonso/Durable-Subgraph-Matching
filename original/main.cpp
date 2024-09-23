@@ -13,13 +13,13 @@ extern int k;  // Global variable k
 int main() {
     clock_t start, finish;
     double duration;
-
+    set<int> available_labels = {1, 2, 3};  // Set of available labels
     // Load the graph data from files
     cout << "Loading graph data..." << endl;
-    Graph G = read_graph_from_file("../Dataset/testdata.txt");
+    Graph G = read_graph_from_file("../Dataset/testdata.txt", available_labels);
     cout << "Graph data loaded." << endl;
     cout << "Loading query data..." << endl;
-    Graph Q = read_graph_from_file("../Dataset/Query.txt");
+    Graph Q = read_graph_from_file("../Dataset/Query.txt", available_labels);
     cout << "Query data loaded." << endl;
     
     Tree* T = new Tree;
@@ -35,6 +35,7 @@ int main() {
     // Phase 2: Search for Candidate Vertex Matchings
     cout << "Phase 2: Search for Candidate Vertex Matchings..." << endl;
     T = GrowTDTree(G, Q, T, k);
+    save_tree_to_file(T, "./grow_td_tree.txt");
     cout << "Candidate Vertex Matchings found." << endl;
     save_tree_to_file(T, "./candidates.txt");
     // Phase 3: Enumeration of Durable Subgraph Matchings

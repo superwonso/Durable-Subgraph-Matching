@@ -57,7 +57,7 @@ extern Graph Q;
 // Function declarations
 void save_graph_to_file(Graph G, const string& filename);
 void save_tree_to_file(Tree* T, const string& filename);
-Graph read_graph_from_file(const string& filename);
+Graph read_graph_from_file(const string& filename, const set<int>& available_labels);
 Graph read_query_graph_from_file(const string& filename);
 
 #endif // UTILS_H
