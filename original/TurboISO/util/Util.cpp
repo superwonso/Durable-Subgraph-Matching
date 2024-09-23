@@ -59,9 +59,12 @@ Util::process_mem_usage(double& vm_usage, double& resident_set)
                >> utime >> stime >> cutime >> cstime >> priority >> nice
                >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
 
-   stat_stream.close();
-
-   long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
+    stat_stream.close();
+    SYSTEM_INFO sysInfo; // for windows
+    GetSystemInfo(&sysInfo); // for windows
+    DWORD pageSize = sysInfo.dwPageSize;// for windows
+//    long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages , for linux
+   long page_size_kb = pageSize / 1024; // for windows
    vm_usage     = vsize / 1024.0;
    resident_set = rss * page_size_kb;
 }
@@ -229,42 +232,94 @@ Util::intersect(vector<int>& res, vector<int>& tmp)
     res = res2;
 }
 
-void myTimeout(int signo)
-{
-    switch(signo)
-    {
-        case SIGALRM:
-            printf("This query runs time out!\n");
-            exit(1);
-        default:
-            break;
-    }
+// void myTimeout(int signo)
+// {
+//     switch(signo)
+//     {
+//         case SIGALRM:
+//             printf("This query runs time out!\n");
+//             exit(1);
+//         default:
+//             break;
+//     }
+// }
+
+
+// void 
+// Util::timeLimit(int seconds)
+// {
+//     struct itimerval tick;
+//     //signal(SIGALRM, exit);
+//     signal(SIGALRM, myTimeout);
+//     memset(&tick, 0, sizeof(tick));
+//     //Timeout to run first time
+//     tick.it_value.tv_sec = seconds;
+//     tick.it_value.tv_usec = 0;
+//     //After first, the Interval time for clock
+//     tick.it_interval.tv_sec = seconds;
+//     tick.it_interval.tv_usec = 0;
+//     if(setitimer(ITIMER_REAL, &tick, NULL) < 0)
+//         printf("Set timer failed!\n");
+// }
+
+
+// void 
+// Util::noTimeLimit()
+// {
+//     struct itimerval tick;
+//     memset(&tick, 0, sizeof(tick));
+//     if(setitimer(ITIMER_REAL, &tick, NULL) < 0)
+//         printf("Withdraw timer failed!\n");
+// }
+
+
+
+// for windows
+void CALLBACK myTimeout(LPVOID lpArg, DWORD dwTimerLowValue, DWORD dwTimerHighValue) {
+    printf("This query runs time out!\n");
+    // 타이머 만료 시 프로그램을 종료
+    exit(1);
 }
+
+HANDLE hTimer = NULL;
+LARGE_INTEGER liDueTime;
 
 void 
 Util::timeLimit(int seconds)
 {
-    struct itimerval tick;
-    //signal(SIGALRM, exit);
-    signal(SIGALRM, myTimeout);
-    memset(&tick, 0, sizeof(tick));
-    //Timeout to run first time
-    tick.it_value.tv_sec = seconds;
-    tick.it_value.tv_usec = 0;
-    //After first, the Interval time for clock
-    tick.it_interval.tv_sec = seconds;
-    tick.it_interval.tv_usec = 0;
-    if(setitimer(ITIMER_REAL, &tick, NULL) < 0)
-        printf("Set timer failed!\n");
+    hTimer = CreateWaitableTimer(NULL, TRUE, NULL);
+    if (hTimer == NULL) {
+        printf("CreateWaitableTimer failed (%d)\n", GetLastError());
+        return;
+    }
+
+    // 타이머 만료 시간을 설정 (seconds를 100ns 단위로 변환)
+    liDueTime.QuadPart = -seconds * 10000000LL;  // 음수로 설정해 바로 타이머 작동
+
+    // 타이머 설정 (두 번째 인자에서 주어진 시간 후에 타이머가 만료됨)
+    if (!SetWaitableTimer(hTimer, &liDueTime, 0, myTimeout, NULL, FALSE)) {
+        printf("SetWaitableTimer failed (%d)\n", GetLastError());
+        return;
+    }
+
+    // 타이머가 만료되기를 기다림 (필요 시 비동기적으로 처리 가능)
+    printf("Waiting for timer...\n");
+    WaitForSingleObject(hTimer, INFINITE);
+
+    // 타이머 객체를 닫음
+    CloseHandle(hTimer);
 }
 
-void 
-Util::noTimeLimit()
-{
-    struct itimerval tick;
-    memset(&tick, 0, sizeof(tick));
-    if(setitimer(ITIMER_REAL, &tick, NULL) < 0)
-        printf("Withdraw timer failed!\n");
+void Util::noTimeLimit(HANDLE hTimer) {
+    // 타이머 핸들이 유효한지 확인 후 해제
+    if (hTimer != NULL) {
+        if (!CancelWaitableTimer(hTimer)) {
+            printf("Withdraw timer failed (%d)\n", GetLastError());
+        } else {
+            printf("Timer successfully withdrawn.\n");
+        }
+
+        // 타이머 객체 해제
+        CloseHandle(hTimer);
+    }
 }
-
-

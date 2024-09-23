@@ -1,6 +1,6 @@
-#include "util.h"
+#include "util/Util.h"
 
-#include "../control.h"
+#include "util.h"
 
 using namespace std;
 
@@ -1283,7 +1283,8 @@ int main(int argc, char** argv) {
             timeLimit(TIME_LIMIT_SECONDS);
 			if(CheckQ(q, g))  //check the maximum label num
 				TurboISO(q, g, fpR);
-            noTimeLimit();
+            noTimeLimit(hTimer); // for windows
+			// noTimeLimit(); // for linux
 #ifdef _PRINT_ANS	
 			fprintf(fpR, "\n\n\n");
 			fflush(fpR);

@@ -33,6 +33,7 @@
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/stat.h>
+/* ---- for Linux headers ----
 #include <sys/mman.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
@@ -41,6 +42,13 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+----  */
+
+
+/* ---- for Windows headers  */
+#include <windows.h>
+#include <synchapi.h>
+// ---- */
 
 //NOTICE:below are restricted to C++, C files should not include(maybe nested) this header!
 #include <bitset>
@@ -93,7 +101,9 @@ public:
     static void intersect(std::vector<int>& res, std::vector<int>& tmp);
     static void process_mem_usage(double& vm_usage, double& resident_set);
     static void timeLimit(int seconds);
-    static void noTimeLimit();
+    // static void noTimeLimit(); // for Linux
+    static void noTimeLimit(HANDLE hTimer); // for Windows
+
 };
 
 #endif //_UTIL_UTIL_H

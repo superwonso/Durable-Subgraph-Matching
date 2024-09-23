@@ -39,13 +39,21 @@ with TurboISO, and finally verify each answer according to the real graph restri
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
-#include <sys/wait.h>
 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <arpa/inet.h>
+/* ---- for Linux headers ----
+// #include <sys/mman.h>
+// #include <sys/wait.h>
+
+// #include <sys/socket.h>
+// #include <netinet/in.h>
+// #include <netdb.h>
+// #include <arpa/inet.h>
+---- */
+
+/* ---- for Windows headers  */
+#include <windows.h>
+#include <synchapi.h>
+// ---- */
 
 //NOTICE:below are restricted to C++, C files should not include(maybe nested) this header!
 #include <bitset>
@@ -68,13 +76,13 @@ with TurboISO, and finally verify each answer according to the real graph restri
 #include <new>
 
 //NOTICE:below are libraries need to link
-//#include <thread>    //only for c++11 or greater versions
-//#include <atomic> 
-//#include <mutex> 
-//#include <condition_variable> 
-//#include <future> 
-//#include <memory> 
-//#include <stdexcept> 
+#include <thread>    //only for c++11 or greater versions
+#include <atomic> 
+#include <mutex> 
+#include <condition_variable> 
+#include <future> 
+#include <memory> 
+#include <stdexcept> 
 #include <pthread.h> 
 #include <math.h>
 #include <readline/readline.h>
@@ -660,45 +668,112 @@ void process_mem_usage(double& vm_usage, double& resident_set) {
                >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
 
    stat_stream.close();
-
-   long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
-   vm_usage     = vsize / 1024.0;
+   
+	SYSTEM_INFO sysInfo; // for windows
+    DWORD pageSize = sysInfo.dwPageSize;// for windows
+//    long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages , for linux
+   long page_size_kb = pageSize / 1024; // for windows   vm_usage     = vsize / 1024.0;
    resident_set = rss * page_size_kb;
 }
 
-void myTimeout(int signo) {
-    switch(signo) {
-        case SIGALRM:
-            printf("This query runs time out!\n");
-            exit(1);
-        default:
-            break;
+// void myTimeout(int signo) {
+//     switch(signo) {
+//         case SIGALRM:
+//             printf("This query runs time out!\n");
+//             exit(1);
+//         default:
+//             break;
+//     }
+// }
+
+// void timeLimit(int seconds) {
+//     struct itimerval tick;
+//     //signal(SIGALRM, exit);
+//     signal(SIGALRM, myTimeout);
+//     memset(&tick, 0, sizeof(tick));
+//     //Timeout to run first time
+//     tick.it_value.tv_sec = seconds;
+//     tick.it_value.tv_usec = 0;
+//     //After first, the Interval time for clock
+//     tick.it_interval.tv_sec = seconds;
+//     tick.it_interval.tv_usec = 0;
+//     if(setitimer(ITIMER_REAL, &tick, NULL) < 0)
+//         printf("Set timer failed!\n");
+// }
+
+
+// void noTimeLimit() {
+//     struct itimerval tick;
+//     memset(&tick, 0, sizeof(tick));
+//     if(setitimer(ITIMER_REAL, &tick, NULL) < 0)
+//         printf("Withdraw timer failed!\n");
+// }
+
+
+
+// for windows 
+
+HANDLE hTimer = NULL;
+LARGE_INTEGER liDueTime;
+
+void CALLBACK myTimeout(LPVOID lpArg, DWORD dwTimerLowValue, DWORD dwTimerHighValue) {
+    printf("This query runs time out!\n");
+    // ??? ?? ? ????? ??
+    exit(1);
+}
+
+void timeLimit(int seconds)
+{
+    hTimer = CreateWaitableTimer(NULL, TRUE, NULL);
+    if (hTimer == NULL) {
+        printf("CreateWaitableTimer failed (%d)\n", GetLastError());
+        return;
+    }
+
+    // ??? ?? ??? ?? (seconds? 100ns ??? ??)
+    liDueTime.QuadPart = -seconds * 10000000LL;  // ??? ??? ?? ??? ??
+
+    // ??? ?? (? ?? ???? ??? ?? ?? ???? ???)
+    if (!SetWaitableTimer(hTimer, &liDueTime, 0, myTimeout, NULL, FALSE)) {
+        printf("SetWaitableTimer failed (%d)\n", GetLastError());
+        return;
+    }
+
+    // ???? ????? ??? (?? ? ?????? ?? ??)
+    printf("Waiting for timer...\n");
+    WaitForSingleObject(hTimer, INFINITE);
+
+    // ??? ??? ??
+    CloseHandle(hTimer);
+}
+
+void noTimeLimit(HANDLE hTimer) {
+    // ??? ??? ???? ?? ? ??
+    if (hTimer != NULL) {
+        if (!CancelWaitableTimer(hTimer)) {
+            printf("Withdraw timer failed (%d)\n", GetLastError());
+        } else {
+            printf("Timer successfully withdrawn.\n");
+        }
+
+        // ??? ?? ??
+        CloseHandle(hTimer);
     }
 }
 
-void timeLimit(int seconds) {
-    struct itimerval tick;
-    //signal(SIGALRM, exit);
-    signal(SIGALRM, myTimeout);
-    memset(&tick, 0, sizeof(tick));
-    //Timeout to run first time
-    tick.it_value.tv_sec = seconds;
-    tick.it_value.tv_usec = 0;
-    //After first, the Interval time for clock
-    tick.it_interval.tv_sec = seconds;
-    tick.it_interval.tv_usec = 0;
-    if(setitimer(ITIMER_REAL, &tick, NULL) < 0)
-        printf("Set timer failed!\n");
+void noTimeLimit(HANDLE hTimer) {
+    // ??? ??? ???? ?? ? ??
+    if (hTimer != NULL) {
+        if (!CancelWaitableTimer(hTimer)) {
+            printf("Withdraw timer failed (%d)\n", GetLastError());
+        } else {
+            printf("Timer successfully withdrawn.\n");
+        }
+
+        // ??? ?? ??
+        CloseHandle(hTimer);
+    }
 }
-
-void noTimeLimit() {
-    struct itimerval tick;
-    memset(&tick, 0, sizeof(tick));
-    if(setitimer(ITIMER_REAL, &tick, NULL) < 0)
-        printf("Withdraw timer failed!\n");
-}
-
-
 
 #endif
 
