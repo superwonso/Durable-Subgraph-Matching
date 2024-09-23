@@ -8,9 +8,7 @@ This repository is the implementation code about DongHyeon Cha’s Master Degree
 
 AMD Ryzen Threadripper PRO 5955WX
 
-DDR4 ECC 128GB @ 3200Mhz, Octa Channal
-
-Samsung SSD 990 Pro
+DDR4 ECC 128GB @ 3200Mhz
 
 Ubuntu 23.04 LTS
 
@@ -30,7 +28,9 @@ g++ -Wall -Wextra -g3 -O3 main.cpp utils.cpp grow_td_tree.cpp match_td_tree.cpp 
 
 | Algorithm | Paper |
 | --- | --- |
-| DSM | https://ieeexplore.ieee.org/document/9706278 |
+| DSM | Durable Subgraph Matching on Temporal Graphs |
+| TiNLA | TurboISO: Towards Ultrafast and Robust Subgraph Isomorphism Search in Large Graph Databases |
+| CECI | CECI: Compact Embedding Cluster Index for Scalable Subgraph Matching |
 |  |  |
 
 # Datasets
@@ -46,5 +46,5 @@ g++ -Wall -Wextra -g3 -O3 main.cpp utils.cpp grow_td_tree.cpp match_td_tree.cpp 
 
 | Elements | Link |
 | --- | --- |
-| TurboISO | https://github.com/bookug/siep |
+| TiNLA | https://github.com/bookug/siep |
 |  |  |
