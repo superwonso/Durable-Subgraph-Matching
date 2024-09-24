@@ -20,7 +20,11 @@ g++ (c++17)
 
 # Build Command
 
-g++ -Wall -Wextra -g3 -O3 main.cpp utils.cpp grow_td_tree.cpp match_td_tree.cpp trim_td_tree.cpp decompose_query.cpp bloom_filter.cpp -o main.exe
+g++ -Wall -Wextra -g3 -O3 -std=c++17 main.cpp BloomFilter.cpp Graph.cpp TDTreeNode.cpp TDTree.cpp -o td_tree.o
+
+# Method
+
+td_tree.o {data_graph} {query_graph} {threshold(integer)}
 
 # Compared algorithms
 
