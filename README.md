@@ -1,7 +1,5 @@
 # Enhanced Durable Subgraph Matching
 
-
-
 This repository is the implementation code about DongHyeon Cha’s Master Degree Thesis
 
 # Experiments Spec
@@ -26,9 +24,11 @@ g++ -Wall -Wextra -g3 -O3 -std=c++17 main.cpp BloomFilter.cpp Graph.cpp TDTreeNo
 
 td_tree.o {data_graph} {query_graph} {threshold(integer)}
 
+# Papers 
+
+동적 그래프에서 지속 가능한 서브 그래프 매칭 방법(Durable Subgraph Matching Method in Dynamic Graph), Cha et al., KoCon.a 2024 Conference, (2024) 
+
 # Compared algorithms
-
-
 
 | Algorithm | Paper |
 | --- | --- |
