@@ -7,6 +7,7 @@
 #include <limits>
 #include "utils.h"
 #include "decompose_query.h"
+#include "TurboISO/Graph.h"
 
 using namespace std;
 
