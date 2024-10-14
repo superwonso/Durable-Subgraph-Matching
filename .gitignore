@@ -39,3 +39,6 @@
 bitcoin-*.*
 output.*
 candidates.*
+
+# Other repo
+./TurboISO
