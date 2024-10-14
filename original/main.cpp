@@ -3,10 +3,18 @@
 #include "query_decomposition.h"
 #include "Utils.h"
 
-int main(){
+int main(int argc, char* argv[]){
     // File paths for the temporal graph and query graph
-    std::string temporalGraphFile = "temporal_graph.txt";
-    std::string queryGraphFile = "query_graph.txt";
+
+    if(argc != 4){
+        std::cerr << "사용법: " << argv[0] << " <데이터 그래프 파일> <쿼리 그래프 파일> <최소 지속 기간 k>\n";
+        return 1;
+    }
+
+    std::string temporalGraphFile = argv[1];
+    std::string queryGraphFile = argv[2];
+    // Minimum duration threshold
+    int k = std::stoi(argv[3]);
 
     // Read the temporal graph
     Graph temporalGraph;
@@ -33,9 +41,6 @@ int main(){
 
     // Perform query decomposition
     QueryDecomposition qd = decomposeQuery(queryGraph, label_counts);
-
-    // Minimum duration threshold
-    int k = 3; // Example value, set as needed
 
     // Create and build the TDTree
     TDTree tdTree(temporalGraph, qd, k);
