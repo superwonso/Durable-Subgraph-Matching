@@ -1,52 +1,70 @@
-// TDTree.h
 #ifndef TDTREE_H
 #define TDTREE_H
 
-#include "Graph.h"
-#include "TDTreeNode.h"
-#include <string>
 #include <vector>
-#include <map>
-#include <utility>
+#include <unordered_set>
+#include <memory>
+#include "query_decomposition.h"
+#include "Utils.h"
 
+// Structure: TDTreeBlock
+struct TDTreeBlock {
+    int v_par; // Parent vertex in the data graph
+    std::vector<int> V_cand; // Candidate vertices for the current query vertex
+    std::unordered_set<int> TS; // Time instance set (only for leaf nodes)
+
+    TDTreeBlock(int parent_vertex) : v_par(parent_vertex) {}
+};
+
+// Structure: TDTreeNode
+struct TDTreeNode {
+    int query_vertex_id; // ID of the query vertex
+    std::vector<TDTreeBlock> blocks; // List of blocks
+    std::unique_ptr<BloomFilter> bloom; // Bloom filter for internal nodes
+    bool isLeaf; // Indicates if the node is a leaf
+
+    TDTreeNode(int q_vid, size_t bloom_size = 1000, size_t num_hashes = 3)
+        : query_vertex_id(q_vid), isLeaf(false) {
+        bloom = std::make_unique<BloomFilter>(bloom_size, num_hashes);
+    }
+};
+
+// Class: TDTree
 class TDTree {
 public:
-    TDTreeNode* root;
-    Graph dataGraph;
-    Graph queryGraph;
-    int k; // 최소 지속 기간
+    // Constructor
+    TDTree(const Graph& temporal_graph, const QueryDecomposition& decomposition, int k);
 
-    TDTree(const Graph& data, const Graph& query, int durationThreshold);
-    ~TDTree();
+    // Build the TD-Tree
+    void build();
 
-    void buildTDTree(const std::vector<std::pair<int, int>>& nonTreeEdges);
-    void printTDTree(TDTreeNode* node, int level = 0) const;
-
-    // 트리 트리밍
-    void trimTDTree();
-
-    // 매칭 열거
-    std::vector<std::map<int, int>> enumerateDurableMatchings();
+    // Print the TD-Tree (for debugging)
+    void print() const;
 
 private:
-    // 후보 정점 찾기
+    const Graph& G; // Temporal graph
+    const QueryDecomposition& QD; // Query decomposition result
+    int k_threshold; // Minimum duration threshold
+
+    std::vector<std::unique_ptr<TDTreeNode>> nodes; // List of TD-Tree nodes
+
+    // Internal methods for tree construction
+    void growTDTree();
+    void trimTDTree();
+    void initTree(const std::unordered_map<std::string, int>& label_counts);
     void fillRoot();
-    void buildTDTreeRecursive(TDTreeNode* node, const std::vector<std::pair<int, int>>& nonTreeEdges);
+    void fillNode(TDTreeNode* current_node, int parent_vertex, const std::unordered_set<int>& TS_set);
+    void removeBlock(TDTreeNode* node, int block_index);
 
-    // 지속 기간 계산
-    int getDuration(int vertex) const;
+    // Helper methods for trimming
+    void trimTopDown();
+    void trimBottomUp();
 
-    // 정점의 차수 계산
-    int getDegree(int vertex, const Graph& graph) const;
+    // Non-tree edge verification
+    bool nonTreeEdgeTest(int v_prime, TDTreeNode* current_node) const;
 
-    // 정점의 이웃 라벨 중 고유한 라벨 수 계산
-    int getDistinctNeighborLabels(int vertex, const Graph& graph) const;
-
-    // 특정 엣지가 데이터 그래프에 존재하는지 확인
-    bool edgeExists(int from, int to) const;
-
-    // 매칭 검증
-    bool verifyMatching(const std::map<int, int>& matching) const;
+    // Reference to label counts for selectivity
+    const std::unordered_map<std::string, int>& label_counts_;
 };
 
 #endif // TDTREE_H

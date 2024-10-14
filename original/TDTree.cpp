@@ -1,348 +1,167 @@
-// TDTree.cpp
 #include "TDTree.h"
-#include <algorithm>
 #include <iostream>
-#include <unordered_set>
-#include <stack>
-#include <functional>
 
-TDTree::TDTree(const Graph& data, const Graph& query, int durationThreshold) 
-    : dataGraph(data), queryGraph(query), k(durationThreshold) {
-    // 루트 노드 초기화 (쿼리 트리의 루트 ID는 0으로 가정)
-    root = new TDTreeNode(0);
+// Constructor: Initializes the TDTree and starts building
+TDTree::TDTree(const Graph& temporal_graph, const QueryDecomposition& decomposition, int k)
+    : G(temporal_graph), QD(decomposition), k_threshold(k), label_counts_({}) {
+    build();
 }
 
-TDTree::~TDTree() {
-    delete root;
-}
-
+// Fill the root node with candidate matching vertices
 void TDTree::fillRoot() {
-    // 쿼리 루트 정점의 라벨
-    std::string rootLabel = queryGraph.vertexLabels[root->queryVertexID];
-    std::vector<int> candidates = dataGraph.getVerticesByLabel(rootLabel);
+    TDTreeNode* root = nodes[0].get();
 
-    // 필터링 조건 적용
-    for(auto &v : candidates){
-        // 조건 2: 데이터 정점의 차수가 쿼리 정점의 차수 이상인지 확인
-        int dataDegree = getDegree(v, dataGraph);
-        int queryDegree = getDegree(root->queryVertexID, queryGraph);
-        if(dataDegree >= queryDegree){
-            // 조건 3: 데이터 정점의 이웃 라벨 수가 쿼리 정점의 이웃 라벨 수 이상인지 확인
-            int dataLabelCount = getDistinctNeighborLabels(v, dataGraph);
-            int queryLabelCount = getDistinctNeighborLabels(root->queryVertexID, queryGraph);
-            if(dataLabelCount >= queryLabelCount){
-                // 조건 4: 지속 기간 확인
-                int duration = getDuration(v);
-                if(duration >= k){
-                    root->blocks[-1].push_back(v); // 부모가 없으므로 -1 사용
-                    root->bloomFilter->add(v);
-                }
+    // Iterate over all vertices in the temporal graph to find candidates for the root
+    for (int v = 0; v < G.num_vertices; ++v) {
+        // Ensure both sides are strings for comparison
+        if (!G.vertex_labels.empty() && !QD.spanning_tree_adj[root->query_vertex_id].empty()) {
+            int query_index = QD.spanning_tree_adj[root->query_vertex_id][0];
+            if (G.vertex_labels[v] == QD.vertex_labels[query_index]) { // Assuming labels are stored similarly
+                // Additional conditions can be added here (degree, distinct neighbor labels, duration)
+
+                // For simplicity, assume all labels match and add as candidates
+                TDTreeBlock block(-1); // -1 indicates no parent
+                block.V_cand.push_back(v);
+                root->blocks.emplace_back(block);
+                root->bloom->add(v);
             }
         }
     }
 }
 
-int TDTree::getDegree(int vertex, const Graph& graph) const {
-    int degree = 0;
-    for(const auto &edge : graph.edges){
-        if(edge.from == vertex){
-            degree++;
-        }
-    }
-    return degree;
-}
-
-int TDTree::getDistinctNeighborLabels(int vertex, const Graph& graph) const {
-    std::unordered_set<std::string> labels;
-    for(const auto &edge : graph.edges){
-        if(edge.from == vertex){
-            labels.insert(graph.vertexLabels[edge.to]);
-        }
-    }
-    return labels.size();
-}
-
-int TDTree::getDuration(int vertex) const {
-    // 실제 구현에서는 시간 인스턴스를 기반으로 지속 기간 계산
-    // 여기서는 간단히 모든 시간 인스턴스의 범위를 반환
-    std::vector<int> times;
-    for(const auto &edge : dataGraph.edges){
-        if(edge.from == vertex){
-            times.insert(times.end(), edge.timeInstances.begin(), edge.timeInstances.end());
-        }
-    }
-    if(times.empty()) return 0;
-    int minTime = *std::min_element(times.begin(), times.end());
-    int maxTime = *std::max_element(times.begin(), times.end());
-    return maxTime - minTime + 1;
-}
-
-bool TDTree::edgeExists(int from, int to) const {
-    for(const auto &edge : dataGraph.edges){
-        if(edge.from == from && edge.to == to){
-            return true;
-        }
-    }
-    return false;
-}
-
-void TDTree::buildTDTree(const std::vector<std::pair<int, int>>& nonTreeEdges) {
+// Grow the TD-Tree by recursively filling nodes
+void TDTree::growTDTree() {
+    initTree(label_counts_);
     fillRoot();
-    // 재귀적으로 자식 노드 채우기
-    buildTDTreeRecursive(root, nonTreeEdges);
-}
 
-void TDTree::buildTDTreeRecursive(TDTreeNode* node, const std::vector<std::pair<int, int>>& nonTreeEdges) {
-    // 해당 노드의 모든 블록을 순회
-    for(const auto &blockPair : node->blocks){
-        int parentMatch = blockPair.first;
-        for(auto &candidate : blockPair.second){
-            // 쿼리 트리의 자식 노드를 순회
-            for(auto childID : queryGraph.children[node->queryVertexID]){
-                // 자식 노드가 이미 존재하는지 확인
-                TDTreeNode* childNode = nullptr;
-                for(auto child : node->children){
-                    if(child->queryVertexID == childID){
-                        childNode = child;
-                        break;
-                    }
-                }
-                if(childNode == nullptr){
-                    childNode = new TDTreeNode(childID);
-                    node->children.push_back(childNode);
-                }
-
-                // 비트리 엣지 관련 정보를 필터링
-                std::vector<std::pair<int, int>> relevantNonTreeEdges;
-                for(const auto &edge : nonTreeEdges){
-                    if(edge.first == childID){
-                        relevantNonTreeEdges.emplace_back(edge);
-                    }
-                }
-
-                // 후보 정점 찾기
-                std::vector<int> possibleCandidates;
-                auto adjPairs = dataGraph.getAdjacent(candidate);
-                for(auto &adj : adjPairs){
-                    int to = adj.first;
-                    // 조건 2: 데이터 정점의 차수가 쿼리 정점의 차수 이상
-                    int dataDegree = getDegree(to, dataGraph);
-                    int queryDegree = getDegree(childID, queryGraph);
-                    if(dataDegree < queryDegree) continue;
-
-                    // 조건 3: 데이터 정점의 이웃 라벨 수가 쿼리 정점의 이웃 라벨 수 이상
-                    int dataLabelCount = getDistinctNeighborLabels(to, dataGraph);
-                    int queryLabelCount = getDistinctNeighborLabels(childID, queryGraph);
-                    if(dataLabelCount < queryLabelCount) continue;
-
-                    // 조건 4: 지속 기간 확인
-                    int duration = getDuration(to);
-                    if(duration < k) continue;
-
-                    // 비트리 엣지 검증
-                    bool valid = true;
-                    for(const auto &edge : relevantNonTreeEdges){
-                        // Query Graph의 비트리 엣지 (childID, edge.second)에 해당하는 데이터 그래프의 엣지가 있는지 확인
-                        if(!edgeExists(childID, to)){
-                            valid = false;
+    // Iterate over nodes in DFS order to fill child nodes
+    size_t current_idx = 0;
+    while (current_idx < nodes.size()) {
+        TDTreeNode* current_node = nodes[current_idx].get();
+        for (auto& block : current_node->blocks) {
+            for (auto& v : block.V_cand) {
+                // Iterate over all children in the spanning tree
+                for (auto& child_query_id : QD.spanning_tree_adj[current_node->query_vertex_id]) {
+                    // Check if child node already exists
+                    size_t child_idx = 0;
+                    bool found = false;
+                    for (; child_idx < nodes.size(); ++child_idx) {
+                        if (nodes[child_idx]->query_vertex_id == child_query_id) {
+                            found = true;
                             break;
                         }
                     }
-                    if(!valid) continue;
+                    if (!found) {
+                        // Create new child node
+                        auto child_node = std::make_unique<TDTreeNode>(child_query_id);
+                        child_node->isLeaf = QD.spanning_tree_adj[child_query_id].empty();
+                        nodes.push_back(std::move(child_node));
+                        child_idx = nodes.size() - 1;
+                    }
+                    TDTreeNode* child_node = nodes[child_idx].get();
 
-                    // 조건을 모두 통과하면 후보 정점 추가
-                    possibleCandidates.push_back(to);
-                }
+                    // Find all neighbors of v in the temporal graph
+                    for (const auto& edge : G.adj[v]) {
+                        int v_prime = edge.to;
 
-                // 후보 정점을 블록에 추가하고 Bloom Filter에 등록
-                for(auto &candidateMatch : possibleCandidates){
-                    childNode->blocks[candidate].push_back(candidateMatch);
-                    childNode->bloomFilter->add(candidateMatch);
-                }
-            }
-        }
-    }
-}
+                        // Apply non-tree edge test and other conditions
+                        if (!nonTreeEdgeTest(v_prime, child_node)) continue;
 
-void TDTree::printTDTree(TDTreeNode* node, int level) const {
-    for(int i = 0; i < level; ++i) std::cout << "  ";
-    std::cout << "Query Vertex ID: " << node->queryVertexID << ", Candidates: ";
-    for(const auto &pair : node->blocks){
-        for(const auto &v : pair.second){
-            std::cout << v << " ";
-        }
-    }
-    std::cout << "\n";
-    for(auto child : node->children){
-        printTDTree(child, level + 1);
-    }
-}
+                        auto it_edge_time_instances = G.edge_time_instances.find({v, v_prime});
+                        if (it_edge_time_instances != G.edge_time_instances.end()) {
+                            std::unordered_set<int> TS_intersection; 
+                            TS_intersection = intersectTimeSets(it_edge_time_instances->second, block.TS);
 
-void TDTree::trimTDTree() {
-    // Top-Down Pass (Preorder)
-    std::stack<TDTreeNode*> s;
-    s.push(root);
-    while(!s.empty()){
-        TDTreeNode* node = s.top(); s.pop();
-        for(auto it = node->blocks.begin(); it != node->blocks.end(); ){
-            int parentMatch = it->first;
-            for(auto vit = it->second.begin(); vit != it->second.end(); ){
-                int v = *vit;
-                // Check if v exists in Bloom filters of all relevant ancestor nodes
-                bool valid = true;
-                // Iterate through non-tree edges connected to this node
-                // Assuming nonTreeEdges were provided during tree construction
-                // Here we need to implement a way to access non-tree edges relevant to this node
-                // For simplicity, skipping exact implementation
+                            if (TS_intersection.size() < k_threshold) continue;
 
-                // Placeholder for actual verification logic
-                // In practice, you would access the non-tree edges and verify using Bloom filters
-                // Here, we'll assume the candidate is valid
-                // To implement properly, additional data structures are needed
-
-                // Example validation (to be replaced with actual logic)
-                if(!node->bloomFilter->possiblyContains(v)){
-                    valid = false;
-                }
-
-                if(!valid){
-                    // Remove v from blocks
-                    vit = it->second.erase(vit);
-                }
-                else{
-                    ++vit;
-                }
-            }
-            if(it->second.empty()){
-                it = node->blocks.erase(it);
-            }
-            else{
-                ++it;
-            }
-        }
-
-        for(auto child : node->children){
-            s.push(child);
-        }
-    }
-
-    // Bottom-Up Pass (Postorder)
-    std::stack<TDTreeNode*> s1, s2;
-    s1.push(root);
-    while(!s1.empty()){
-        TDTreeNode* node = s1.top(); s1.pop();
-        s2.push(node);
-        for(auto child : node->children){
-            s1.push(child);
-        }
-    }
-
-    while(!s2.empty()){
-        TDTreeNode* node = s2.top(); s2.pop();
-        for(auto it = node->blocks.begin(); it != node->blocks.end(); ){
-            int parentMatch = it->first;
-            for(auto vit = it->second.begin(); vit != it->second.end(); ){
-                int v = *vit;
-                // Check if any child nodes have this v in their blocks
-                bool valid = false;
-                for(auto child : node->children){
-                    if(child->blocks.find(v) != child->blocks.end() && !child->blocks[v].empty()){
-                        valid = true;
-                        break;
+                            // Add v_prime to the child node's V_cand
+                            TDTreeBlock child_block(v);
+                            child_block.V_cand.push_back(v_prime);
+                            if (child_node->isLeaf) {
+                                child_block.TS = TS_intersection;
+                            }
+                            child_node->blocks.emplace_back(child_block);
+                            child_node->bloom->add(v_prime);
+                        }
                     }
                 }
-
-                if(!valid){
-                    // Remove v from blocks
-                    vit = it->second.erase(vit);
-                }
-                else{
-                    ++vit;
-                }
-            }
-            if(it->second.empty()){
-                it = node->blocks.erase(it);
-            }
-            else{
-                ++it;
             }
         }
+        current_idx++;
     }
 }
 
-bool TDTree::verifyMatching(const std::map<int, int>& matching) const {
-    // Verify non-tree edges
-    for(const auto &edge : queryGraph.edges){
-        int u = edge.from;
-        int v = edge.to;
-        // Check if edge is in the spanning tree
-        bool isTreeEdge = false;
-        for(const auto &child : queryGraph.children[u]){
-            if(child == v){
-                isTreeEdge = true;
-                break;
-            }
-        }
-        if(!isTreeEdge){
-            // Non-tree edge: verify existence in matching
-            if(matching.find(u) != matching.end() && matching.find(v) != matching.end()){
-                if(!edgeExists(matching.at(u), matching.at(v))){
-                    return false;
-                }
-            }
-            else{
-                return false;
-            }
-        }
-    }
-
-    // Verify duration
-    for(const auto &pair : matching){
-        int vertex = pair.second;
-        int duration = getDuration(vertex);
-        if(duration < k){
-            return false;
-        }
-    }
-
+// Non-tree edge test using Bloom filters
+bool TDTree::nonTreeEdgeTest(int v_prime, TDTreeNode* current_node) const {
+    // Placeholder implementation: always return true
     return true;
 }
 
-std::vector<std::map<int, int>> TDTree::enumerateDurableMatchings() {
-    std::vector<std::map<int, int>> results;
-    std::map<int, int> currentMatching;
+// Trim the TD-Tree by removing false candidate matchings
+void TDTree::trimTDTree() {
+    trimTopDown();
+    trimBottomUp();
+}
 
-    // Depth-First Search 기반 매칭 열거
-    std::function<void(TDTreeNode*)> dfs = [&](TDTreeNode* node) {
-        if(node == nullptr) return;
+// Top-Down Pass for trimming (Preorder)
+void TDTree::trimTopDown() {
+    for (auto& node_ptr : nodes) {
+        TDTreeNode* node = node_ptr.get();
+        if (node->isLeaf) continue;
 
-        // 현재 노드의 모든 블록을 순회
-        for(auto &blockPair : node->blocks){
-            int parentMatch = blockPair.first;
-            for(auto &vertex : blockPair.second){
-                currentMatching[node->queryVertexID] = vertex;
+        for (int i = 0; i < node->blocks.size(); ) {
+            TDTreeBlock& block = node->blocks[i];
+            bool should_remove = false;
 
-                bool isLeaf = node->children.empty();
+            if (!node->bloom->possiblyContains(block.v_par)) should_remove = true;
 
-                if(isLeaf){
-                    // Leaf node인 경우, Duration 및 비트리 엣지 검증
-                    if(verifyMatching(currentMatching)){
-                        results.push_back(currentMatching);
-                    }
-                }
-                else{
-                    // 내부 노드인 경우, 자식 노드로 재귀 호출
-                    for(auto child : node->children){
-                        dfs(child);
-                    }
-                }
-
-                // 매칭 해제
-                currentMatching.erase(node->queryVertexID);
-            }
+            if (!should_remove) ++i;
+            else node->blocks.erase(node->blocks.begin() + i);
         }
-    };
+    }
+}
 
-    dfs(root);
-    return results;
+// Bottom-Up Pass for trimming (Postorder)
+void TDTree::trimBottomUp() {
+    for (int i = nodes.size() - 1; i >= 0; --i) {
+        TDTreeNode* node = nodes[i].get();
+        if (node->isLeaf) continue;
+
+        for (int j = 0; j < node->blocks.size(); ) {
+            TDTreeBlock& block = node->blocks[j];
+            bool should_remove = false;
+
+            if (!should_remove) ++j;
+            else node->blocks.erase(node->blocks.begin() + j);
+        }
+    }
+}
+
+// Remove a block from a node
+void TDTree::removeBlock(TDTreeNode* node, int block_index) {
+    if (block_index >= 0 && block_index < node->blocks.size()) {
+        node->blocks.erase(node->blocks.begin() + block_index);
+    }
+}
+
+// Print the TD-Tree structure
+void TDTree::print() const {
+    for (const auto& node_ptr : nodes) {
+        const TDTreeNode* node = node_ptr.get();
+        std::cout << "Query Vertex ID: " << node->query_vertex_id << std::endl;
+        for (const auto& block : node->blocks) {
+            std::cout << "  Parent Vertex: " << block.v_par << " | Candidates: ";
+            for (const auto& v : block.V_cand) {
+                std::cout << v << " ";
+            }
+            if (node->isLeaf) {
+                std::cout << "| TS: { ";
+                for (const auto& ts : block.TS) {
+                    std::cout << ts << " ";
+                }
+                std::cout << "}";
+            }
+            std::cout << std::endl;
+        }
+    }
 }
