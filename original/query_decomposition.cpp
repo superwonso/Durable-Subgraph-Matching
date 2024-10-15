@@ -82,6 +82,5 @@ QueryDecomposition decomposeQuery(const Graph& Q, const std::unordered_map<std::
             }
         }
     }
-
     return result;
 }

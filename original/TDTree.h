@@ -33,7 +33,7 @@ struct TDTreeNode {
 class TDTree {
 public:
     // Constructor
-    TDTree(const Graph& temporal_graph, const QueryDecomposition& decomposition, int k);
+    TDTree(const Graph& temporal_graph, const Graph& query_graph, const QueryDecomposition& decomposition, int k);
 
     // Build the TD-Tree
     void build();
@@ -43,6 +43,7 @@ public:
 
 private:
     const Graph& G; // Temporal graph
+    const Graph& Q; // Query Graph
     const QueryDecomposition& QD; // Query decomposition result
     int k_threshold; // Minimum duration threshold
 
@@ -51,7 +52,7 @@ private:
     // Internal methods for tree construction
     void growTDTree();
     void trimTDTree();
-    void initTree(const std::unordered_map<std::string, int>& label_counts);
+    void initTree(const std::vector<std::vector<int>>& query_tree);    
     void fillRoot();
     void fillNode(TDTreeNode* current_node, int parent_vertex, const std::unordered_set<int>& TS_set);
     void removeBlock(TDTreeNode* node, int block_index);
@@ -64,7 +65,7 @@ private:
     bool nonTreeEdgeTest(int v_prime, TDTreeNode* current_node) const;
 
     // Reference to label counts for selectivity
-    const std::unordered_map<std::string, int>& label_counts_;
+    // const std::unordered_map<std::string, int>& label_counts_;
 };
 
 #endif // TDTREE_H

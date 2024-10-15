@@ -18,7 +18,7 @@ g++ (c++17)
 
 # Build Command
 
-g++ -Wall -Wextra -g3 -O3 -std=c++17 main.cpp BloomFilter.cpp Graph.cpp TDTreeNode.cpp TDTree.cpp -o td_tree.o
+g++ -Wall -Wextra -g3 -O3 -std=c++17 main.cpp query_decomposition.cpp TDTree.cpp Utils.cpp -o td_tree.o
 
 # Method
 
