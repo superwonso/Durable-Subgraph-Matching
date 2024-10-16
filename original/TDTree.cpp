@@ -48,6 +48,7 @@ void TDTree::fillRoot() {
     }
     std::cout << "Root node filled with " << root->blocks.size() << " candidate blocks." << std::endl;
 }
+}
 
 // Grow the TD-Tree by recursively filling nodes
 void TDTree::growTDTree() {
