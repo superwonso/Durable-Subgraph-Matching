@@ -77,7 +77,7 @@ bool readTemporalGraph(const std::string& filename, Graph& graph) {
     std::string line;
     
     // Random generator for labels
-    std::vector<std::string> labels = {"A", "B", "C", "D", "E"};
+    std::vector<std::string> labels = {"A", "B", "C"};
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, labels.size() - 1);
@@ -163,7 +163,7 @@ bool readQueryGraph(const std::string &filename ,Graph &queryGraph){
 		
         	queryGraph.adj[v1].emplace_back(Edge{v2,""});
      }
-
+	 queryGraph.num_vertices = queryGraph.adj.size();
      infile.close();
 
      return true;

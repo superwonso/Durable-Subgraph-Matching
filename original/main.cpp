@@ -22,14 +22,14 @@ int main(int argc, char* argv[]){
         std::cerr << "Failed to read temporal graph." << std::endl;
         return -1;
     }
-
+    std::cout << "Temporal Graph Read" << std::endl;
     // Read the query graph
     Graph queryGraph;
     if(!readQueryGraph(queryGraphFile, queryGraph)){
         std::cerr << "Failed to read query graph." << std::endl;
         return -1;
     }
-
+    std::cout<< "Query Graph Read" << std::endl;
     // Define label_counts based on temporal graph labels
     // Assuming label_counts map contains counts of each label in the data graph
     std::cout << "Start Label Counting" << std::endl;

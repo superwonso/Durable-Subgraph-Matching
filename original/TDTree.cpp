@@ -33,7 +33,7 @@ void TDTree::fillRoot() {
     // Iterate over all vertices in the temporal graph to find candidates for the root
     for (int v = 0; v < G.num_vertices; ++v) {
         // Check label matching and other conditions
-        if (std::stoi(G.vertex_labels[v]) == QD.spanning_tree_adj[root->query_vertex_id][0]) { // Assuming labels are stored similarly
+        if (G.vertex_labels[v] == QD.vertex_labels[root->query_vertex_id]) { // Assuming labels are stored similarly
             // Additional conditions can be added here (degree, distinct neighbor labels, duration)
 
             // For simplicity, assume all labels match and add as candidates

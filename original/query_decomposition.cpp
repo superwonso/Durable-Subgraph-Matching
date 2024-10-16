@@ -8,8 +8,9 @@ QueryDecomposition decomposeQuery(const Graph& Q, const std::unordered_map<std::
 
     // Copy vertex labels from the query graph
     result.vertex_labels = Q.vertex_labels;
-
     // Calculate selectivity for each query vertex
+    std::cout << "Calculating selectivity for query vertices..." << std::endl;
+    std::cout << "Size of Query Tree... " << Q.num_vertices << std::endl;
     std::vector<double> selectivity(Q.num_vertices, 0.0);
     for (int u = 0; u < Q.num_vertices; ++u) {
         int degree = Q.adj[u].size();
