@@ -107,6 +107,7 @@ bool readTemporalGraph(const std::string& filename, Graph& graph) {
 		graph.edge_time_instances[{v1,v2}].insert(time);	
 		
 	}
+	graph.num_vertices = graph.adj.size();
 	infile.close();
 	
 	return true;

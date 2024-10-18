@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include "TDTree.h"
 #include "query_decomposition.h"
 #include "Utils.h"
@@ -33,9 +34,15 @@ int main(int argc, char* argv[]){
     // Define label_counts based on temporal graph labels
     // Assuming label_counts map contains counts of each label in the data graph
     std::cout << "Start Label Counting" << std::endl;
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     std::unordered_map<std::string, int> label_counts;
-    for(int u = 0; u < temporalGraph.num_vertices; ++u){
-        for(const auto& edge : temporalGraph.adj[u]){
+    // for(int u = 0; u < temporalGraph.num_vertices; ++u){
+    //     for(const auto& edge : temporalGraph.adj[u]){
+    //         label_counts[edge.label]++;
+    //     }
+    // }
+    for (int u = 0; u < temporalGraph.adj.size(); ++u) {
+        for (const auto& edge : temporalGraph.adj[u]) {
             label_counts[edge.label]++;
         }
     }
@@ -45,6 +52,9 @@ int main(int argc, char* argv[]){
     std::cout << "Query Decomposed" << std::endl; 
     // Create and build the TDTree
     TDTree tdTree(temporalGraph, queryGraph ,qd, k);
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::chrono::milliseconds millisec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "Time consumed: " << millisec.count() << " ms" << std::endl;
     std::cout << "TDTree Created" << std::endl;
     // Print the TD-Tree
     tdTree.print();

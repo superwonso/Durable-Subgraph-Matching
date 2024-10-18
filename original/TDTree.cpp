@@ -27,16 +27,15 @@ void TDTree::initTree(const std::vector<std::vector<int>>& query_tree) {
 }
 
 // Fill the root node with candidate matching vertices
-// Fill the root node with candidate matching vertices
 void TDTree::fillRoot() {
     TDTreeNode* root = nodes[0].get();
 
     // Iterate over all vertices in the temporal graph to find candidates for the root
     for (int v = 0; v < G.num_vertices; ++v) {
         // Check label matching and other conditions
-        if (!G.vertex_labels.empty() && !Q.vertex_labels.empty()) {
+        if (!G.vertex_labels.empty() && !QD.vertex_labels.empty()) {
             int query_index = root->query_vertex_id;
-            if (G.vertex_labels[v] == Q.vertex_labels[query_index]) { // Compare using query graph labels
+            if (G.vertex_labels[v] == QD.vertex_labels[query_index]) { // Compare using query graph labels
             // Compare using query graph labels
             // Additional conditions can be added here (degree, distinct neighbor labels, duration)
             // For simplicity, assume all labels match and add as candidates
@@ -45,6 +44,8 @@ void TDTree::fillRoot() {
                 root->blocks.emplace_back(block);
                 root->bloom->add(v);
             }
+        } else {
+            std::cout << "Error: Vertex labels not found in the temporal graph or query graph." << std::endl;
         }
     }
     std::cout << "Root node filled with " << root->blocks.size() << " candidate blocks." << std::endl;
