@@ -117,9 +117,9 @@ void remove_duplicates(const string& temp_output_filename, const string& final_o
 int main() {
     // Example usage
     string input_filename = "bitcoin-temporal.txt";
-    string temp_output_filename = "bitcoin-temporal-timeinstance.txt";
-    string final_output_filename = "bitcoin-temporal-timeinstance-unique.txt";
-    int interval_minutes = 10;
+    string temp_output_filename = "bitcoin-temporal-timeinstance-1w.txt";
+    string final_output_filename = "bitcoin-temporal-timeinstance-unique-1w.txt";
+    int interval_minutes = 10080;
 
     convert_and_save_with_time_instance(input_filename, temp_output_filename, interval_minutes);
     remove_duplicates(temp_output_filename, final_output_filename);

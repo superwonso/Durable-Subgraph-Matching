@@ -15,3 +15,5 @@ New Journal of Physics, 2014. [bibtex]
 
 
 
+Filtered bitcoin-temporal
+#Timestamped Edges: 1,654,443
