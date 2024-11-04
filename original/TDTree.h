@@ -40,6 +40,7 @@ public:
 
     // Print the TD-Tree (for debugging)
     void print() const;
+    void print_res() const;
 
 private:
     const Graph& G; // Temporal graph

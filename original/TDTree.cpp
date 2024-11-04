@@ -32,13 +32,33 @@ void TDTree::fillRoot() {
 
     // Iterate over all vertices in the temporal graph to find candidates for the root
     for (int v = 0; v < G.num_vertices; ++v) {
-        // Check label matching and other conditions
+        // Check if vertex labels match and other required conditions
         if (!G.vertex_labels.empty() && !QD.vertex_labels.empty()) {
             int query_index = root->query_vertex_id;
-            if (G.vertex_labels[v] == QD.vertex_labels[query_index]) { // Compare using query graph labels
-            // Compare using query graph labels
-            // Additional conditions can be added here (degree, distinct neighbor labels, duration)
-            // For simplicity, assume all labels match and add as candidates
+
+            // Label matching condition
+            if (G.vertex_labels[v] == QD.vertex_labels[query_index]) {
+
+                // Degree condition: check if the degree of the vertex in G is sufficient
+                if (G.adj[v].size() < QD.spanning_tree_adj[query_index].size()) {
+                    continue;
+                }
+
+                // Neighbor label count condition: ensure sufficient distinct labels
+                std::unordered_set<std::string> neighbor_labels;
+                for (const auto& edge : G.adj[v]) {
+                    neighbor_labels.insert(G.vertex_labels[edge.to]);                
+
+                }
+                if (neighbor_labels.size() < QD.spanning_tree_adj[query_index].size()) {
+                    continue;
+                }
+                // // Minimum duration condition: check if vertex has duration >= k
+                // if (G.vertex_durations[v] < k_threshold) {
+                //     continue;
+                // }
+
+                // Add vertex as a candidate for the root node
                 TDTreeBlock block(-1); // -1 indicates no parent
                 block.V_cand.push_back(v);
                 root->blocks.emplace_back(block);
@@ -169,20 +189,36 @@ void TDTree::removeBlock(TDTreeNode* node, int block_index) {
 
 // Print the TD-Tree structure
 void TDTree::print() const {
+    // for (const auto& node_ptr : nodes) {
+    //     const TDTreeNode* node = node_ptr.get();
+    //     std::cout << "Query Vertex ID: " << node->query_vertex_id << std::endl;
+    //     for (const auto& block : node->blocks) {
+    //         std::cout << "  Parent Vertex: " << block.v_par << " | Candidates: ";
+    //         for (const auto& v : block.V_cand) {
+    //             std::cout << v << " ";
+    //         }
+    //         if (node->isLeaf) {
+    //             std::cout << "| TS: { ";
+    //             for (const auto& ts : block.TS) {
+    //                 std::cout << ts << " ";
+    //             }
+    //             std::cout << "}";
+    //         }
+    //         std::cout << std::endl;
+    //     }
+    // }
+}
+
+void TDTree::print_res() const {
     for (const auto& node_ptr : nodes) {
         const TDTreeNode* node = node_ptr.get();
-        std::cout << "Query Vertex ID: " << node->query_vertex_id << std::endl;
-        for (const auto& block : node->blocks) {
-            std::cout << "  Parent Vertex: " << block.v_par << " | Candidates: ";
-            for (const auto& v : block.V_cand) {
-                std::cout << v << " ";
-            }
-            if (node->isLeaf) {
-                std::cout << "| TS: { ";
-                for (const auto& ts : block.TS) {
-                    std::cout << ts << " ";
+        // Print only the final matching results for each query vertex
+        if (node->isLeaf) {
+            std::cout << "Query Vertex ID: " << node->query_vertex_id << " - Candidates: ";
+            for (const auto& block : node->blocks) {
+                for (const auto& v : block.V_cand) {
+                    std::cout << v << " ";
                 }
-                std::cout << "}";
             }
             std::cout << std::endl;
         }

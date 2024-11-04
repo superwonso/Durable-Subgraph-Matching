@@ -2,6 +2,7 @@ bitcoin-temporal https://www.cs.cornell.edu/~arb/data/temporal-bitcoin/
 #Node: 48,098,591
 #Timestamped Edges: 113,100,979
 #Static Edges: 86,798,226
+#Unique Nodes(1w/Snapshot): 94,668,442
 Time span: 7.08Y
 Ref: 
 Sampling Methods for Counting Temporal Motifs.
@@ -16,4 +17,4 @@ New Journal of Physics, 2014. [bibtex]
 
 
 Filtered bitcoin-temporal
-#Timestamped Edges: 1,654,443
+#Timestamped Edges: 8,027,213 (Compressed 91.52%)

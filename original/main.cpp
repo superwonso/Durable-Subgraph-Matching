@@ -57,7 +57,7 @@ int main(int argc, char* argv[]){
     std::cout << "Time consumed: " << millisec.count() << " ms" << std::endl;
     std::cout << "TDTree Created" << std::endl;
     // Print the TD-Tree
-    tdTree.print();
+    // tdTree.print_res();
 
     return 0;
 }

@@ -75,44 +75,45 @@ bool readTemporalGraph(const std::string& filename, Graph& graph) {
     }
 
     std::string line;
-    
+
     // Random generator for labels
     std::vector<std::string> labels = {"A", "B", "C"};
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, labels.size() - 1);
 
-	int max_vertex = -1;
+    int max_vertex = -1;
 
-	// Read edges and determine the maximum vertex ID
-	while (getline(infile, line)) {
-		if (line.empty()) continue;
+    // Read edges and determine the maximum vertex ID
+    while (getline(infile, line)) {
+        if (line.empty()) continue;
 
-		std::istringstream iss(line);	
-		int v1,v2,time;	
-		if (!(iss >> v1 >> v2 >> time)) {	
-			std::cerr << "Error: Invalid line in temporal graph file: "<<line<<std::endl;	
-			return false;	
-		}
-		
-		max_vertex = std::max(max_vertex,std::max(v1,v2));	
-		
-		while(graph.adj.size() <= max_vertex){
-			graph.adj.emplace_back();
-			graph.vertex_labels.push_back("");
-		}
-		
-		graph.adj[v1].emplace_back(Edge{v2,labels[dis(gen)]});
-		
-		graph.edge_time_instances[{v1,v2}].insert(time);	
-		
-	}
-	graph.num_vertices = graph.adj.size();
-	infile.close();
-	
-	return true;
+        std::istringstream iss(line);    
+        int v1, v2, time;    
+        if (!(iss >> v1 >> v2 >> time)) {    
+            std::cerr << "Error: Invalid line in temporal graph file: " << line << std::endl;    
+            return false;    
+        }
 
+        max_vertex = std::max(max_vertex, std::max(v1, v2));
+        
+        // Ensure the graph structure can hold all vertices up to max_vertex
+        while (graph.adj.size() <= max_vertex) {
+            graph.adj.emplace_back();
+            // Assign a random label to each new vertex
+            graph.vertex_labels.push_back(labels[dis(gen)]);
+        }
+
+        // Add the edge between v1 and v2 with a random label
+        graph.adj[v1].emplace_back(Edge{v2, labels[dis(gen)]});
+        graph.edge_time_instances[{v1, v2}].insert(time);
+    }
+    graph.num_vertices = graph.adj.size();
+    infile.close();
+
+    return true;
 }
+
 
 // Function to read the query graph from a file
 bool readQueryGraph(const std::string &filename ,Graph &queryGraph){
