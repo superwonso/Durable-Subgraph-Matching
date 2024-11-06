@@ -44,6 +44,9 @@ td_tree.o {data_graph} {query_graph} {threshold(integer)}
 | Datasets | Link |
 | --- | --- |
 | bitcoin-temporal | https://www.cs.cornell.edu/~arb/data/temporal-bitcoin/ |
+| sx-stackoverflow | https://snap.stanford.edu/data/sx-stackoverflow.html |
+| wiki-talk-temporal | https://snap.stanford.edu/data/wiki-talk-temporal.html |
+| sx-superuser | https://snap.stanford.edu/data/sx-superuser.html |
 |  |  |
 
 # References
