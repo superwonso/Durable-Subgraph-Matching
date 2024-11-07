@@ -14,7 +14,6 @@ New Journal of Physics, 2014. [bibtex]
 
 ---
 
-
-
 Filtered bitcoin-temporal
-#Timestamped Edges: 8,027,213 (Compressed 91.52%)
+#Timestamped Edges: 8,027,213 (Compressed 92.90%)
+#Static Nodes: 1,654,443 (Compressed 98.09%)
