@@ -53,10 +53,11 @@ void TDTree::fillRoot() {
                 if (neighbor_labels.size() < QD.spanning_tree_adj[query_index].size()) {
                     continue;
                 }
-                // // Minimum duration condition: check if vertex has duration >= k
-                // if (G.vertex_durations[v] < k_threshold) {
-                //     continue;
-                // }
+
+                // Minimum duration condition: check if vertex has duration >= k
+                if (!checkMinimumDuration(v)) {
+                    continue;  // Skip this vertex if duration requirement is not met
+                }
 
                 // Add vertex as a candidate for the root node
                 TDTreeBlock block(-1); // -1 indicates no parent
@@ -135,9 +136,24 @@ void TDTree::growTDTree() {
 
 // Non-tree edge test using Bloom filters
 bool TDTree::nonTreeEdgeTest(int v_prime, TDTreeNode* current_node) const {
-    // Placeholder implementation: always return true
-    return true;
+    // Check if the node is internal and has a Bloom filter
+    if (!current_node || !current_node->bloom) {
+        // If there is no bloom filter or current node is null, we cannot perform the test
+        return false;
+    }
+
+    // Use the Bloom filter to check if v_prime is a possible match
+    bool bloom_result = current_node->bloom->possiblyContains(v_prime);
+
+    if (bloom_result) {
+        // If Bloom filter says it might contain the element, we consider it as a potential candidate
+        return true;
+    } else {
+        // If Bloom filter says no, we can definitively say it does not match
+        return false;
+    }
 }
+
 
 // Trim the TD-Tree by removing false candidate matchings
 void TDTree::trimTDTree() {
@@ -223,4 +239,37 @@ void TDTree::print_res() const {
             std::cout << std::endl;
         }
     }
+}
+
+bool TDTree::checkMinimumDuration(int vertex) const {
+    std::unordered_set<int> vertex_time_instances;
+    
+    // Collect all time instances for the vertex from its edges
+    for (const auto& edge : G.adj[vertex]) {
+        // Check forward edge
+        std::pair<int, int> edge_pair(vertex, edge.to);
+        auto time_it = G.edge_time_instances.find(edge_pair);
+        if (time_it != G.edge_time_instances.end()) {
+            vertex_time_instances.insert(time_it->second.begin(), time_it->second.end());
+        }
+        
+        // Check reverse edge
+        edge_pair = std::make_pair(edge.to, vertex);
+        time_it = G.edge_time_instances.find(edge_pair);
+        if (time_it != G.edge_time_instances.end()) {
+            vertex_time_instances.insert(time_it->second.begin(), time_it->second.end());
+        }
+    }
+    
+    // If no time instances found, vertex doesn't meet duration requirement
+    if (vertex_time_instances.empty()) {
+        return false;
+    }
+    
+    // Calculate duration as max time - min time + 1
+    int min_time = *std::min_element(vertex_time_instances.begin(), vertex_time_instances.end());
+    int max_time = *std::max_element(vertex_time_instances.begin(), vertex_time_instances.end());
+    int duration = max_time - min_time + 1;
+    
+    return duration >= k_threshold;
 }

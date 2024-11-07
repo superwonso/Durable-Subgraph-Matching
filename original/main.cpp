@@ -36,16 +36,13 @@ int main(int argc, char* argv[]){
     std::cout << "Start Label Counting" << std::endl;
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     std::unordered_map<std::string, int> label_counts;
-    // for(int u = 0; u < temporalGraph.num_vertices; ++u){
-    //     for(const auto& edge : temporalGraph.adj[u]){
-    //         label_counts[edge.label]++;
-    //     }
-    // }
+
     for (int u = 0; u < temporalGraph.adj.size(); ++u) {
         for (const auto& edge : temporalGraph.adj[u]) {
             label_counts[edge.label]++;
         }
     }
+    
     std::cout << "Label Counted " << std::endl;
     // Perform query decomposition
     QueryDecomposition qd = decomposeQuery(queryGraph, label_counts);

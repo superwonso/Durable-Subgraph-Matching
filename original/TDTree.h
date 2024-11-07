@@ -64,6 +64,7 @@ private:
 
     // Non-tree edge verification
     bool nonTreeEdgeTest(int v_prime, TDTreeNode* current_node) const;
+    bool checkMinimumDuration(int vertex) const;
 
     // Reference to label counts for selectivity
     // const std::unordered_map<std::string, int>& label_counts_;
