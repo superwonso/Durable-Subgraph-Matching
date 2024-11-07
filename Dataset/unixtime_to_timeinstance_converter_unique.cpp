@@ -114,12 +114,18 @@ void remove_duplicates(const string& temp_output_filename, const string& final_o
     outfile.close();
 }
 
-int main() {
-    // Example usage
-    string input_filename = "bitcoin-temporal.txt";
-    string temp_output_filename = "bitcoin-temporal-timeinstance-1w.txt";
-    string final_output_filename = "bitcoin-temporal-timeinstance-unique-1w.txt";
-    int interval_minutes = 10080;
+int main(int argc, char *argv[]) {
+    // Check if correct number of arguments are provided
+    if (argc != 5) {
+        std::cerr << "Usage: " << argv[0] << " <input_file> <temp_output_file> <final_output_file> <interval_minutes>" << std::endl;
+        return 1;
+    }
+
+    // Get filenames and interval from command line arguments
+    string input_filename = argv[1];
+    string temp_output_filename = argv[2];
+    string final_output_filename = argv[3];
+    int interval_minutes = std::stoi(argv[4]);
 
     convert_and_save_with_time_instance(input_filename, temp_output_filename, interval_minutes);
     remove_duplicates(temp_output_filename, final_output_filename);

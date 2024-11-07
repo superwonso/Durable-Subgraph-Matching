@@ -35,10 +35,16 @@ void remove_duplicate_lines(const string& input_filename, const string& output_f
     outfile.close();
 }
 
-int main() {
-    // Example usage
-    string input_filename = "bitcoin-temporal-timeinstance.txt";
-    string output_filename = "bitcoin-temporal-timeinstance-unique.txt";
+int main(int argc, char *argv[]) {
+    // Check if correct number of arguments are provided
+    if (argc != 3) {
+        std::cerr << "Usage: " << argv[0] << " <input_file> <output_file>" << std::endl;
+        return 1;
+    }
+
+    // Get filenames from command line arguments
+    string input_filename = argv[1];
+    string output_filename = argv[2];
 
     remove_duplicate_lines(input_filename, output_filename);
 
