@@ -114,7 +114,7 @@ void TDTree::growTDTree() {
                             std::unordered_set<int> TS_intersection; 
                             TS_intersection = intersectTimeSets(it_edge_time_instances->second, block.TS);
 
-                            if (TS_intersection.size() < k_threshold) continue;
+                            if (!checkMinimumConsecutiveDuration(TS_intersection)) continue;
 
                             // Add v_prime to the child node's V_cand
                             TDTreeBlock child_block(v);
@@ -266,10 +266,33 @@ bool TDTree::checkMinimumDuration(int vertex) const {
         return false;
     }
     
-    // Calculate duration as max time - min time + 1
-    int min_time = *std::min_element(vertex_time_instances.begin(), vertex_time_instances.end());
-    int max_time = *std::max_element(vertex_time_instances.begin(), vertex_time_instances.end());
-    int duration = max_time - min_time + 1;
+    // Calculate duration as the number of unique time instances
+    int duration = vertex_time_instances.size();
     
     return duration >= k_threshold;
+}
+
+bool TDTree::checkMinimumConsecutiveDuration(const std::unordered_set<int>& time_instances) const {
+    if (time_instances.size() < k_threshold) {
+        return false;
+    }
+
+    // Convert unordered_set to a sorted vector
+    std::vector<int> times(time_instances.begin(), time_instances.end());
+    std::sort(times.begin(), times.end());
+
+    // Check if there are at least k consecutive time instances
+    int consecutive_count = 1;
+    for (size_t i = 1; i < times.size(); ++i) {
+        if (times[i] == times[i - 1] + 1) {
+            consecutive_count++;
+            if (consecutive_count >= k_threshold) {
+                return true;
+            }
+        } else {
+            consecutive_count = 1;
+        }
+    }
+
+    return false;
 }

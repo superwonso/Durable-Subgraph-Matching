@@ -3,4 +3,3 @@ B C
 C A
 A D
 D E
-E A
