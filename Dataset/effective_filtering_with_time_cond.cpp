@@ -2,7 +2,6 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
 #include <utility>
 #include <algorithm>
@@ -10,13 +9,19 @@
 
 using namespace std;
 
-// pair를 위한 해시 함수 (향상된 충돌 방지)
+// 향상된 pair 해시 함수 (Boost의 hash_combine 유사 방식)
 struct pair_hash {
     size_t operator()(const pair<int, int>& p) const {
-        // Boost의 hash_combine 유사 방식 사용
-        return hash<int>()(p.first) * 31 + hash<int>()(p.second);
+        size_t seed = hash<int>()(p.first);
+        seed ^= hash<int>()(p.second) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        return seed;
     }
 };
+
+// 엣지를 저장할 타입 정의
+using EdgeKey = pair<int, int>;
+using Edges = unordered_map<EdgeKey, vector<int>, pair_hash>;
+using FilteredEdges = unordered_map<EdgeKey, vector<int>, pair_hash>;
 
 int main(int argc, char* argv[]) {
     // 프로그램 사용법 검사
@@ -26,7 +31,7 @@ int main(int argc, char* argv[]) {
     }
 
     // 입력 파일 열기
-    ifstream inFile(argv[1]);
+    ifstream inFile(argv[1], ios::in | ios::binary);
     if (!inFile) {
         cerr << "Error: Cannot open input file " << argv[1] << endl;
         return 1;
@@ -41,14 +46,15 @@ int main(int argc, char* argv[]) {
     outFileName += "_filtered.txt";
 
     // 출력 파일 열기
-    ofstream outFile(outFileName);
+    ofstream outFile(outFileName, ios::out | ios::binary);
     if (!outFile) {
         cerr << "Error: Cannot create output file " << outFileName << endl;
         return 1;
     }
 
-    // 엣지 정보를 저장할 해시맵과 스냅샷을 저장할 해시셋
-    unordered_map<pair<int, int>, unordered_set<int>, pair_hash> edges;
+    // 엣지 정보를 저장할 해시맵과 스냅샷을 저장할 벡터
+    Edges edges;
+    edges.reserve(850000); // 예상 엣지 수에 따라 조정
 
     // 입력 데이터의 유효성 검증을 위한 변수
     int invalid_lines = 0;
@@ -61,7 +67,7 @@ int main(int argc, char* argv[]) {
         int v1, v2, snapshot;
         if (iss >> v1 >> v2 >> snapshot) {
             // 유향 엣지이므로 순서를 유지
-            edges[{v1, v2}].insert(snapshot);
+            edges[{v1, v2}].emplace_back(snapshot);
         } else {
             invalid_lines++;
         }
@@ -72,49 +78,53 @@ int main(int argc, char* argv[]) {
         cerr << "Warning: " << invalid_lines << " invalid lines were skipped." << endl;
     }
 
-    // 처리 시작 시간 기록
-    chrono::steady_clock::time_point start = chrono::steady_clock::now();
+    // 필터링된 엣지를 저장할 맵
+    FilteredEdges filtered_edges;
+    filtered_edges.reserve(edges.size()); // 예상 크기에 따라 조정 가능
 
-    // 필터링된 엣지를 저장할 임시 맵
-    unordered_map<pair<int, int>, vector<int>, pair_hash> filtered_edges;
+    // 처리 시작 시간 기록
+    chrono::steady_clock::time_point filter_start = chrono::steady_clock::now();
 
     // 엣지 필터링: 단 한 번이라도 연속된 스냅샷을 가진 엣지만 유지
-    for (const auto& edge : edges) {
-        const auto& snapshot_set = edge.second;
+    for (auto& edge : edges) {
+        auto& snapshot_vector = edge.second;
 
-        if (snapshot_set.size() < 2) {
+        if (snapshot_vector.size() < 2) {
             // 스냅샷이 하나뿐이라면 연속된 스냅샷이 없으므로 스킵
             continue;
         }
 
-        // 정렬된 스냅샷 벡터 생성
-        vector<int> sorted_snapshots(snapshot_set.begin(), snapshot_set.end());
-        sort(sorted_snapshots.begin(), sorted_snapshots.end());
+        // 스냅샷을 정렬 및 중복 제거
+        sort(snapshot_vector.begin(), snapshot_vector.end());
+        snapshot_vector.erase(unique(snapshot_vector.begin(), snapshot_vector.end()), snapshot_vector.end());
 
         // 연속된 스냅샷이 존재하는지 확인
         bool has_consecutive = false;
-        for (size_t i = 1; i < sorted_snapshots.size(); ++i) {
-            if (sorted_snapshots[i] == sorted_snapshots[i - 1] + 1) {
+        for (size_t i = 1; i < snapshot_vector.size(); ++i) {
+            if (snapshot_vector[i] == snapshot_vector[i - 1] + 1) {
                 has_consecutive = true;
                 break;
             }
         }
 
         if (has_consecutive) {
-            // 필터링된 엣지에 추가
-            filtered_edges[edge.first] = move(sorted_snapshots);
+            // 필터링된 엣지에 추가 (이동 시멘틱스 사용)
+            filtered_edges.emplace(edge.first, move(snapshot_vector));
         }
     }
 
     // 처리 종료 시간 기록
-    chrono::steady_clock::time_point end = chrono::steady_clock::now();
-    chrono::milliseconds millisec = chrono::duration_cast<chrono::milliseconds>(end - start);
-    cout << "Time consumed: " << millisec.count() << " ms" << endl;
+    chrono::steady_clock::time_point filter_end = chrono::steady_clock::now();
+    chrono::milliseconds filter_millisec = chrono::duration_cast<chrono::milliseconds>(filter_end - filter_start);
+    cout << "Time consumed (filtering): " << filter_millisec.count() << " ms" << endl;
     cout << "Total original edges: " << edges.size() << endl;
     cout << "Total filtered edges: " << filtered_edges.size() << endl;
 
     // 필터링된 엣지를 출력 파일에 쓰기
-    // 버퍼링을 통해 I/O 성능 최적화
+    // I/O 성능 최적화를 위해 별도의 시간 측정
+    chrono::steady_clock::time_point io_start = chrono::steady_clock::now();
+
+    // 효율적인 I/O를 위해 버퍼를 사용
     const size_t BUFFER_SIZE = 100000;
     vector<string> output_buffer;
     output_buffer.reserve(BUFFER_SIZE);
@@ -124,21 +134,37 @@ int main(int argc, char* argv[]) {
         const auto& v2 = edge.first.second;
         const auto& snapshots = edge.second;
         for (int snapshot : snapshots) {
+            // 문자열을 미리 생성하여 버퍼에 추가
             output_buffer.emplace_back(to_string(v1) + " " + to_string(v2) + " " + to_string(snapshot));
             if (output_buffer.size() >= BUFFER_SIZE) {
                 // 버퍼가 가득 찼으면 파일에 쓰기
+                string bulk_output;
+                bulk_output.reserve(BUFFER_SIZE * 20); // 예상 한 줄의 평균 길이에 따라 조정
                 for (const auto& out_line : output_buffer) {
-                    outFile << out_line << "\n";
+                    bulk_output += out_line;
+                    bulk_output += '\n';
                 }
+                outFile.write(bulk_output.data(), bulk_output.size());
                 output_buffer.clear();
             }
         }
     }
 
     // 남은 버퍼 내용 쓰기
-    for (const auto& out_line : output_buffer) {
-        outFile << out_line << "\n";
+    if (!output_buffer.empty()) {
+        string bulk_output;
+        bulk_output.reserve(output_buffer.size() * 20);
+        for (const auto& out_line : output_buffer) {
+            bulk_output += out_line;
+            bulk_output += '\n';
+        }
+        outFile.write(bulk_output.data(), bulk_output.size());
     }
+
+    // 출력 종료 시간 기록
+    chrono::steady_clock::time_point io_end = chrono::steady_clock::now();
+    chrono::milliseconds io_millisec = chrono::duration_cast<chrono::milliseconds>(io_end - io_start);
+    cout << "Time consumed (I/O): " << io_millisec.count() << " ms" << endl;
 
     outFile.close();
     cout << "Filtered data has been written to: " << outFileName << endl;

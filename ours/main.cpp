@@ -101,6 +101,5 @@ int main(int argc, char* argv[]){
     std::cout << "TDTree Created" << std::endl;
     // Print the TD-Tree
     // tdTree.print_res();
-
     return 0;
 }
