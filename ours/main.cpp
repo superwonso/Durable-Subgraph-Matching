@@ -83,15 +83,15 @@ int main(int argc, char* argv[]){
         }
     }
 
-    // 평균 수명 확인을 위한 출력
-    for (const auto& label_avg : label_average_lifespans) {
-        std::cout << "Label: " << label_avg.first << ", Average Lifespan: " << label_avg.second << std::endl;
-    }
+    // // 평균 수명 확인을 위한 출력
+    // for (const auto& label_avg : label_average_lifespans) {
+    //     std::cout << "Label: " << label_avg.first << ", Average Lifespan: " << label_avg.second << std::endl;
+    // }
 
     std::cout << "Label Counted " << std::endl;
     // Perform query decomposition
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    QueryDecomposition qd = decomposeQuery(queryGraph, label_counts);
+    QueryDecomposition qd = decomposeQuery(queryGraph, label_counts, label_average_lifespans);
     std::cout << "Query Decomposed" << std::endl; 
     // Create and build the TDTree
     TDTree tdTree(temporalGraph, queryGraph ,qd, k);

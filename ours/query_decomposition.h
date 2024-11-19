@@ -21,6 +21,5 @@ struct QueryDecomposition {
 };
 
 // Function prototype for query decomposition
-QueryDecomposition decomposeQuery(const Graph& Q, const std::unordered_map<std::string, int>& label_counts);
-
+QueryDecomposition decomposeQuery(const Graph& Q, const std::unordered_map<std::string, int>& label_counts, const std::unordered_map<std::string, double>& label_average_lifespans);
 #endif // QUERY_DECOMPOSITION_H
