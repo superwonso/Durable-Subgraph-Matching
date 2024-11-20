@@ -2,7 +2,7 @@ bitcoin-temporal https://www.cs.cornell.edu/~arb/data/temporal-bitcoin/
 #Node: 48,098,591
 #Timestamped Edges: 113,100,979
 #Static Edges: 86,798,226
-#Unique Nodes(1w/Snapshot): 94,668,442
+#Unique Edges(1w/Snapshot): 94,668,442
 Time span: 7.08Y
 Ref: 
 Sampling Methods for Counting Temporal Motifs.
@@ -24,7 +24,7 @@ sx-superuser-temporal https://snap.stanford.edu/data/sx-superuser.html
 #Node: 194,085
 #Timestamped Edges: 1,443,339
 #Static Edges: 924,886
-#Unique Nodes(1w/Snapshot): 924,886
+#Unique Edges(1w/Snapshot): 924,886
 Time span: 2,773D
 
 ---
