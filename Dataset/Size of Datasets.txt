@@ -1,5 +1,5 @@
 bitcoin-temporal https://www.cs.cornell.edu/~arb/data/temporal-bitcoin/
-#Node: 48,098,591
+#Nodes: 48,098,591
 #Timestamped Edges: 113,100,979
 #Static Edges: 86,798,226
 #Unique Edges(1w/Snapshot): 94,668,442
@@ -7,10 +7,10 @@ Time span: 7.08Y
 Ref: 
 Sampling Methods for Counting Temporal Motifs.
 Paul Liu, Austin R. Benson, and Moses Charikar.
-Proceedings of the ACM International Conference on Web Search and Data Mining (WSDM), 2019. [bibtex]
+Proceedings of the ACM International Conference on Web Search and Data Mining (WSDM), 2019.
 Inferring the interplay between network structure and market effects in Bitcoin.
 Dániel Kondor, István Csabai, János Szüle, Márton Pósfai and Gábor Vattay.
-New Journal of Physics, 2014. [bibtex]
+New Journal of Physics, 2014.
 
 ---
 
@@ -21,10 +21,10 @@ Filtered bitcoin-temporal
 ---
 
 sx-superuser-temporal https://snap.stanford.edu/data/sx-superuser.html
-#Node: 194,085
+#Nodes: 194,085
 #Timestamped Edges: 1,443,339
 #Static Edges: 924,886
-#Unique Edges(1w/Snapshot): 924,886
+#Unique Edges(1w/Snapshot): 1,088,749
 Time span: 2,773D
 
 ---
@@ -32,3 +32,33 @@ Time span: 2,773D
 Filtered sx-superuser-temporal
 #Timestamped Edges: 130,377 (Compressed 90.97%)
 #Static Nodes: 28,808 (Compressed 96.89%)
+
+---
+
+sx-stackoverflow https://snap.stanford.edu/data/sx-stackoverflow.html
+#Nodes: 2,601,977
+#Timestamped Edges: 63,497,050
+#Static Edges: 36,233,450
+#Unique Edges(1w/Snapshot): 43,687,034
+Time span: 2,774D
+
+---
+
+Filtered sx-stackoverflow
+#Timestamped Edges: 6,412,726 (Compressed 89.90%) 
+#Static Nodes: 1,096,532 (Compressed 57.86%)
+
+---
+
+wiki-talk-temporal https://snap.stanford.edu/data/wiki-talk-temporal.html
+#Nodes: 1,140,149
+#Timestamped Edges: 7,833,140
+#Static Edges: 3,309,592 
+#Unique Edges(1w/Snapshot): 4,451,622
+Time span: 2,320D
+
+---
+
+Filtered wiki-talk-temporal
+#Timestamped Edges: 1,050,459 (Compressed 86.60%)
+#Static Nodes: 202,971 (Compressed 82.20%)
