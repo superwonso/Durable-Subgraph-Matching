@@ -2,13 +2,13 @@
 
 This repository is the implementation code about DongHyeon Cha’s Master Degree Thesis
 
-# Experiments Spec
+# Evaluation Environments
 
-AMD Ryzen Threadripper PRO 5955WX
+Intel Core i7-9700KF
 
-DDR4 ECC 128GB @ 3200Mhz
+DDR4 64GB @ 3200Mhz
 
-Ubuntu 23.04 LTS
+Windows 11 23H2
 
 g++ 14.2.0, x64
 
@@ -27,6 +27,8 @@ td_tree.o {data_graph} {query_graph} {threshold(integer)}
 # Papers 
 
 동적 그래프에서 지속 가능한 서브 그래프 매칭 방법(Durable Subgraph Matching Method in Dynamic Graph), Cha et al., 한국콘텐츠학회 2024 종합학술대회, (2024) 
+An Efficient Durable Subgraph Matching Scheme on Temporal Graphs, Cha et al., ICCC 2024 (KoCon.a), Vietnam, Danang, (2024)
+An Efficient Durable Subgraph Matching Scheme on Temporal Graphs, D.H. Cha, M.S. dissertation, Dept. of Info. & Comm. Eng., Chungbuk National Univ., Cheongju, Chungbuk, Korea, 2025(to be published)
 
 # Compared algorithms
 
