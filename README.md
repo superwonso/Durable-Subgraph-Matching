@@ -28,7 +28,7 @@ td_tree.o {data_graph} {query_graph} {threshold(integer)}
 
 동적 그래프에서 지속 가능한 서브 그래프 매칭 방법(Durable Subgraph Matching Method in Dynamic Graph), Cha et al., 한국콘텐츠학회 2024 종합학술대회, (2024)  
 An Efficient Durable Subgraph Matching Scheme on Temporal Graphs, Cha et al., ICCC 2024 (KoCon.a), Vietnam, Danang, (2024)  
-An Efficient Durable Subgraph Matching Scheme on Temporal Graphs, D.H. Cha, M.S. dissertation, Dept. of Info. & Comm. Eng., Chungbuk National Univ., Cheongju, Chungbuk, Korea, 2025(to be published)  
+An Efficient Durable Subgraph Matching Scheme on Temporal Graphs, D.H. Cha, M.S. dissertation, Dept. of Info. & Comm. Eng., Chungbuk National Univ., Cheongju, Chungbuk, Korea, 2025
 
 # Compared algorithms
 
