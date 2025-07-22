@@ -62,6 +62,7 @@ void TDTree::fillRoot() {
                 // Add vertex as a candidate for the root node
                 TDTreeBlock block(-1); // -1 indicates no parent
                 block.V_cand.push_back(v);
+                block.TS = computeVertexTimeInstances(v);
                 root->blocks.emplace_back(block);
                 root->bloom->add(v);
             }
@@ -295,4 +296,25 @@ bool TDTree::checkMinimumConsecutiveDuration(const std::unordered_set<int>& time
     }
 
     return false;
+}
+
+
+std::unordered_set<int> TDTree::computeVertexTimeInstances(int vertex) const {
+    std::unordered_set<int> vertex_time_instances;
+
+    for (const auto& edge : G.adj[vertex]) {
+        std::pair<int, int> edge_pair(vertex, edge.to);
+        auto time_it = G.edge_time_instances.find(edge_pair);
+        if (time_it != G.edge_time_instances.end()) {
+            vertex_time_instances.insert(time_it->second.begin(), time_it->second.end());
+        }
+
+        edge_pair = std::make_pair(edge.to, vertex);
+        time_it = G.edge_time_instances.find(edge_pair);
+        if (time_it != G.edge_time_instances.end()) {
+            vertex_time_instances.insert(time_it->second.begin(), time_it->second.end());
+        }
+    }
+
+    return vertex_time_instances;
 }

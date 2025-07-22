@@ -66,6 +66,7 @@ private:
     bool nonTreeEdgeTest(int v_prime, TDTreeNode* current_node) const;
     bool checkMinimumDuration(int vertex) const;
     bool checkMinimumConsecutiveDuration(const std::unordered_set<int>& time_instances) const;
+    std::unordered_set<int> computeVertexTimeInstances(int vertex) const;
 
     // Reference to label counts for selectivity
     // const std::unordered_map<std::string, int>& label_counts_;

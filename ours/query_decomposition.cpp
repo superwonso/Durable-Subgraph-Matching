@@ -48,6 +48,9 @@ QueryDecomposition decomposeQuery(const Graph& Q, const std::unordered_map<std::
     // Set to keep track of tree edges
     std::set<std::pair<int, int>> tree_edges;
 
+    // Initialize parent vector
+    std::vector<int> parent(Q.num_vertices, -1);
+
     // Perform DFS to build spanning tree and identify non-tree edges
     while (!s.empty()) {
         int u = s.top();
@@ -64,16 +67,18 @@ QueryDecomposition decomposeQuery(const Graph& Q, const std::unordered_map<std::
             if (!visited[v]) {
                 result.spanning_tree_adj[u].push_back(v);
                 result.spanning_tree_adj[v].push_back(u);
-                tree_edges.emplace(std::make_pair(u, v));
-                tree_edges.emplace(std::make_pair(v, u));
 
                 visited[v] = true;
+                parent[v] = u;
                 s.push(v);
-            } else if (tree_edges.find(std::make_pair(u, v)) == tree_edges.end()) {
-                if (u < v) {
-                    result.non_tree_edges.emplace_back(std::make_pair(u, v));
-                } else {
-                    result.non_tree_edges.emplace_back(std::make_pair(v, u));
+            } else {
+                // parent 정보를 활용해 비트리 간선 판별
+                if (v != parent[u] && u != parent[v]) {
+                    if (u < v) {
+                        result.non_tree_edges.emplace_back(u, v);
+                    } else {
+                        result.non_tree_edges.emplace_back(v, u);
+                    }
                 }
             }
         }
