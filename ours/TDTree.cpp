@@ -111,6 +111,10 @@ void TDTree::growTDTree() {
                         if (!nonTreeEdgeTest(v_prime, child_node)) continue;
 
                         auto it_edge_time_instances = G.edge_time_instances.find({v, v_prime});
+                        if (it_edge_time_instances == G.edge_time_instances.end()) {
+                        it_edge_time_instances = G.edge_time_instances.find({v_prime, v});
+                        }
+                        
                         if (it_edge_time_instances != G.edge_time_instances.end()) {
                             std::unordered_set<int> TS_intersection; 
                             TS_intersection = intersectTimeSets(it_edge_time_instances->second, block.TS);
@@ -139,20 +143,22 @@ void TDTree::growTDTree() {
 bool TDTree::nonTreeEdgeTest(int v_prime, TDTreeNode* current_node) const {
     // Check if the node is internal and has a Bloom filter
     if (!current_node || !current_node->bloom) {
-        // If there is no bloom filter or current node is null, we cannot perform the test
-        return false;
-    }
+    //     // If there is no bloom filter or current node is null, we cannot perform the test
+    //     return false;
+    // }
 
     // Use the Bloom filter to check if v_prime is a possible match
-    bool bloom_result = current_node->bloom->possiblyContains(v_prime);
+    // bool bloom_result = current_node->bloom->possiblyContains(v_prime);
 
-    if (bloom_result) {
+    // if (bloom_result) {
         // If Bloom filter says it might contain the element, we consider it as a potential candidate
         return true;
-    } else {
-        // If Bloom filter says no, we can definitively say it does not match
-        return false;
+    // } else {
+    //     // If Bloom filter says no, we can definitively say it does not match
+    //     return false;
     }
+        // Skip the vertex if it already exists in the Bloom filter (approximate check)
+    return !current_node->bloom->possiblyContains(v_prime);
 }
 
 
