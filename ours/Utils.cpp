@@ -1,13 +1,25 @@
 #include "Utils.h"
 
 // Function to compute the intersection of two unordered_sets (Time Instance Sets)
-std::unordered_set<int> intersectTimeSets(const std::unordered_set<int>& set1, const std::unordered_set<int>& set2) {
+std::unordered_set<int> intersectTimeSets(const std::unordered_set<int>& set1,
+                                         const std::unordered_set<int>& set2) {
+    // Determine the smaller set and iterate over it to reduce lookups.
+    const std::unordered_set<int>* small = &set1;
+    const std::unordered_set<int>* large = &set2;
+    if (set2.size() < set1.size()) {
+        small = &set2;
+        large = &set1;
+    }
+
     std::unordered_set<int> intersection;
-    for (const auto& elem : set1) {
-        if (set2.find(elem) != set2.end()) {
+    for (const auto& elem : *small) {
+        if (large->find(elem) != large->end()) {
             intersection.insert(elem);
         }
     }
+
+    // If clarity is preferred over performance, the sets could be copied to
+    // ordered containers and std::set_intersection applied.
     return intersection;
 }
 
