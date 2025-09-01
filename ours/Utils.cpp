@@ -122,48 +122,50 @@ bool readQueryGraph(const std::string &filename ,Graph &queryGraph){
 		std::cerr << "Error: Cannot open query graph file "<<filename<<std::endl;	
 		return false;	
 	}
-	std::string line;	
-	int max_vertex = -1;
+        std::string line;
 
 	while(getline(infile,line)){
 		if(line.empty()) continue;
 
 		std::istringstream iss(line);	
-		std::string v1_str,v2_str,label;	
-		if(!(iss >> v1_str >> v2_str)){
-			std::cerr << "Error: Invalid line in query graph file: "<<line<<std::endl;	
-			return false;	
-		}
-		
-		int v1 = -1,v2 = -1;	
+                std::string v1_str, v2_str, edge_label;
+                if (!(iss >> v1_str >> v2_str)) {
+                        std::cerr << "Error: Invalid line in query graph file: " << line << std::endl;
+                        return false;
+                }
 
-        	auto it_v1 = std::find(queryGraph.vertex_labels.begin(), queryGraph.vertex_labels.end(), v1_str);
-        	if(it_v1 == queryGraph.vertex_labels.end()){
-            		v1 = queryGraph.vertex_labels.size();
-            		queryGraph.vertex_labels.push_back(v1_str);
-            		queryGraph.adj.emplace_back();
-        	}else{
-            		v1 = it_v1 - queryGraph.vertex_labels.begin();
-        	}
+                // Optional edge label
+                if (iss >> edge_label) {
+                        std::string extra;
+                        if (iss >> extra) {
+                                std::cerr << "Error: Invalid line in query graph file (too many tokens): " << line << std::endl;
+                                return false;
+                        }
+                } else {
+                        edge_label = "";
+                }
 
-        	auto it_v2 = std::find(queryGraph.vertex_labels.begin(), queryGraph.vertex_labels.end(), v2_str);
-        	if(it_v2 == queryGraph.vertex_labels.end()){
-            		v2 = queryGraph.vertex_labels.size();
-            		queryGraph.vertex_labels.push_back(v2_str);
-            		queryGraph.adj.emplace_back();
-        	}else{
-            		v2 = it_v2 - queryGraph.vertex_labels.begin();
-        	}
+                int v1 = -1, v2 = -1;
 
-		
-		max_vertex = std::max(max_vertex,std::max(v1,v2));	
-		
-		while(queryGraph.adj.size() <= max_vertex){
-            		queryGraph.adj.emplace_back();
-            		queryGraph.vertex_labels.push_back("");
-        	}
-		
-        	queryGraph.adj[v1].emplace_back(Edge{v2,""});
+                auto it_v1 = std::find(queryGraph.vertex_labels.begin(), queryGraph.vertex_labels.end(), v1_str);
+                if (it_v1 == queryGraph.vertex_labels.end()) {
+                        v1 = queryGraph.vertex_labels.size();
+                        queryGraph.vertex_labels.push_back(v1_str);
+                        queryGraph.adj.emplace_back();
+                } else {
+                        v1 = it_v1 - queryGraph.vertex_labels.begin();
+                }
+
+                auto it_v2 = std::find(queryGraph.vertex_labels.begin(), queryGraph.vertex_labels.end(), v2_str);
+                if (it_v2 == queryGraph.vertex_labels.end()) {
+                        v2 = queryGraph.vertex_labels.size();
+                        queryGraph.vertex_labels.push_back(v2_str);
+                        queryGraph.adj.emplace_back();
+                } else {
+                        v2 = it_v2 - queryGraph.vertex_labels.begin();
+                }
+
+                queryGraph.adj[v1].emplace_back(Edge{v2, edge_label});
      }
 	 queryGraph.num_vertices = queryGraph.adj.size();
      infile.close();
