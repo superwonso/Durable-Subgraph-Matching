@@ -76,11 +76,12 @@ bool readTemporalGraph(const std::string& filename, Graph& graph) {
 
     std::string line;
 
-    // Random generator for labels
+    // Random generator for labels using a fixed seed so that tests are
+    // reproducible across runs. If deterministic behaviour is not desired, the
+    // seed value below can be replaced with a runtime configurable one.
     std::vector<std::string> labels = {"A", "B", "C", "D", "E"};
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, labels.size() - 1);
+    std::mt19937 gen(42);  // Fixed seed for deterministic label assignment
+    std::uniform_int_distribution<> dis(0, static_cast<int>(labels.size()) - 1);
 
     int max_vertex = -1;
 

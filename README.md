@@ -19,6 +19,13 @@ g++(c++17) 14.2.0, x64
 
 g++ -Wall -Wextra -g3 -O3 -std=c++17 main.cpp query_decomposition.cpp TDTree.cpp Utils.cpp -o td_tree.o
 
+# Temporal Graph File Format
+
+The helper that loads temporal graphs expects each line of the data file to
+contain three integers: `src dst time`. During loading, labels for vertices and
+edges are synthesised from the set `{A, B, C, D, E}` using a fixed random seed
+to make results reproducible across runs.
+
 # Method
 
 td_tree.o {data_graph} {query_graph} {threshold(integer)}
