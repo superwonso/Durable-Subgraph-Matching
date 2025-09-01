@@ -1,20 +1,19 @@
-# Enhanced Durable Subgraph Matching
+# Abstract
 
-This repository is the implementation code about DongHyeon Cha’s Master Degree Thesis
+Durable subgraph matching schemes have been proposed to discover subgraph patterns that occur consecutively
+across multiple snapshots of a temporal graph. However, during candidate selection, the cost of isomorphism test
+increases because the entire temporal range must be scanned. In addition, decomposing the query without considering
+the characteristics of temporal graphs generates many unnecessary candidates. In this paper, we propose an efficient
+durable subgraph matching scheme in temporal graph. The proposed scheme reduces the search space in the candidate
+selection phase by applying a filter during initial snapshot merging to remove edges that can never form durable
+subgraphs. It also accelerates overall processing by decomposing the query with a selectivity formula that reflects
+temporal graph characteristics so that fewer candidates are produced. 
 
 # Evaluation Environments
 
-Intel Core i7-9700KF
-
-DDR4 64GB @ 3200Mhz
-
 Windows 11 23H2
 
-g++ 14.2.0, x64
-
-# Requirements
-
-g++ (c++17)
+g++(c++17) 14.2.0, x64
 
 # Build Command
 
@@ -26,8 +25,6 @@ td_tree.o {data_graph} {query_graph} {threshold(integer)}
 
 # Papers 
 
-동적 그래프에서 지속 가능한 서브 그래프 매칭 방법(Durable Subgraph Matching Method in Dynamic Graph), Cha et al., 한국콘텐츠학회 2024 종합학술대회, (2024)  
-An Efficient Durable Subgraph Matching Scheme on Temporal Graphs, Cha et al., ICCC 2024 (KoCon.a), Vietnam, Danang, (2024)  
 An Efficient Durable Subgraph Matching Scheme on Temporal Graphs, D.H. Cha, M.S. dissertation, Dept. of Info. & Comm. Eng., Chungbuk National Univ., Cheongju, Chungbuk, Korea, 2025
 
 # Compared algorithms
