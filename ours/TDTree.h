@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_set>
 #include <memory>
+#include <string>
 #include "query_decomposition.h"
 #include "Utils.h"
 
@@ -41,6 +42,7 @@ public:
     // Print the TD-Tree (for debugging)
     void print() const;
     void print_res() const;
+    void save_res(const std::string& filename) const;
 
 private:
     const Graph& G; // Temporal graph

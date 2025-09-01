@@ -1,5 +1,7 @@
 #include <iostream>
 #include <chrono>
+#include <fstream>
+#include <unordered_map>
 #include "TDTree.h"
 #include "query_decomposition.h"
 #include "Utils.h"
@@ -17,24 +19,34 @@ int main(int argc, char* argv[]){
     // Minimum duration threshold
     int k = std::stoi(argv[3]);
 
+    std::unordered_map<std::string, long long> timings;
+
     // Read the temporal graph
+    auto start = std::chrono::steady_clock::now();
     Graph temporalGraph;
     if(!readTemporalGraph(temporalGraphFile, temporalGraph)){
         std::cerr << "Failed to read temporal graph." << std::endl;
         return -1;
     }
+    timings["readTemporalGraph"] = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - start).count();
     std::cout << "Temporal Graph Read" << std::endl;
+
     // Read the query graph
+    start = std::chrono::steady_clock::now();
     Graph queryGraph;
     if(!readQueryGraph(queryGraphFile, queryGraph)){
         std::cerr << "Failed to read query graph." << std::endl;
         return -1;
     }
+    timings["readQueryGraph"] = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - start).count();
     std::cout<< "Query Graph Read" << std::endl;
 
     // Define label_counts based on temporal graph labels
     // Assuming label_counts map contains counts of each label in the data graph
     std::cout << "Start Label Counting" << std::endl;
+    start = std::chrono::steady_clock::now();
     std::unordered_map<std::string, int> label_counts;
 
     for (int u = 0; u < temporalGraph.adj.size(); ++u) {
@@ -82,24 +94,36 @@ int main(int argc, char* argv[]){
             label_average_lifespans[label] = 0.0; // 정점이 없는 경우 평균 수명은 0으로 설정
         }
     }
-
-    // // 평균 수명 확인을 위한 출력
-    // for (const auto& label_avg : label_average_lifespans) {
-    //     std::cout << "Label: " << label_avg.first << ", Average Lifespan: " << label_avg.second << std::endl;
-    // }
+    timings["labelCounting"] = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - start).count();
 
     std::cout << "Label Counted " << std::endl;
+
     // Perform query decomposition
-    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+    start = std::chrono::steady_clock::now();
     QueryDecomposition qd = decomposeQuery(queryGraph, label_counts, label_average_lifespans);
-    std::cout << "Query Decomposed" << std::endl; 
+    timings["queryDecomposition"] = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - start).count();
+    std::cout << "Query Decomposed" << std::endl;
+
     // Create and build the TDTree
+    start = std::chrono::steady_clock::now();
     TDTree tdTree(temporalGraph, queryGraph ,qd, k);
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    std::chrono::milliseconds millisec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    std::cout << "Time consumed: " << millisec.count() << " ms" << std::endl;
+    timings["buildTDTree"] = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - start).count();
     std::cout << "TDTree Created" << std::endl;
-    // Print the TD-Tree
-    // tdTree.print_res();
+
+    // Print matching results
+    tdTree.print_res();
+
+    // Save matching results to file
+    tdTree.save_res("matching_results.txt");
+
+    // Write timing results to file
+    std::ofstream resultFile("timing_results.txt");
+    for (const auto& t : timings) {
+        resultFile << t.first << ": " << t.second << " ms" << std::endl;
+    }
+
     return 0;
 }
