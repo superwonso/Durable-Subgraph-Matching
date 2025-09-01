@@ -141,23 +141,7 @@ void TDTree::growTDTree() {
 
 // Non-tree edge test using Bloom filters
 bool TDTree::nonTreeEdgeTest(int v_prime, TDTreeNode* current_node) const {
-    // Check if the node is internal and has a Bloom filter
-    if (!current_node || !current_node->bloom) {
-    //     // If there is no bloom filter or current node is null, we cannot perform the test
-    //     return false;
-    // }
-
-    // Use the Bloom filter to check if v_prime is a possible match
-    // bool bloom_result = current_node->bloom->possiblyContains(v_prime);
-
-    // if (bloom_result) {
-        // If Bloom filter says it might contain the element, we consider it as a potential candidate
-        return true;
-    // } else {
-    //     // If Bloom filter says no, we can definitively say it does not match
-    //     return false;
-    }
-        // Skip the vertex if it already exists in the Bloom filter (approximate check)
+    if (!current_node || !current_node->bloom) return false;
     return !current_node->bloom->possiblyContains(v_prime);
 }
 
