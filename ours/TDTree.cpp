@@ -1,5 +1,6 @@
 #include "TDTree.h"
 #include <iostream>
+#include <algorithm>
 
 // Constructor: Initializes the TDTree and starts building
 TDTree::TDTree(const Graph& temporal_graph, const Graph& query_graph, const QueryDecomposition& decomposition, int k)
@@ -179,10 +180,51 @@ void TDTree::trimBottomUp() {
 
         for (int j = 0; j < node->blocks.size(); ) {
             TDTreeBlock& block = node->blocks[j];
-            bool should_remove = false;
 
-            if (!should_remove) ++j;
-            else node->blocks.erase(node->blocks.begin() + j);
+            // Remove any candidate vertex that cannot be extended to satisfy all
+            // child query vertices.  The check is performed per candidate so that
+            // blocks may store multiple candidates, mirroring typical graph
+            // matching scenarios.
+            block.V_cand.erase(std::remove_if(block.V_cand.begin(), block.V_cand.end(),
+                [&](int v_cand) {
+                    for (int child_qid : QD.spanning_tree_adj[node->query_vertex_id]) {
+                        TDTreeNode* child_node = nullptr;
+                        // Locate the TDTreeNode corresponding to the child query vertex
+                        for (auto& n_ptr : nodes) {
+                            if (n_ptr->query_vertex_id == child_qid) {
+                                child_node = n_ptr.get();
+                                break;
+                            }
+                        }
+
+                        bool found_match = false;
+                        if (child_node) {
+                            // Fast rejection using the child's bloom filter when
+                            // available before scanning the blocks.
+                            if (child_node->bloom && !child_node->bloom->possiblyContains(v_cand)) {
+                                return true; // candidate not present in child
+                            }
+                            for (const auto& child_block : child_node->blocks) {
+                                if (child_block.v_par == v_cand) {
+                                    found_match = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!found_match) {
+                            return true; // remove this candidate
+                        }
+                    }
+                    return false; // candidate is consistent with all children
+                }),
+                block.V_cand.end());
+
+            if (block.V_cand.empty()) {
+                node->blocks.erase(node->blocks.begin() + j);
+            } else {
+                ++j;
+            }
         }
     }
 }
