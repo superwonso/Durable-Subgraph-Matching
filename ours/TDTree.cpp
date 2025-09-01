@@ -1,6 +1,7 @@
 #include "TDTree.h"
 #include <iostream>
 #include <algorithm>
+#include <fstream>
 
 // Constructor: Initializes the TDTree and starts building
 TDTree::TDTree(const Graph& temporal_graph, const Graph& query_graph, const QueryDecomposition& decomposition, int k)
@@ -270,6 +271,25 @@ void TDTree::print_res() const {
                 }
             }
             std::cout << std::endl;
+        }
+    }
+}
+
+void TDTree::save_res(const std::string& filename) const {
+    std::ofstream out(filename);
+    if (!out.is_open()) {
+        return;
+    }
+    for (const auto& node_ptr : nodes) {
+        const TDTreeNode* node = node_ptr.get();
+        if (node->isLeaf) {
+            out << "Query Vertex ID: " << node->query_vertex_id << " - Candidates: ";
+            for (const auto& block : node->blocks) {
+                for (const auto& v : block.V_cand) {
+                    out << v << ' ';
+                }
+            }
+            out << '\n';
         }
     }
 }

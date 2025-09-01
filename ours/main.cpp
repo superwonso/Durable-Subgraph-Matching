@@ -113,8 +113,11 @@ int main(int argc, char* argv[]){
         std::chrono::steady_clock::now() - start).count();
     std::cout << "TDTree Created" << std::endl;
 
-    // Print the TD-Tree
-    // tdTree.print_res();
+    // Print matching results
+    tdTree.print_res();
+
+    // Save matching results to file
+    tdTree.save_res("matching_results.txt");
 
     // Write timing results to file
     std::ofstream resultFile("timing_results.txt");
