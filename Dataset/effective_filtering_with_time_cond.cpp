@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 
     // 엣지 정보를 저장할 해시맵과 스냅샷을 저장할 벡터
     Edges edges;
-    edges.reserve(850000); // 예상 엣지 수에 따라 조정
+    edges.reserve(6420000); // 예상 엣지 수에 따라 조정
 
     // 입력 데이터의 유효성 검증을 위한 변수
     int invalid_lines = 0;
