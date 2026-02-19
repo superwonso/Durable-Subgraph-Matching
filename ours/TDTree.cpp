@@ -165,6 +165,12 @@ void TDTree::trimTopDown() {
             TDTreeBlock& block = node->blocks[i];
             bool should_remove = false;
 
+            // Root block has v_par == -1 and should not be removed by parent-membership test.
+            if (block.v_par == -1) {
+                ++i;
+                continue;
+            }
+
             if (!node->bloom->possiblyContains(block.v_par)) should_remove = true;
 
             if (!should_remove) ++i;

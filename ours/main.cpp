@@ -2,6 +2,7 @@
 #include <chrono>
 #include <fstream>
 #include <unordered_map>
+#include <filesystem>
 #include "TDTree.h"
 #include "query_decomposition.h"
 #include "Utils.h"
@@ -18,7 +19,7 @@ int main(int argc, char* argv[]){
     // File paths for the temporal graph and query graph
 
     if(argc != 4){
-        std::cerr << "사용법: " << argv[0] << " <데이터 그래프 파일> <쿼리 그래프 파일> <최소 지속 기간 k>\n";
+        std::cerr << "Usage: " << argv[0] << " <Data Graph> <Query Graph> <Minimum Duration k>\n";
         return 1;
     }
 
@@ -26,6 +27,7 @@ int main(int argc, char* argv[]){
     std::string queryGraphFile = argv[2];
     // Minimum duration threshold
     int k = std::stoi(argv[3]);
+    std::string datasetName = std::filesystem::path(temporalGraphFile).stem().string();
 
     std::unordered_map<std::string, long long> timings;
 
@@ -36,6 +38,7 @@ int main(int argc, char* argv[]){
         std::cerr << "Failed to read temporal graph." << std::endl;
         return -1;
     }
+    size_t inputGraphMem = temporalGraph.getMemoryUsage();
     timings["readTemporalGraph"] = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now() - start).count();
     std::cout << "Temporal Graph Read" << std::endl;
@@ -125,30 +128,25 @@ int main(int argc, char* argv[]){
     tdTree.print_res();
 
     // Save matching results to file
-    tdTree.save_res("matching_results.txt");
+    tdTree.save_res("matching_results_" + datasetName + ".txt");
 
     // Write timing results to file
-    std::ofstream resultFile("timing_results.txt");
+    std::ofstream resultFile("timing_results_" + datasetName + ".txt");
     for (const auto& t : timings) {
         resultFile << t.first << ": " << t.second << " ms" << std::endl;
     }
 
-    // 1. 입력 그래프 메모리 측정
-    Graph temporalGraph;
-    readTemporalGraph(temporalGraphFile, temporalGraph);
-    size_t inputGraphMem = temporalGraph.getMemoryUsage();
-
-    // 2. TD-Tree 구축 및 메모리 측정
-    TDTree tdTree(temporalGraph, queryGraph, qd, k);
+    // 1. TD-Tree 메모리 측정
     size_t tdTreeMem = tdTree.getMemoryUsage();
 
-    // 3. 전체 실행 후 피크 메모리 측정
+    // 2. 전체 실행 후 피크 메모리 측정
     // (여기서 매칭 함수 expand() 호출 등이 완료된 후)
     size_t totalPeakMem = getPeakRSS();
 
-    // 4. "Other" 메모리 계산
+    // 3. "Other" 메모리 계산
     // 전체 피크에서 (그래프 + TD-tree)를 뺀 나머지
-    size_t otherMem = totalPeakMem - inputGraphMem - tdTreeMem;
+    size_t usedByKnown = inputGraphMem + tdTreeMem;
+    size_t otherMem = (totalPeakMem > usedByKnown) ? (totalPeakMem - usedByKnown) : 0;
 
     // 결과 출력 (메모리 사용량)
     std::cout << "\n--- Memory Measurement (KB) ---" << std::endl;
