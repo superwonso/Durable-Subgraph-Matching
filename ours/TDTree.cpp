@@ -259,6 +259,25 @@ void TDTree::print() const {
     // }
 }
 
+size_t TDTree::getMemoryUsage() const {
+    size_t total = 0;
+    for (const auto& node_ptr : nodes) {
+        total += sizeof(TDTreeNode);
+        // Bloom Filter 크기 (bits_ 벡터 크기 포함)
+        if (node_ptr->bloom) {
+            total += sizeof(BloomFilter) + (1000 / 8); // 예시: 생성 시 bloom_size 기준
+        }
+        // Blocks 및 Candidates 크기
+        for (const auto& block : node_ptr->blocks) {
+            total += sizeof(TDTreeBlock);
+            total += block.V_cand.capacity() * sizeof(int);
+            total += block.TS.size() * sizeof(int);
+        }
+    }
+    return total;
+}
+
+
 void TDTree::print_res() const {
     for (const auto& node_ptr : nodes) {
         const TDTreeNode* node = node_ptr.get();

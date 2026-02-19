@@ -5,6 +5,14 @@
 #include "TDTree.h"
 #include "query_decomposition.h"
 #include "Utils.h"
+#include <windows.h>
+#include <psapi.h>
+
+size_t getPeakRSS() {
+    PROCESS_MEMORY_COUNTERS info;
+    GetProcessMemoryInfo(GetCurrentProcess(), &info, sizeof(info));
+    return (size_t)info.PeakWorkingSetSize;
+}
 
 int main(int argc, char* argv[]){
     // File paths for the temporal graph and query graph
@@ -124,6 +132,30 @@ int main(int argc, char* argv[]){
     for (const auto& t : timings) {
         resultFile << t.first << ": " << t.second << " ms" << std::endl;
     }
+
+    // 1. 입력 그래프 메모리 측정
+    Graph temporalGraph;
+    readTemporalGraph(temporalGraphFile, temporalGraph);
+    size_t inputGraphMem = temporalGraph.getMemoryUsage();
+
+    // 2. TD-Tree 구축 및 메모리 측정
+    TDTree tdTree(temporalGraph, queryGraph, qd, k);
+    size_t tdTreeMem = tdTree.getMemoryUsage();
+
+    // 3. 전체 실행 후 피크 메모리 측정
+    // (여기서 매칭 함수 expand() 호출 등이 완료된 후)
+    size_t totalPeakMem = getPeakRSS();
+
+    // 4. "Other" 메모리 계산
+    // 전체 피크에서 (그래프 + TD-tree)를 뺀 나머지
+    size_t otherMem = totalPeakMem - inputGraphMem - tdTreeMem;
+
+    // 결과 출력 (메모리 사용량)
+    std::cout << "\n--- Memory Measurement (KB) ---" << std::endl;
+    std::cout << "Input Graph Size: " << inputGraphMem / 1024 << " KB" << std::endl;
+    std::cout << "DSM (TD-tree): " << tdTreeMem / 1024 << " KB" << std::endl;
+    std::cout << "DSM (Other): " << otherMem / 1024 << " KB" << std::endl;
+    std::cout << "Total Peak: " << totalPeakMem / 1024 << " KB" << std::endl;
 
     return 0;
 }

@@ -31,6 +31,24 @@ struct Graph {
     };
     std::unordered_map<std::pair<int, int>, std::unordered_set<int>, pair_hash> edge_time_instances; // Time instances for each edge
 
+// Graph 구조체 내부에 추가
+size_t getMemoryUsage() const {
+    size_t total = sizeof(Graph);
+    // 인접 리스트 메모리
+    for (const auto& neighbors : adj) {
+        total += sizeof(std::vector<Edge>) + (neighbors.capacity() * sizeof(Edge));
+    }
+    // 정점 레이블 메모리
+    for (const auto& label : vertex_labels) {
+        total += label.capacity();
+    }
+    // 시간 정보(Map & Set) 메모리 - 대략적인 추정
+    for (const auto& entry : edge_time_instances) {
+        total += sizeof(std::pair<int, int>) + sizeof(std::unordered_set<int>);
+        total += entry.second.size() * sizeof(int); // Set 내부 요소
+    }
+    return total;
+}
 
 };
 

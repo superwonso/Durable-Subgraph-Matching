@@ -43,6 +43,7 @@ public:
     void print() const;
     void print_res() const;
     void save_res(const std::string& filename) const;
+    size_t getMemoryUsage() const;
 
 private:
     const Graph& G; // Temporal graph
@@ -72,6 +73,7 @@ private:
 
     // Reference to label counts for selectivity
     // const std::unordered_map<std::string, int>& label_counts_;
+
 };
 
 #endif // TDTREE_H
