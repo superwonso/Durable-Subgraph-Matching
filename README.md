@@ -15,20 +15,43 @@ Windows 11 23H2
 
 g++(c++17) 14.2.0, x64
 
-# Build Command
+# Implementations
 
-g++ -Wall -Wextra -g3 -O3 -std=c++17 main.cpp query_decomposition.cpp TDTree.cpp Utils.cpp -o td_tree.o
+| Directory | Semantics | Build and usage |
+| --- | --- | --- |
+| `ours` | Algorithm 3.1 prefilter + temporal root selectivity + exact durable matching | [`ours/README.md`](ours/README.md) |
+| `original` | No prefilter, original topological root selectivity + exact durable matching | [`original/README.md`](original/README.md) |
+| `TurboISO` | Timestamp-collapsed static directed baseline | [`TurboISO/README.md`](TurboISO/README.md) |
+
+On Windows, each directory provides `build.ps1` and a regression-test script.
+For example:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\ours\build.ps1
+powershell -ExecutionPolicy Bypass -File .\original\run_tests.ps1
+powershell -ExecutionPolicy Bypass -File .\TurboISO\run_tests.ps1
+```
 
 # Temporal Graph File Format
 
-The helper that loads temporal graphs expects each line of the data file to
-contain three integers: `src dst time`. During loading, labels for vertices and
-edges are synthesised from the set `{A, B, C, D, E}` using a fixed random seed
-to make results reproducible across runs.
+Each data row contains three integers, `src dst time`, and represents the
+directed arc `src -> dst` at one snapshot. The datasets do not contain vertex
+labels, so sorted raw vertex IDs receive reproducible random labels from
+`{A, B, C, D, E}` using `std::mt19937` and seed 42 by default. Reciprocal arcs
+remain distinct.
 
 # Method
 
-td_tree.o {data_graph} {query_graph} {threshold(integer)}
+The durable implementations use:
+
+```text
+td_tree.exe <data_graph> <query_graph> <minimum_duration_k> [label_seed]
+```
+
+`Original` additionally supports `--count-only` for large result sets. The
+TurboISO converter collapses timestamps by ordered pair because TurboISO is a
+static, not durable, comparison baseline; see its README for the two-step
+convert/run command.
 
 # Papers 
 
