@@ -40,8 +40,14 @@ bitcoin-*.*
 output.*
 candidates.*
 
-# Other repo
-/TurboISO
+# TurboISO is maintained as a baseline in this repository. Its generated
+# executables, object files, and text outputs are already covered above.
+# `TurboISO/util/Util.*` is an unused legacy duplicate; the supported build
+# uses `TurboISO/util.h` and does not compile that directory.
+/TurboISO/util/
 
 # Dataset
 *.txt
+
+# Local paper reference
+/ours/260408_cdh.pdf
