@@ -1,79 +1,82 @@
 #ifndef TDTREE_H
 #define TDTREE_H
 
-#include <vector>
-#include <unordered_set>
-#include <memory>
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <iosfwd>
 #include <string>
-#include "query_decomposition.h"
+#include <unordered_map>
+#include <vector>
+
 #include "Utils.h"
+#include "query_decomposition.h"
 
-// Structure: TDTreeBlock
 struct TDTreeBlock {
-    int v_par; // Parent vertex in the data graph
-    std::vector<int> V_cand; // Candidate vertices for the current query vertex
-    std::unordered_set<int> TS; // Time instance set (only for leaf nodes)
-
-    TDTreeBlock(int parent_vertex) : v_par(parent_vertex) {}
+    int v_par = -1;
+    std::vector<int> V_cand;
 };
 
-// Structure: TDTreeNode
 struct TDTreeNode {
-    int query_vertex_id; // ID of the query vertex
-    std::vector<TDTreeBlock> blocks; // List of blocks
-    std::unique_ptr<BloomFilter> bloom; // Bloom filter for internal nodes
-    bool isLeaf; // Indicates if the node is a leaf
+    int query_vertex_id = -1;
+    bool isRoot = false;
+    bool isLeaf = false;
+    std::vector<int> root_candidates;
+    std::vector<TDTreeBlock> blocks;
+    std::unordered_map<int, std::size_t> block_index;
 
-    TDTreeNode(int q_vid, size_t bloom_size = 1000, size_t num_hashes = 3)
-        : query_vertex_id(q_vid), isLeaf(false) {
-        bloom = std::make_unique<BloomFilter>(bloom_size, num_hashes);
-    }
+    const TDTreeBlock* findBlock(int parent_vertex) const;
+    void rebuildBlockIndex();
 };
 
-// Class: TDTree
+struct MatchSummary {
+    std::uint64_t match_count = 0;
+    long long enumeration_milliseconds = 0;
+    bool output_written = false;
+};
+
 class TDTree {
 public:
-    // Constructor
-    TDTree(const Graph& temporal_graph, const Graph& query_graph, const QueryDecomposition& decomposition, int k);
+    TDTree(
+        const Graph& temporal_graph,
+        const Graph& query_graph,
+        const QueryDecomposition& decomposition,
+        int minimum_duration);
 
-    // Build the TD-Tree
-    void build();
-
-    // Print the TD-Tree (for debugging)
-    void print() const;
     void print_res() const;
-    void save_res(const std::string& filename) const;
-    size_t getMemoryUsage() const;
+    MatchSummary save_res(const std::string& filename) const;
+    std::size_t getMemoryUsage() const;
+    std::size_t candidateRelationCount() const;
 
 private:
-    const Graph& G; // Temporal graph
-    const Graph& Q; // Query Graph
-    const QueryDecomposition& QD; // Query decomposition result
-    int k_threshold; // Minimum duration threshold
+    const Graph& G;
+    const Graph& Q;
+    const QueryDecomposition& QD;
+    int k_threshold;
 
-    std::vector<std::unique_ptr<TDTreeNode>> nodes; // List of TD-Tree nodes
+    std::vector<TDTreeNode> nodes;
+    std::vector<std::array<int, kLabelCount>> query_out_neighbor_label_requirements;
+    std::vector<std::array<int, kLabelCount>> query_in_neighbor_label_requirements;
 
-    // Internal methods for tree construction
-    void growTDTree();
-    void trimTDTree();
-    void initTree(const std::vector<std::vector<int>>& query_tree);    
+    void build();
+    void initializeNodes();
+    void initializeQueryRequirements();
     void fillRoot();
-    void fillNode(TDTreeNode* current_node, int parent_vertex, const std::unordered_set<int>& TS_set);
-    void removeBlock(TDTreeNode* node, int block_index);
-
-    // Helper methods for trimming
-    void trimTopDown();
+    void buildCandidateRelations();
     void trimBottomUp();
+    void trimTopDown();
+    void rebuildBlockIndexes();
 
-    // Non-tree edge verification
-    bool nonTreeEdgeTest(int v_prime, TDTreeNode* current_node) const;
-    bool checkMinimumDuration(int vertex) const;
-    bool checkMinimumConsecutiveDuration(const std::unordered_set<int>& time_instances) const;
-    std::unordered_set<int> computeVertexTimeInstances(int vertex) const;
+    bool isDataVertexCandidate(int data_vertex, int query_vertex) const;
+    bool passesAvailableNonTreeConstraints(
+        int data_vertex,
+        int query_vertex,
+        const std::vector<int>& order_position,
+        const std::vector<std::vector<std::uint8_t>>& candidate_flags) const;
 
-    // Reference to label counts for selectivity
-    // const std::unordered_map<std::string, int>& label_counts_;
-
+    std::vector<int> uniqueCandidates(const TDTreeNode& node) const;
+    std::size_t uniqueCandidateCount(const TDTreeNode& node) const;
+    std::uint64_t enumerateMatches(std::ostream& output) const;
 };
 
 #endif // TDTREE_H

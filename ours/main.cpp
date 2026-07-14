@@ -1,159 +1,212 @@
-#include <iostream>
+#include <array>
 #include <chrono>
-#include <fstream>
-#include <unordered_map>
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
-#include "TDTree.h"
-#include "query_decomposition.h"
-#include "Utils.h"
+#include <fstream>
+#include <iostream>
+#include <limits>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+
+#ifdef _WIN32
 #include <windows.h>
 #include <psapi.h>
+#else
+#include <sys/resource.h>
+#endif
 
-size_t getPeakRSS() {
-    PROCESS_MEMORY_COUNTERS info;
-    GetProcessMemoryInfo(GetCurrentProcess(), &info, sizeof(info));
-    return (size_t)info.PeakWorkingSetSize;
+#include "TDTree.h"
+#include "Utils.h"
+#include "query_decomposition.h"
+
+namespace {
+
+std::size_t getPeakRSS() {
+#ifdef _WIN32
+    PROCESS_MEMORY_COUNTERS info{};
+    if (GetProcessMemoryInfo(GetCurrentProcess(), &info, sizeof(info)) == 0) return 0;
+    return static_cast<std::size_t>(info.PeakWorkingSetSize);
+#else
+    rusage usage{};
+    if (getrusage(RUSAGE_SELF, &usage) != 0) return 0;
+    return static_cast<std::size_t>(usage.ru_maxrss) * 1024;
+#endif
 }
 
-int main(int argc, char* argv[]){
-    // File paths for the temporal graph and query graph
+long long elapsedMilliseconds(std::chrono::steady_clock::time_point start) {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - start).count();
+}
 
-    if(argc != 4){
-        std::cerr << "Usage: " << argv[0] << " <Data Graph> <Query Graph> <Minimum Duration k>\n";
+} // namespace
+
+int main(int argc, char* argv[]) {
+    if (argc != 4 && argc != 5) {
+        std::cerr << "Usage: " << argv[0]
+                  << " <Data Graph> <Query Graph> <Minimum Duration k> [Label Seed]\n";
         return 1;
     }
 
-    std::string temporalGraphFile = argv[1];
-    std::string queryGraphFile = argv[2];
-    // Minimum duration threshold
-    int k = std::stoi(argv[3]);
-    std::string datasetName = std::filesystem::path(temporalGraphFile).stem().string();
+    int minimum_duration = 0;
+    try {
+        minimum_duration = std::stoi(argv[3]);
+    } catch (const std::exception&) {
+        std::cerr << "Error: k must be an integer.\n";
+        return 1;
+    }
+    if (minimum_duration < 2) {
+        std::cerr << "Error: k must be at least 2 because the PDF's preprocessing "
+                     "removes edges without a consecutive snapshot pair.\n";
+        return 1;
+    }
 
+    std::uint32_t label_seed = kDefaultLabelSeed;
+    if (argc == 5) {
+        try {
+            const std::string seed_text = argv[4];
+            if (seed_text.empty() || seed_text.front() == '-') {
+                throw std::invalid_argument("label seed");
+            }
+            std::size_t parsed_characters = 0;
+            const unsigned long long parsed_seed =
+                std::stoull(seed_text, &parsed_characters);
+            if (parsed_characters != seed_text.size()) {
+                throw std::invalid_argument("label seed");
+            }
+            if (parsed_seed > std::numeric_limits<std::uint32_t>::max()) {
+                throw std::out_of_range("label seed");
+            }
+            label_seed = static_cast<std::uint32_t>(parsed_seed);
+        } catch (const std::exception&) {
+            std::cerr << "Error: label seed must be a 32-bit unsigned integer.\n";
+            return 1;
+        }
+    }
+
+    const std::string temporal_graph_file = argv[1];
+    const std::string query_graph_file = argv[2];
+    const std::string dataset_name =
+        std::filesystem::path(temporal_graph_file).stem().string();
+    const auto total_start = std::chrono::steady_clock::now();
     std::unordered_map<std::string, long long> timings;
 
-    // Read the temporal graph
-    auto start = std::chrono::steady_clock::now();
-    Graph temporalGraph;
-    if(!readTemporalGraph(temporalGraphFile, temporalGraph)){
-        std::cerr << "Failed to read temporal graph." << std::endl;
-        return -1;
+    Graph temporal_graph;
+    TemporalGraphLoadTimings temporal_load_timings;
+    auto stage_start = std::chrono::steady_clock::now();
+    if (!readTemporalGraph(
+            temporal_graph_file, temporal_graph, label_seed, &temporal_load_timings)) {
+        return 2;
     }
-    size_t inputGraphMem = temporalGraph.getMemoryUsage();
-    timings["readTemporalGraph"] = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() - start).count();
-    std::cout << "Temporal Graph Read" << std::endl;
+    timings["readAndFilterTemporalGraph"] = elapsedMilliseconds(stage_start);
+    timings["readTemporalGraph"] = temporal_load_timings.read_milliseconds;
+    timings["filterTemporalGraph"] = temporal_load_timings.filter_milliseconds;
+    std::cout << "Temporal graph: " << temporal_graph.input_occurrence_count
+              << " occurrences, " << temporal_graph.input_unique_edge_count
+              << " unique directed edges, " << temporal_graph.filtered_edge_count
+              << " retained edges, " << temporal_graph.num_vertices
+              << " active vertices, random label seed=" << label_seed << ".\n";
+    std::cout << "Temporal preprocessing (ms): read="
+              << temporal_load_timings.read_milliseconds
+              << ", filter=" << temporal_load_timings.filter_milliseconds
+              << ", total=" << timings["readAndFilterTemporalGraph"] << '\n';
 
-    // Read the query graph
-    start = std::chrono::steady_clock::now();
-    Graph queryGraph;
-    if(!readQueryGraph(queryGraphFile, queryGraph)){
-        std::cerr << "Failed to read query graph." << std::endl;
-        return -1;
+    Graph query_graph;
+    stage_start = std::chrono::steady_clock::now();
+    if (!readQueryGraph(query_graph_file, query_graph)) return 2;
+    timings["readQueryGraph"] = elapsedMilliseconds(stage_start);
+
+    stage_start = std::chrono::steady_clock::now();
+    std::array<std::size_t, kLabelCount> label_vertex_counts{};
+    std::array<long long, kLabelCount> label_duration_sums{};
+    for (std::size_t vertex = 0; vertex < temporal_graph.vertex_labels.size(); ++vertex) {
+        const Label label = temporal_graph.vertex_labels[vertex];
+        if (label >= kLabelCount) continue;
+        ++label_vertex_counts[label];
+        label_duration_sums[label] += temporal_graph.vertex_active_durations[vertex];
     }
-    timings["readQueryGraph"] = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() - start).count();
-    std::cout<< "Query Graph Read" << std::endl;
 
-    // Define label_counts based on temporal graph labels
-    // Assuming label_counts map contains counts of each label in the data graph
-    std::cout << "Start Label Counting" << std::endl;
-    start = std::chrono::steady_clock::now();
-    std::unordered_map<std::string, int> label_counts;
+    std::array<double, kLabelCount> label_average_lifespans{};
+    for (std::size_t label = 0; label < kLabelCount; ++label) {
+        if (label_vertex_counts[label] > 0) {
+            label_average_lifespans[label] =
+                static_cast<double>(label_duration_sums[label]) /
+                static_cast<double>(label_vertex_counts[label]);
+        }
+    }
+    timings["labelStatistics"] = elapsedMilliseconds(stage_start);
 
-    for (int u = 0; u < temporalGraph.adj.size(); ++u) {
-        for (const auto& edge : temporalGraph.adj[u]) {
-            label_counts[edge.label]++;
+    stage_start = std::chrono::steady_clock::now();
+    const QueryDecomposition decomposition = decomposeQuery(
+        query_graph, label_vertex_counts, label_average_lifespans);
+    timings["queryDecomposition"] = elapsedMilliseconds(stage_start);
+    if (decomposition.root < 0) {
+        std::cerr << "No query root has data candidates with a positive active lifespan.\n";
+        return 3;
+    }
+    if (!decomposition.connected) {
+        std::cerr << "Error: Query graph must be connected.\n";
+        return 3;
+    }
+
+    std::cout << "Query root: q" << decomposition.root
+              << " label=" << labelToString(query_graph.vertex_labels[decomposition.root])
+              << " S_temp=" << decomposition.temporal_selectivity[decomposition.root]
+              << " | DFS order:";
+    for (int query_vertex : decomposition.dfs_order) std::cout << ' ' << query_vertex;
+    std::cout << " | non-tree edges=" << decomposition.non_tree_edges.size() << '\n';
+
+    stage_start = std::chrono::steady_clock::now();
+    TDTree td_tree(temporal_graph, query_graph, decomposition, minimum_duration);
+    timings["buildTDTree"] = elapsedMilliseconds(stage_start);
+    td_tree.print_res();
+
+    const std::string matching_result_file = "matching_results_" + dataset_name + ".txt";
+    const MatchSummary match_summary = td_tree.save_res(matching_result_file);
+    if (!match_summary.output_written) {
+        std::cerr << "Error: Could not write " << matching_result_file << '\n';
+        return 4;
+    }
+    timings["enumerateMatches"] = match_summary.enumeration_milliseconds;
+    timings["endToEnd"] = elapsedMilliseconds(total_start);
+
+    const std::string timing_result_file = "timing_results_" + dataset_name + ".txt";
+    std::ofstream timing_output(timing_result_file);
+    if (!timing_output.is_open()) {
+        std::cerr << "Error: Could not write " << timing_result_file << '\n';
+        return 4;
+    }
+    const std::array<const char*, 9> timing_order{{
+        "readTemporalGraph",
+        "filterTemporalGraph",
+        "readAndFilterTemporalGraph",
+        "readQueryGraph",
+        "labelStatistics",
+        "queryDecomposition",
+        "buildTDTree",
+        "enumerateMatches",
+        "endToEnd"}};
+    for (const char* timing_name : timing_order) {
+        const auto timing = timings.find(timing_name);
+        if (timing != timings.end()) {
+            timing_output << timing->first << ": " << timing->second << " ms\n";
         }
     }
 
-    std::unordered_map<std::string, int> label_vertex_counts; // 각 레이블의 정점 개수 저장
-    std::unordered_map<std::string, int> label_total_durations; // 각 레이블의 총 지속 시간 저장
-    std::unordered_map<int, int> vertex_durations; // 각 정점의 총 지속 시간 저장
+    const std::size_t input_graph_memory = temporal_graph.getMemoryUsage();
+    const std::size_t td_tree_memory = td_tree.getMemoryUsage();
+    const std::size_t total_peak_memory = getPeakRSS();
+    const std::size_t known_memory = input_graph_memory + td_tree_memory;
+    const std::size_t other_memory =
+        total_peak_memory > known_memory ? total_peak_memory - known_memory : 0;
 
-    // 정점별 간선 정보를 활용하여 지속 시간 계산
-    for (int u = 0; u < temporalGraph.adj.size(); ++u) {
-        int total_duration = 0;
-
-        for (const auto& edge : temporalGraph.adj[u]) {
-            // 각 간선이 존재하는 스냅샷의 개수를 이용해 지속 시간 계산
-            auto it = temporalGraph.edge_time_instances.find({u, edge.to});
-            if (it != temporalGraph.edge_time_instances.end()) {
-                const auto& time_instances = it->second;
-                int duration = time_instances.size();  // 간선이 존재하는 스냅샷의 개수
-                total_duration += duration;
-            }
-        }
-
-        // 현재 정점에 대한 총 지속 시간 저장
-        vertex_durations[u] = total_duration;
-
-        // 레이블별 지속 시간 및 정점 개수 누적
-        const std::string& label = temporalGraph.vertex_labels[u];
-        label_vertex_counts[label]++;
-        label_total_durations[label] += total_duration;
-    }
-
-    // 각 레이블의 평균 수명을 계산
-    std::unordered_map<std::string, double> label_average_lifespans;
-    for (const auto& label_entry : label_vertex_counts) {
-        const std::string& label = label_entry.first;
-        int vertex_count = label_entry.second;
-
-        if (vertex_count > 0) {
-            label_average_lifespans[label] = static_cast<double>(label_total_durations[label]) / vertex_count;
-        } else {
-            label_average_lifespans[label] = 0.0; // 정점이 없는 경우 평균 수명은 0으로 설정
-        }
-    }
-    timings["labelCounting"] = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() - start).count();
-
-    std::cout << "Label Counted " << std::endl;
-
-    // Perform query decomposition
-    start = std::chrono::steady_clock::now();
-    QueryDecomposition qd = decomposeQuery(queryGraph, label_counts, label_average_lifespans);
-    timings["queryDecomposition"] = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() - start).count();
-    std::cout << "Query Decomposed" << std::endl;
-
-    // Create and build the TDTree
-    start = std::chrono::steady_clock::now();
-    TDTree tdTree(temporalGraph, queryGraph ,qd, k);
-    timings["buildTDTree"] = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() - start).count();
-    std::cout << "TDTree Created" << std::endl;
-
-    // Print matching results
-    tdTree.print_res();
-
-    // Save matching results to file
-    tdTree.save_res("matching_results_" + datasetName + ".txt");
-
-    // Write timing results to file
-    std::ofstream resultFile("timing_results_" + datasetName + ".txt");
-    for (const auto& t : timings) {
-        resultFile << t.first << ": " << t.second << " ms" << std::endl;
-    }
-
-    // 1. TD-Tree 메모리 측정
-    size_t tdTreeMem = tdTree.getMemoryUsage();
-
-    // 2. 전체 실행 후 피크 메모리 측정
-    // (여기서 매칭 함수 expand() 호출 등이 완료된 후)
-    size_t totalPeakMem = getPeakRSS();
-
-    // 3. "Other" 메모리 계산
-    // 전체 피크에서 (그래프 + TD-tree)를 뺀 나머지
-    size_t usedByKnown = inputGraphMem + tdTreeMem;
-    size_t otherMem = (totalPeakMem > usedByKnown) ? (totalPeakMem - usedByKnown) : 0;
-
-    // 결과 출력 (메모리 사용량)
-    std::cout << "\n--- Memory Measurement (KB) ---" << std::endl;
-    std::cout << "Input Graph Size: " << inputGraphMem / 1024 << " KB" << std::endl;
-    std::cout << "DSM (TD-tree): " << tdTreeMem / 1024 << " KB" << std::endl;
-    std::cout << "DSM (Other): " << otherMem / 1024 << " KB" << std::endl;
-    std::cout << "Total Peak: " << totalPeakMem / 1024 << " KB" << std::endl;
-
+    std::cout << "Final durable matches: " << match_summary.match_count << '\n'
+              << "Result file: " << matching_result_file << '\n'
+              << "Timing file: " << timing_result_file << '\n'
+              << "Memory (KiB): graph=" << input_graph_memory / 1024
+              << ", TD-tree=" << td_tree_memory / 1024
+              << ", other=" << other_memory / 1024
+              << ", peak=" << total_peak_memory / 1024 << '\n';
     return 0;
 }
