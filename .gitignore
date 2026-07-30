@@ -51,3 +51,8 @@ candidates.*
 
 # Local paper reference
 /ours/260408_cdh.pdf
+/.deps
+/evaluation
+/Fails
+*.Identifier
+/Fails
