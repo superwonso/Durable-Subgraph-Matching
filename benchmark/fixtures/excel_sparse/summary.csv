@@ -1,0 +1,2 @@
+case_id,algorithm,semantic_group,runs,successful_runs,timeouts,errors,wall_s_median,match_count,repeat_match_count_consistent,unknown_future_column
+case_without_dimensions,experimental,consecutive,1,1,0,0,1.25,4,true,sparse

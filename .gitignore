@@ -56,3 +56,7 @@ candidates.*
 /Fails
 *.Identifier
 /Fails
+/appendix
+/benchmark/__pycache__
+/Fails/241010
+/Fails

@@ -4,6 +4,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -13,6 +14,14 @@ constexpr std::size_t kLabelCount = 5;
 constexpr Label kInvalidLabel = static_cast<Label>(kLabelCount);
 constexpr std::uint32_t kDefaultLabelSeed = 42U;
 
+enum class LabelMode {
+    SequentialRng,
+    StableId
+};
+
+const char* labelModeName(LabelMode mode);
+Label stableIdLabel(int external_id, std::uint32_t label_seed);
+
 Label labelFromString(const std::string& value);
 std::string labelToString(Label label);
 
@@ -21,7 +30,12 @@ struct TimeInterval {
     int end = -1;
 
     int length() const {
-        return end >= start ? end - start + 1 : 0;
+        if (end < start) return 0;
+        const long long span =
+            static_cast<long long>(end) - static_cast<long long>(start) + 1;
+        return span > std::numeric_limits<int>::max()
+            ? std::numeric_limits<int>::max()
+            : static_cast<int>(span);
     }
 };
 
@@ -29,7 +43,7 @@ struct TemporalEdge {
     int u = -1;
     int v = -1;
     std::vector<TimeInterval> active_intervals;
-    int active_snapshot_count = 0;
+    std::int64_t active_snapshot_count = 0;
 };
 
 struct Edge {
@@ -85,7 +99,7 @@ bool hasEdge(const std::vector<std::vector<Edge>>& adj, int u, int v);
 
 struct TemporalGraphLoadTimings {
     long long read_milliseconds = 0;
-    // Sorting, deduplication, Algorithm 3.1 filtering, random labels, compact
+    // Sorting, deduplication, Algorithm 3.1 filtering, label assignment, compact
     // graph construction, and directed vertex statistics after file parsing.
     long long filter_milliseconds = 0;
 };
@@ -93,12 +107,14 @@ struct TemporalGraphLoadTimings {
 // Temporal and query inputs are directed. Parallel timestamps for the same
 // ordered pair are merged, external IDs are compacted, and Algorithm 3.1's
 // consecutive-pair filter is applied. Label-free data vertices receive a
-// reproducible random A-E label before temporal filtering.
+// reproducible A-E label before temporal filtering.
 bool readTemporalGraph(
     const std::string& filename,
     Graph& graph,
     std::uint32_t label_seed = kDefaultLabelSeed,
-    TemporalGraphLoadTimings* load_timings = nullptr);
+    TemporalGraphLoadTimings* load_timings = nullptr,
+    bool apply_consecutive_pair_filter = true,
+    LabelMode label_mode = LabelMode::SequentialRng);
 bool readQueryGraph(const std::string& filename, Graph& query_graph);
 
 #endif // UTILS_H

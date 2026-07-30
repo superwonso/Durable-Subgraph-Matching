@@ -47,9 +47,9 @@ QueryDecomposition decomposeQuery(
         }
     }
 
-    // No finite score means that no query label currently has data candidates.
-    // The structurally valid query should still run and report Count: 0 rather
-    // than fail, so choose a deterministic fallback root.
+    // If no scored vertex was found (for example, an externally constructed
+    // query with only isolated vertices), choose a deterministic fallback.
+    // Normal file-backed queries contain at least one edge.
     if (result.root < 0) {
         for (int query_vertex = 0; query_vertex < query_vertex_count; ++query_vertex) {
             if (!query_graph.adj[static_cast<std::size_t>(query_vertex)].empty() ||
@@ -62,7 +62,7 @@ QueryDecomposition decomposeQuery(
     if (result.root < 0) return result;
 
     std::vector<bool> visited(static_cast<std::size_t>(query_vertex_count), false);
-    std::set<std::pair<int, int>> tree_edges;
+    std::set<std::pair<int, int>> directed_tree_edges;
     std::function<void(int)> dfs = [&](int query_vertex) {
         visited[static_cast<std::size_t>(query_vertex)] = true;
         result.dfs_order.push_back(query_vertex);
@@ -89,7 +89,12 @@ QueryDecomposition decomposeQuery(
             if (visited[static_cast<std::size_t>(neighbor)]) continue;
             result.parent[static_cast<std::size_t>(neighbor)] = query_vertex;
             result.spanning_tree_adj[static_cast<std::size_t>(query_vertex)].push_back(neighbor);
-            tree_edges.emplace(std::min(query_vertex, neighbor), std::max(query_vertex, neighbor));
+            const std::pair<int, int> directed_tree_edge =
+                GraphUtils::hasEdge(query_graph.adj, query_vertex, neighbor)
+                ? std::make_pair(query_vertex, neighbor)
+                : std::make_pair(neighbor, query_vertex);
+            result.tree_edges.push_back(directed_tree_edge);
+            directed_tree_edges.insert(directed_tree_edge);
             dfs(neighbor);
         }
     };
@@ -100,11 +105,12 @@ QueryDecomposition decomposeQuery(
 
     for (int query_vertex = 0; query_vertex < query_vertex_count; ++query_vertex) {
         for (const auto& edge : query_graph.adj[static_cast<std::size_t>(query_vertex)]) {
-            const std::pair<int, int> normalized{
-                std::min(query_vertex, edge.to), std::max(query_vertex, edge.to)};
-            if (tree_edges.find(normalized) == tree_edges.end()) {
-                // Preserve the original query-arc direction. The spanning tree
-                // is only a weak-connectivity search skeleton.
+            const std::pair<int, int> directed_edge{query_vertex, edge.to};
+            if (directed_tree_edges.find(directed_edge) ==
+                directed_tree_edges.end()) {
+                // Preserve the original query-arc direction. In particular,
+                // only one direction of a reciprocal pair belongs to T; the
+                // other direction is a non-tree edge in S.
                 result.non_tree_edges.emplace_back(query_vertex, edge.to);
             }
         }

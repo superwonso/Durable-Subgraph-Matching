@@ -1,0 +1,2 @@
+case_id,algorithm,semantic_group,repeat,status,exit_code,wall_s,match_count,data,query,unknown_future_column
+case_without_dimensions,experimental,consecutive,1,ok,0,1.25,4,/fixture/undimensioned.txt,/fixture/custom.qry,sparse

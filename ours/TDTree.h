@@ -33,6 +33,34 @@ struct MatchSummary {
     std::uint64_t match_count = 0;
     long long enumeration_milliseconds = 0;
     bool output_written = false;
+    bool count_overflow = false;
+    std::size_t threads_requested = 1;
+    std::size_t threads_used = 1;
+    std::size_t workers_with_tasks = 0;
+    std::size_t root_tasks_claimed = 0;
+    std::size_t worker_root_tasks_min = 0;
+    std::size_t worker_root_tasks_max = 0;
+    std::size_t root_candidate_count = 0;
+    std::uint64_t dfs_states = 0;
+    std::uint64_t generated_candidates = 0;
+    std::uint64_t accepted_candidates = 0;
+    std::uint64_t completed_matches = 0;
+    std::uint64_t pruned_injectivity = 0;
+    std::uint64_t pruned_temporal_support = 0;
+};
+
+enum class MatchOutputMode {
+    Full,
+    CountOnly
+};
+
+const char* matchOutputModeName(MatchOutputMode mode);
+
+struct CheckedMatchCounter {
+    std::uint64_t value = 0;
+    bool overflowed = false;
+
+    bool increment();
 };
 
 class TDTree {
@@ -44,7 +72,10 @@ public:
         int minimum_duration);
 
     void print_res() const;
-    MatchSummary save_res(const std::string& filename) const;
+    MatchSummary save_res(
+        const std::string& filename,
+        MatchOutputMode mode = MatchOutputMode::Full,
+        std::size_t threads = 1) const;
     std::size_t getMemoryUsage() const;
     std::size_t candidateRelationCount() const;
 
@@ -76,7 +107,11 @@ private:
 
     std::vector<int> uniqueCandidates(const TDTreeNode& node) const;
     std::size_t uniqueCandidateCount(const TDTreeNode& node) const;
-    std::uint64_t enumerateMatches(std::ostream& output) const;
+    CheckedMatchCounter enumerateMatches(
+        std::ostream& output,
+        MatchOutputMode mode,
+        std::size_t requested_threads,
+        MatchSummary& summary) const;
 };
 
 #endif // TDTREE_H

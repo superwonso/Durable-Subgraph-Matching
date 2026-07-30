@@ -1,0 +1,1601 @@
+{
+  "schema_version": 1,
+  "title": "Selectivity, candidate-volume, pruning, and GPU-memory ablations",
+  "as_of": "2026-07-29",
+  "description": "Controlled ablations for Original (TD-Tree), Ours, Ours+Gopher CPU, and Ours+Gopher-GPU. A full-raw-file suite isolates Selectivity candidate volume on all four datasets; the earlier 5% raw-derived rows remain a resource-bounded timing supplement.",
+  "repeats": 5,
+  "timeout_seconds": 900,
+  "methodology": {
+    "primary_metric": "Median cold-process end-to-end wall time over five isolated, interleaved repetitions.",
+    "td_tree_baseline": "Original is the TD-Tree baseline. Cross-engine rows always pass --duration-mode consecutive; the unsupported --selectivity option is never passed to Original.",
+    "selectivity_factor": "Ours is evaluated with tdtree (|V_L|/degree), paper (degree/(|V_L|*A_dur)), and intended (|V_L|/(degree*A_dur)) root scores.",
+    "full_raw_selectivity_boundary": "The primary Selectivity candidate-count cohort passes the same supplied non-_filtered full raw file to all three Ours modes, holds the consecutive-pair prefilter on, and changes only the root-score definition. One repetition is sufficient for deterministic candidate counters; its wall time is diagnostic, not a repeated timing estimate.",
+    "prefilter_factor": "Ours is evaluated with its consecutive-pair edge-history prefilter both off and on. Original retains all directed edge histories and is therefore the prefilter-off TD-Tree reference.",
+    "candidate_metrics": "root_candidate_count, raw_extension_candidates, and accepted_extensions are common search-volume counters. candidate_relation_entries measures built relation size. CPU Gopher generated_candidates is a post-structural counter and must not be compared directly with the GPU legacy generated_candidates field.",
+    "statistics_boundary": "Ours and Original collect their lightweight aggregated counters in the CPU32 rows. Gopher performance rows use --statistics off; separate one-repeat CPU1 and GPU diagnostic rows use --statistics on for candidate-volume analysis.",
+    "pruning_factor": "The early-pruning study holds data, query, selectivity=paper, order=paper, memo=none, label seed, scheduler or GPU variant, and memory cap fixed within each cohort.",
+    "gpu_memory_factor": "The GPU memory study holds resident execution, early-prune=on, selectivity=paper, order=paper, memo=none, and statistics=off fixed while varying only --gpu-memory-mb.",
+    "cpu_affinity": "CPU32 rows are pinned to logical CPUs 0-31. CPU1 and GPU host-control rows are pinned to logical CPU 0.",
+    "correctness": "Every algorithm in a case must finish every repetition, remain count-stable, and match the nonzero expected_match_count oracle.",
+    "output_mode": "All rows use count-only output. A positive Count is still recorded; only per-mapping materialization is suppressed.",
+    "provenance": "The runner records SHA-256 hashes for executables, datasets, queries, and the used manifest."
+  },
+  "factor_definitions": {
+    "selectivity": [
+      "tdtree",
+      "paper",
+      "intended"
+    ],
+    "prefilter": [
+      "off",
+      "on"
+    ],
+    "early_prune": [
+      "off",
+      "on"
+    ],
+    "k": [
+      3,
+      4,
+      5
+    ],
+    "gpu_memory_mb": [
+      32,
+      64,
+      128,
+      256,
+      1024,
+      4096
+    ]
+  },
+  "dataset_inventory": [
+    {
+      "id": "sx_superuser_raw",
+      "path": "{root}/Dataset/sx-superuser-temporal-1w-unique.txt",
+      "input_variant": "raw_unique_occurrences"
+    },
+    {
+      "id": "wiki_talk_raw",
+      "path": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w.txt",
+      "input_variant": "raw_unique_occurrences"
+    },
+    {
+      "id": "sx_stackoverflow_raw",
+      "path": "{root}/Dataset/sx-stackoverflow-timeinstance-unique-1w.txt",
+      "input_variant": "raw_unique_occurrences"
+    },
+    {
+      "id": "bitcoin_raw",
+      "path": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w.txt",
+      "input_variant": "raw_unique_occurrences"
+    },
+    {
+      "id": "sx_stackoverflow_sample_5pct",
+      "path": "{root}/benchmark/data/sx_stackoverflow_edge_sample_5pct.txt",
+      "input_variant": "deterministic_edge_history_sample",
+      "sampling_rate": 0.05
+    },
+    {
+      "id": "bitcoin_sample_5pct",
+      "path": "{root}/benchmark/data/bitcoin_edge_sample_5pct.txt",
+      "input_variant": "deterministic_edge_history_sample",
+      "sampling_rate": 0.05
+    },
+    {
+      "id": "bitcoin_filtered",
+      "path": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "input_variant": "supplied_prefiltered"
+    }
+  ],
+  "algorithms": {
+    "original_tdtree_cpu32": {
+      "executable": "{root}/original/td_tree",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Original (TD-Tree) CPU 32T baseline",
+      "implementation_generation": "parallel_root_tasks",
+      "comparison_family": "selectivity_prefilter_cpu32",
+      "cohort": "selectivity_prefilter_performance_and_candidates",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "factors": {
+        "method": "Original (TD-Tree)",
+        "selectivity": "tdtree",
+        "prefilter": "off",
+        "duration_mode": "consecutive",
+        "statistics": "lightweight_always_on"
+      },
+      "flags": [
+        "--count-only",
+        "--duration-mode",
+        "consecutive",
+        "--threads",
+        "32"
+      ]
+    },
+    "ours_cpu32_prefilter_off_tdtree": {
+      "executable": "{root}/ours/td_tree",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Ours CPU 32T, prefilter off, TD-Tree selectivity",
+      "implementation_generation": "parallel_root_tasks",
+      "comparison_family": "selectivity_prefilter_cpu32",
+      "cohort": "selectivity_prefilter_performance_and_candidates",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "factors": {
+        "method": "Ours",
+        "selectivity": "tdtree",
+        "prefilter": "off",
+        "statistics": "lightweight_always_on"
+      },
+      "flags": [
+        "--count-only",
+        "--prefilter",
+        "off",
+        "--selectivity",
+        "tdtree",
+        "--threads",
+        "32"
+      ]
+    },
+    "ours_cpu32_prefilter_off_paper": {
+      "executable": "{root}/ours/td_tree",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Ours CPU 32T, prefilter off, printed-paper selectivity",
+      "implementation_generation": "parallel_root_tasks",
+      "comparison_family": "selectivity_prefilter_cpu32",
+      "cohort": "selectivity_prefilter_performance_and_candidates",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "factors": {
+        "method": "Ours",
+        "selectivity": "paper",
+        "prefilter": "off",
+        "statistics": "lightweight_always_on"
+      },
+      "flags": [
+        "--count-only",
+        "--prefilter",
+        "off",
+        "--selectivity",
+        "paper",
+        "--threads",
+        "32"
+      ]
+    },
+    "ours_cpu32_prefilter_off_intended": {
+      "executable": "{root}/ours/td_tree",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Ours CPU 32T, prefilter off, intended selectivity",
+      "implementation_generation": "parallel_root_tasks",
+      "comparison_family": "selectivity_prefilter_cpu32",
+      "cohort": "selectivity_prefilter_performance_and_candidates",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "factors": {
+        "method": "Ours",
+        "selectivity": "intended",
+        "prefilter": "off",
+        "statistics": "lightweight_always_on"
+      },
+      "flags": [
+        "--count-only",
+        "--prefilter",
+        "off",
+        "--selectivity",
+        "intended",
+        "--threads",
+        "32"
+      ]
+    },
+    "ours_cpu32_prefilter_on_tdtree": {
+      "executable": "{root}/ours/td_tree",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Ours CPU 32T, prefilter on, TD-Tree selectivity",
+      "implementation_generation": "parallel_root_tasks",
+      "comparison_family": "selectivity_prefilter_cpu32",
+      "cohort": "selectivity_prefilter_performance_and_candidates",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "factors": {
+        "method": "Ours",
+        "selectivity": "tdtree",
+        "prefilter": "on",
+        "statistics": "lightweight_always_on"
+      },
+      "flags": [
+        "--count-only",
+        "--prefilter",
+        "on",
+        "--selectivity",
+        "tdtree",
+        "--threads",
+        "32"
+      ]
+    },
+    "ours_cpu32_prefilter_on_paper": {
+      "executable": "{root}/ours/td_tree",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Ours CPU 32T, prefilter on, printed-paper selectivity",
+      "implementation_generation": "parallel_root_tasks",
+      "comparison_family": "selectivity_prefilter_cpu32",
+      "cohort": "selectivity_prefilter_performance_and_candidates",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "factors": {
+        "method": "Ours",
+        "selectivity": "paper",
+        "prefilter": "on",
+        "statistics": "lightweight_always_on"
+      },
+      "flags": [
+        "--count-only",
+        "--prefilter",
+        "on",
+        "--selectivity",
+        "paper",
+        "--threads",
+        "32"
+      ]
+    },
+    "ours_cpu32_prefilter_on_intended": {
+      "executable": "{root}/ours/td_tree",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Ours CPU 32T, prefilter on, intended selectivity",
+      "implementation_generation": "parallel_root_tasks",
+      "comparison_family": "selectivity_prefilter_cpu32",
+      "cohort": "selectivity_prefilter_performance_and_candidates",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "factors": {
+        "method": "Ours",
+        "selectivity": "intended",
+        "prefilter": "on",
+        "statistics": "lightweight_always_on"
+      },
+      "flags": [
+        "--count-only",
+        "--prefilter",
+        "on",
+        "--selectivity",
+        "intended",
+        "--threads",
+        "32"
+      ]
+    },
+    "ours_fullraw_cpu32_tdtree": {
+      "executable": "{root}/ours/td_tree",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Ours CPU 32T full-raw Selectivity diagnostic, TD-Tree score",
+      "implementation_generation": "parallel_root_tasks",
+      "comparison_family": "full_raw_selectivity_candidates",
+      "cohort": "full_raw_selectivity_candidate_diagnostic",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "factors": {
+        "method": "Ours",
+        "selectivity": "tdtree",
+        "prefilter": "on",
+        "label_mode": "stable-id",
+        "statistics": "lightweight_always_on"
+      },
+      "flags": [
+        "--count-only",
+        "--prefilter",
+        "on",
+        "--selectivity",
+        "tdtree",
+        "--label-mode",
+        "stable-id",
+        "--threads",
+        "32"
+      ]
+    },
+    "ours_fullraw_cpu32_paper": {
+      "executable": "{root}/ours/td_tree",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Ours CPU 32T full-raw Selectivity diagnostic, printed-paper score",
+      "implementation_generation": "parallel_root_tasks",
+      "comparison_family": "full_raw_selectivity_candidates",
+      "cohort": "full_raw_selectivity_candidate_diagnostic",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "factors": {
+        "method": "Ours",
+        "selectivity": "paper",
+        "prefilter": "on",
+        "label_mode": "stable-id",
+        "statistics": "lightweight_always_on"
+      },
+      "flags": [
+        "--count-only",
+        "--prefilter",
+        "on",
+        "--selectivity",
+        "paper",
+        "--label-mode",
+        "stable-id",
+        "--threads",
+        "32"
+      ]
+    },
+    "ours_fullraw_cpu32_intended": {
+      "executable": "{root}/ours/td_tree",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Ours CPU 32T full-raw Selectivity diagnostic, intended score",
+      "implementation_generation": "parallel_root_tasks",
+      "comparison_family": "full_raw_selectivity_candidates",
+      "cohort": "full_raw_selectivity_candidate_diagnostic",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "factors": {
+        "method": "Ours",
+        "selectivity": "intended",
+        "prefilter": "on",
+        "label_mode": "stable-id",
+        "statistics": "lightweight_always_on"
+      },
+      "flags": [
+        "--count-only",
+        "--prefilter",
+        "on",
+        "--selectivity",
+        "intended",
+        "--label-mode",
+        "stable-id",
+        "--threads",
+        "32"
+      ]
+    },
+    "gopher_cpu32_prune_off_perf": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Ours+Gopher CPU 32T early-prune off performance",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gopher_early_prune_cpu32_performance",
+      "cohort": "gopher_prune_performance",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "factors": {
+        "early_prune": "off",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "off"
+      },
+      "flags": [
+        "--engine",
+        "gopher",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "off",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "32",
+        "--parallel",
+        "prefix",
+        "--prefix-depth",
+        "0",
+        "--tasks-per-thread",
+        "8",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "gopher_cpu32_prune_on_perf": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Ours+Gopher CPU 32T early-prune on performance",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gopher_early_prune_cpu32_performance",
+      "cohort": "gopher_prune_performance",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "factors": {
+        "early_prune": "on",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "off"
+      },
+      "flags": [
+        "--engine",
+        "gopher",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "32",
+        "--parallel",
+        "prefix",
+        "--prefix-depth",
+        "0",
+        "--tasks-per-thread",
+        "8",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "gopher_cpu1_prune_off_diag": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Ours+Gopher CPU 1T early-prune off candidate diagnostic",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gopher_early_prune_cpu1_diagnostic",
+      "cohort": "gopher_prune_candidate_diagnostic",
+      "threads": 1,
+      "cpu_affinity": "0",
+      "factors": {
+        "early_prune": "off",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "on"
+      },
+      "flags": [
+        "--engine",
+        "gopher",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "off",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--parallel",
+        "roots",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "gopher_cpu1_prune_on_diag": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "backend": "cpu",
+      "role": "Ours+Gopher CPU 1T early-prune on candidate diagnostic",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gopher_early_prune_cpu1_diagnostic",
+      "cohort": "gopher_prune_candidate_diagnostic",
+      "threads": 1,
+      "cpu_affinity": "0",
+      "factors": {
+        "early_prune": "on",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "on"
+      },
+      "flags": [
+        "--engine",
+        "gopher",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--parallel",
+        "roots",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "gopher_gpu_prune_off_perf": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "backend": "rocm",
+      "device": "AMD Radeon 8060S gfx1151",
+      "role": "Ours+Gopher-GPU resident early-prune off performance",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gopher_early_prune_gpu_performance",
+      "cohort": "gopher_prune_performance",
+      "threads": 1,
+      "cpu_affinity": "0",
+      "factors": {
+        "gpu_variant": "resident",
+        "early_prune": "off",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "off",
+        "gpu_memory_mb": 4096
+      },
+      "flags": [
+        "--backend",
+        "gpu",
+        "--gpu-variant",
+        "resident",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "off",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--gpu-memory-mb",
+        "4096",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "gopher_gpu_prune_on_perf": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "backend": "rocm",
+      "device": "AMD Radeon 8060S gfx1151",
+      "role": "Ours+Gopher-GPU resident early-prune on performance",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gopher_early_prune_gpu_performance",
+      "cohort": "gopher_prune_performance",
+      "threads": 1,
+      "cpu_affinity": "0",
+      "factors": {
+        "gpu_variant": "resident",
+        "early_prune": "on",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "off",
+        "gpu_memory_mb": 4096
+      },
+      "flags": [
+        "--backend",
+        "gpu",
+        "--gpu-variant",
+        "resident",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--gpu-memory-mb",
+        "4096",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "gopher_gpu_prune_off_diag": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "backend": "rocm",
+      "device": "AMD Radeon 8060S gfx1151",
+      "role": "Ours+Gopher-GPU resident early-prune off candidate diagnostic",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gopher_early_prune_gpu_diagnostic",
+      "cohort": "gopher_prune_candidate_diagnostic",
+      "threads": 1,
+      "cpu_affinity": "0",
+      "factors": {
+        "gpu_variant": "resident",
+        "early_prune": "off",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "on",
+        "gpu_memory_mb": 4096
+      },
+      "flags": [
+        "--backend",
+        "gpu",
+        "--gpu-variant",
+        "resident",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "off",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--gpu-memory-mb",
+        "4096",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "gopher_gpu_prune_on_diag": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "backend": "rocm",
+      "device": "AMD Radeon 8060S gfx1151",
+      "role": "Ours+Gopher-GPU resident early-prune on candidate diagnostic",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gopher_early_prune_gpu_diagnostic",
+      "cohort": "gopher_prune_candidate_diagnostic",
+      "threads": 1,
+      "cpu_affinity": "0",
+      "factors": {
+        "gpu_variant": "resident",
+        "early_prune": "on",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "on",
+        "gpu_memory_mb": 4096
+      },
+      "flags": [
+        "--backend",
+        "gpu",
+        "--gpu-variant",
+        "resident",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--gpu-memory-mb",
+        "4096",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "gopher_gpu_mem_32": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "backend": "rocm",
+      "device": "AMD Radeon 8060S gfx1151",
+      "role": "Ours+Gopher-GPU resident 32 MiB cap",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gpu_resident_memory_cap",
+      "cohort": "gpu_memory_performance",
+      "threads": 1,
+      "cpu_affinity": "0",
+      "factors": {
+        "gpu_memory_mb": 32,
+        "gpu_variant": "resident",
+        "early_prune": "on",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "off"
+      },
+      "flags": [
+        "--backend",
+        "gpu",
+        "--gpu-variant",
+        "resident",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--gpu-memory-mb",
+        "32",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "gopher_gpu_mem_64": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "backend": "rocm",
+      "device": "AMD Radeon 8060S gfx1151",
+      "role": "Ours+Gopher-GPU resident 64 MiB cap",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gpu_resident_memory_cap",
+      "cohort": "gpu_memory_performance",
+      "threads": 1,
+      "cpu_affinity": "0",
+      "factors": {
+        "gpu_memory_mb": 64,
+        "gpu_variant": "resident",
+        "early_prune": "on",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "off"
+      },
+      "flags": [
+        "--backend",
+        "gpu",
+        "--gpu-variant",
+        "resident",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--gpu-memory-mb",
+        "64",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "gopher_gpu_mem_128": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "backend": "rocm",
+      "device": "AMD Radeon 8060S gfx1151",
+      "role": "Ours+Gopher-GPU resident 128 MiB cap",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gpu_resident_memory_cap",
+      "cohort": "gpu_memory_performance",
+      "threads": 1,
+      "cpu_affinity": "0",
+      "factors": {
+        "gpu_memory_mb": 128,
+        "gpu_variant": "resident",
+        "early_prune": "on",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "off"
+      },
+      "flags": [
+        "--backend",
+        "gpu",
+        "--gpu-variant",
+        "resident",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--gpu-memory-mb",
+        "128",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "gopher_gpu_mem_256": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "backend": "rocm",
+      "device": "AMD Radeon 8060S gfx1151",
+      "role": "Ours+Gopher-GPU resident 256 MiB cap",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gpu_resident_memory_cap",
+      "cohort": "gpu_memory_performance",
+      "threads": 1,
+      "cpu_affinity": "0",
+      "factors": {
+        "gpu_memory_mb": 256,
+        "gpu_variant": "resident",
+        "early_prune": "on",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "off"
+      },
+      "flags": [
+        "--backend",
+        "gpu",
+        "--gpu-variant",
+        "resident",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--gpu-memory-mb",
+        "256",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "gopher_gpu_mem_1024": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "backend": "rocm",
+      "device": "AMD Radeon 8060S gfx1151",
+      "role": "Ours+Gopher-GPU resident 1024 MiB cap",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gpu_resident_memory_cap",
+      "cohort": "gpu_memory_performance",
+      "threads": 1,
+      "cpu_affinity": "0",
+      "factors": {
+        "gpu_memory_mb": 1024,
+        "gpu_variant": "resident",
+        "early_prune": "on",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "off"
+      },
+      "flags": [
+        "--backend",
+        "gpu",
+        "--gpu-variant",
+        "resident",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--gpu-memory-mb",
+        "1024",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "gopher_gpu_mem_4096": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "backend": "rocm",
+      "device": "AMD Radeon 8060S gfx1151",
+      "role": "Ours+Gopher-GPU resident 4096 MiB cap",
+      "implementation_generation": "parallel_v2",
+      "comparison_family": "gpu_resident_memory_cap",
+      "cohort": "gpu_memory_performance",
+      "threads": 1,
+      "cpu_affinity": "0",
+      "factors": {
+        "gpu_memory_mb": 4096,
+        "gpu_variant": "resident",
+        "early_prune": "on",
+        "selectivity": "paper",
+        "order": "paper",
+        "memo": "none",
+        "statistics": "off"
+      },
+      "flags": [
+        "--backend",
+        "gpu",
+        "--gpu-variant",
+        "resident",
+        "--selectivity",
+        "paper",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--gpu-memory-mb",
+        "4096",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "selectivity_sx_superuser_raw_tailed4_k3",
+      "suite": "selectivity_prefilter_cpu32",
+      "axes": [
+        "dataset",
+        "prefilter",
+        "selectivity",
+        "runtime",
+        "candidate_volume"
+      ],
+      "dataset_id": "sx_superuser_raw",
+      "input_variant": "raw_unique_occurrences",
+      "query_shape": "tailed4",
+      "query_edges": 4,
+      "data": "{root}/Dataset/sx-superuser-temporal-1w-unique.txt",
+      "query": "{root}/benchmark/queries/raw/sx_superuser_raw_tailed4_k3.qry",
+      "k": 3,
+      "label_seed": 42,
+      "repeats": 5,
+      "expected_match_count": 1,
+      "algorithms": [
+        "original_tdtree_cpu32",
+        "ours_cpu32_prefilter_off_tdtree",
+        "ours_cpu32_prefilter_off_paper",
+        "ours_cpu32_prefilter_off_intended",
+        "ours_cpu32_prefilter_on_tdtree",
+        "ours_cpu32_prefilter_on_paper",
+        "ours_cpu32_prefilter_on_intended"
+      ]
+    },
+    {
+      "id": "selectivity_wiki_talk_raw_tailed4_k3",
+      "suite": "selectivity_prefilter_cpu32",
+      "axes": [
+        "dataset",
+        "prefilter",
+        "selectivity",
+        "runtime",
+        "candidate_volume"
+      ],
+      "dataset_id": "wiki_talk_raw",
+      "input_variant": "raw_unique_occurrences",
+      "query_shape": "tailed4",
+      "query_edges": 4,
+      "data": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w.txt",
+      "query": "{root}/benchmark/queries/raw/wiki_talk_raw_tailed4_k3.qry",
+      "k": 3,
+      "label_seed": 42,
+      "repeats": 5,
+      "expected_match_count": 11,
+      "algorithms": [
+        "original_tdtree_cpu32",
+        "ours_cpu32_prefilter_off_tdtree",
+        "ours_cpu32_prefilter_off_paper",
+        "ours_cpu32_prefilter_off_intended",
+        "ours_cpu32_prefilter_on_tdtree",
+        "ours_cpu32_prefilter_on_paper",
+        "ours_cpu32_prefilter_on_intended"
+      ]
+    },
+    {
+      "id": "selectivity_sx_stackoverflow_sample5_path3_k3",
+      "suite": "selectivity_prefilter_cpu32",
+      "axes": [
+        "dataset",
+        "prefilter",
+        "selectivity",
+        "runtime",
+        "candidate_volume"
+      ],
+      "dataset_id": "sx_stackoverflow_sample_5pct",
+      "input_variant": "deterministic_edge_history_sample",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/benchmark/data/sx_stackoverflow_edge_sample_5pct.txt",
+      "query": "{root}/benchmark/queries/samples/sx_stackoverflow_5pct_path3_k3.qry",
+      "k": 3,
+      "label_seed": 42,
+      "repeats": 5,
+      "expected_match_count": 1,
+      "algorithms": [
+        "original_tdtree_cpu32",
+        "ours_cpu32_prefilter_off_tdtree",
+        "ours_cpu32_prefilter_off_paper",
+        "ours_cpu32_prefilter_off_intended",
+        "ours_cpu32_prefilter_on_tdtree",
+        "ours_cpu32_prefilter_on_paper",
+        "ours_cpu32_prefilter_on_intended"
+      ]
+    },
+    {
+      "id": "selectivity_bitcoin_sample5_path3_k3",
+      "suite": "selectivity_prefilter_cpu32",
+      "axes": [
+        "dataset",
+        "prefilter",
+        "selectivity",
+        "runtime",
+        "candidate_volume"
+      ],
+      "dataset_id": "bitcoin_sample_5pct",
+      "input_variant": "deterministic_edge_history_sample",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/benchmark/data/bitcoin_edge_sample_5pct.txt",
+      "query": "{root}/benchmark/queries/samples/bitcoin_5pct_path3_k3.qry",
+      "k": 3,
+      "label_seed": 42,
+      "repeats": 5,
+      "expected_match_count": 20,
+      "algorithms": [
+        "original_tdtree_cpu32",
+        "ours_cpu32_prefilter_off_tdtree",
+        "ours_cpu32_prefilter_off_paper",
+        "ours_cpu32_prefilter_off_intended",
+        "ours_cpu32_prefilter_on_tdtree",
+        "ours_cpu32_prefilter_on_paper",
+        "ours_cpu32_prefilter_on_intended"
+      ]
+    },
+    {
+      "id": "selectivity_fullraw_sx_superuser_path3_k3",
+      "suite": "full_raw_selectivity_candidates",
+      "axes": [
+        "dataset",
+        "selectivity",
+        "candidate_volume"
+      ],
+      "dataset_id": "sx_superuser_raw",
+      "input_variant": "full_raw_unfiltered_common",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/sx-superuser-temporal-1w-unique.txt",
+      "query": "{root}/benchmark/queries/stable_id/sx_superuser_path3_k3.qry",
+      "k": 3,
+      "label_seed": 42,
+      "repeats": 1,
+      "expected_match_count": 2,
+      "algorithms": [
+        "ours_fullraw_cpu32_tdtree",
+        "ours_fullraw_cpu32_paper",
+        "ours_fullraw_cpu32_intended"
+      ]
+    },
+    {
+      "id": "selectivity_fullraw_wiki_talk_path3_k3",
+      "suite": "full_raw_selectivity_candidates",
+      "axes": [
+        "dataset",
+        "selectivity",
+        "candidate_volume"
+      ],
+      "dataset_id": "wiki_talk_raw",
+      "input_variant": "full_raw_unfiltered_common",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w.txt",
+      "query": "{root}/benchmark/queries/stable_id/wiki_talk_path3_k3.qry",
+      "k": 3,
+      "label_seed": 42,
+      "repeats": 1,
+      "expected_match_count": 48,
+      "algorithms": [
+        "ours_fullraw_cpu32_tdtree",
+        "ours_fullraw_cpu32_paper",
+        "ours_fullraw_cpu32_intended"
+      ]
+    },
+    {
+      "id": "selectivity_fullraw_sx_stackoverflow_path3_k3",
+      "suite": "full_raw_selectivity_candidates",
+      "axes": [
+        "dataset",
+        "selectivity",
+        "candidate_volume"
+      ],
+      "dataset_id": "sx_stackoverflow_raw",
+      "input_variant": "full_raw_unfiltered_common",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/sx-stackoverflow-timeinstance-unique-1w.txt",
+      "query": "{root}/benchmark/queries/stable_id/sx_stackoverflow_path3_k3.qry",
+      "k": 3,
+      "label_seed": 42,
+      "repeats": 1,
+      "expected_match_count": 15,
+      "algorithms": [
+        "ours_fullraw_cpu32_tdtree",
+        "ours_fullraw_cpu32_paper",
+        "ours_fullraw_cpu32_intended"
+      ]
+    },
+    {
+      "id": "selectivity_fullraw_bitcoin_path3_k3",
+      "suite": "full_raw_selectivity_candidates",
+      "axes": [
+        "dataset",
+        "selectivity",
+        "candidate_volume"
+      ],
+      "dataset_id": "bitcoin_raw",
+      "input_variant": "full_raw_unfiltered_common",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w.txt",
+      "query": "{root}/benchmark/queries/stable_id/bitcoin_path3_k3.qry",
+      "k": 3,
+      "label_seed": 42,
+      "repeats": 1,
+      "expected_match_count": 333741,
+      "algorithms": [
+        "ours_fullraw_cpu32_tdtree",
+        "ours_fullraw_cpu32_paper",
+        "ours_fullraw_cpu32_intended"
+      ]
+    },
+    {
+      "id": "gopher_prune_perf_bitcoin_path3_k3",
+      "suite": "gopher_early_prune_performance",
+      "axes": [
+        "k",
+        "early_prune",
+        "backend",
+        "runtime"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path3_k5.qry",
+      "k": 3,
+      "label_seed": 42,
+      "repeats": 5,
+      "expected_match_count": 1124896,
+      "algorithms": [
+        "gopher_cpu32_prune_off_perf",
+        "gopher_cpu32_prune_on_perf",
+        "gopher_gpu_prune_off_perf",
+        "gopher_gpu_prune_on_perf"
+      ]
+    },
+    {
+      "id": "gopher_prune_perf_bitcoin_path3_k4",
+      "suite": "gopher_early_prune_performance",
+      "axes": [
+        "k",
+        "early_prune",
+        "backend",
+        "runtime"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path3_k5.qry",
+      "k": 4,
+      "label_seed": 42,
+      "repeats": 5,
+      "expected_match_count": 398369,
+      "algorithms": [
+        "gopher_cpu32_prune_off_perf",
+        "gopher_cpu32_prune_on_perf",
+        "gopher_gpu_prune_off_perf",
+        "gopher_gpu_prune_on_perf"
+      ]
+    },
+    {
+      "id": "gopher_prune_perf_bitcoin_path3_k5",
+      "suite": "gopher_early_prune_performance",
+      "axes": [
+        "k",
+        "early_prune",
+        "backend",
+        "runtime"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path3_k5.qry",
+      "k": 5,
+      "label_seed": 42,
+      "repeats": 5,
+      "expected_match_count": 186048,
+      "algorithms": [
+        "gopher_cpu32_prune_off_perf",
+        "gopher_cpu32_prune_on_perf",
+        "gopher_gpu_prune_off_perf",
+        "gopher_gpu_prune_on_perf"
+      ]
+    },
+    {
+      "id": "gopher_prune_diag_bitcoin_path3_k3",
+      "suite": "gopher_early_prune_diagnostic",
+      "axes": [
+        "k",
+        "early_prune",
+        "backend",
+        "candidate_volume"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path3_k5.qry",
+      "k": 3,
+      "label_seed": 42,
+      "repeats": 1,
+      "expected_match_count": 1124896,
+      "algorithms": [
+        "gopher_cpu1_prune_off_diag",
+        "gopher_cpu1_prune_on_diag",
+        "gopher_gpu_prune_off_diag",
+        "gopher_gpu_prune_on_diag"
+      ]
+    },
+    {
+      "id": "gopher_prune_diag_bitcoin_path3_k4",
+      "suite": "gopher_early_prune_diagnostic",
+      "axes": [
+        "k",
+        "early_prune",
+        "backend",
+        "candidate_volume"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path3_k5.qry",
+      "k": 4,
+      "label_seed": 42,
+      "repeats": 1,
+      "expected_match_count": 398369,
+      "algorithms": [
+        "gopher_cpu1_prune_off_diag",
+        "gopher_cpu1_prune_on_diag",
+        "gopher_gpu_prune_off_diag",
+        "gopher_gpu_prune_on_diag"
+      ]
+    },
+    {
+      "id": "gopher_prune_diag_bitcoin_path3_k5",
+      "suite": "gopher_early_prune_diagnostic",
+      "axes": [
+        "k",
+        "early_prune",
+        "backend",
+        "candidate_volume"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path3_k5.qry",
+      "k": 5,
+      "label_seed": 42,
+      "repeats": 1,
+      "expected_match_count": 186048,
+      "algorithms": [
+        "gopher_cpu1_prune_off_diag",
+        "gopher_cpu1_prune_on_diag",
+        "gopher_gpu_prune_off_diag",
+        "gopher_gpu_prune_on_diag"
+      ]
+    },
+    {
+      "id": "gpu_memory_bitcoin_path4_k3",
+      "suite": "gpu_resident_memory_cap",
+      "axes": [
+        "gpu_memory_mb",
+        "runtime",
+        "peak_frontier"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered",
+      "query_shape": "path4",
+      "query_edges": 4,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path4_k3.qry",
+      "k": 3,
+      "label_seed": 42,
+      "repeats": 5,
+      "expected_match_count": 662531,
+      "algorithms": [
+        "gopher_gpu_mem_32",
+        "gopher_gpu_mem_64",
+        "gopher_gpu_mem_128",
+        "gopher_gpu_mem_256",
+        "gopher_gpu_mem_1024",
+        "gopher_gpu_mem_4096"
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "tdtree_implementation_equivalence",
+      "sheet": "Selectivity_Prefilter",
+      "category": "TD-Tree baseline",
+      "suite": "selectivity_prefilter_cpu32",
+      "baseline_algorithm": "original_tdtree_cpu32",
+      "variant_algorithms": [
+        "ours_cpu32_prefilter_off_tdtree"
+      ],
+      "cohort": "CPU32, all-edge histories, TD-Tree selectivity",
+      "backend": "cpu",
+      "metric": "wall_s",
+      "candidate_metric": "raw_extension_candidates",
+      "notes": "Original (TD-Tree) uses consecutive duration semantics. This is the closest implementation-equivalence arm before changing either prefilter or selectivity."
+    },
+    {
+      "id": "selectivity_without_prefilter",
+      "sheet": "Selectivity_Prefilter",
+      "category": "Selectivity",
+      "suite": "selectivity_prefilter_cpu32",
+      "baseline_algorithm": "original_tdtree_cpu32",
+      "variant_algorithms": [
+        "ours_cpu32_prefilter_off_tdtree",
+        "ours_cpu32_prefilter_off_paper",
+        "ours_cpu32_prefilter_off_intended"
+      ],
+      "cohort": "CPU32, prefilter off",
+      "backend": "cpu",
+      "metric": "wall_s",
+      "candidate_metric": "raw_extension_candidates",
+      "notes": "Isolates root-score definition while all methods retain the same edge histories. Baseline label in the workbook must be Original (TD-Tree)."
+    },
+    {
+      "id": "prefilter_under_tdtree_selectivity",
+      "sheet": "Selectivity_Prefilter",
+      "category": "Prefilter",
+      "suite": "selectivity_prefilter_cpu32",
+      "baseline_algorithm": "ours_cpu32_prefilter_off_tdtree",
+      "variant_algorithms": [
+        "ours_cpu32_prefilter_on_tdtree"
+      ],
+      "cohort": "Ours CPU32, TD-Tree selectivity",
+      "backend": "cpu",
+      "metric": "wall_s",
+      "candidate_metric": "raw_extension_candidates",
+      "notes": "Only the consecutive-pair prefilter changes."
+    },
+    {
+      "id": "prefilter_under_paper_selectivity",
+      "sheet": "Selectivity_Prefilter",
+      "category": "Prefilter",
+      "suite": "selectivity_prefilter_cpu32",
+      "baseline_algorithm": "ours_cpu32_prefilter_off_paper",
+      "variant_algorithms": [
+        "ours_cpu32_prefilter_on_paper"
+      ],
+      "cohort": "Ours CPU32, printed-paper selectivity",
+      "backend": "cpu",
+      "metric": "wall_s",
+      "candidate_metric": "raw_extension_candidates",
+      "notes": "Only the consecutive-pair prefilter changes."
+    },
+    {
+      "id": "prefilter_under_intended_selectivity",
+      "sheet": "Selectivity_Prefilter",
+      "category": "Prefilter",
+      "suite": "selectivity_prefilter_cpu32",
+      "baseline_algorithm": "ours_cpu32_prefilter_off_intended",
+      "variant_algorithms": [
+        "ours_cpu32_prefilter_on_intended"
+      ],
+      "cohort": "Ours CPU32, intended selectivity",
+      "backend": "cpu",
+      "metric": "wall_s",
+      "candidate_metric": "raw_extension_candidates",
+      "notes": "Only the consecutive-pair prefilter changes."
+    },
+    {
+      "id": "selectivity_with_prefilter",
+      "sheet": "Selectivity_Prefilter",
+      "category": "Selectivity",
+      "suite": "selectivity_prefilter_cpu32",
+      "baseline_algorithm": "ours_cpu32_prefilter_on_tdtree",
+      "variant_algorithms": [
+        "ours_cpu32_prefilter_on_paper",
+        "ours_cpu32_prefilter_on_intended"
+      ],
+      "cohort": "Ours CPU32, prefilter on",
+      "backend": "cpu",
+      "metric": "wall_s",
+      "candidate_metric": "raw_extension_candidates",
+      "notes": "Isolates selectivity after holding the proposed prefilter on."
+    },
+    {
+      "id": "full_raw_selectivity_candidates",
+      "sheet": "Candidate_Pruning",
+      "category": "Selectivity candidate volume",
+      "suite": "full_raw_selectivity_candidates",
+      "baseline_algorithm": "ours_fullraw_cpu32_tdtree",
+      "variant_algorithms": [
+        "ours_fullraw_cpu32_paper",
+        "ours_fullraw_cpu32_intended"
+      ],
+      "cohort": "Ours CPU32, same full raw input, prefilter on, stable-ID labels",
+      "backend": "cpu",
+      "metric": "wall_s",
+      "candidate_metric": "raw_extension_candidates",
+      "notes": "Primary candidate-count isolation requested by the user. All modes receive the identical supplied non-_filtered full raw path; only Selectivity changes. The single wall-time repetition is diagnostic."
+    },
+    {
+      "id": "gopher_cpu32_early_prune_runtime",
+      "sheet": "Gopher_Prune",
+      "category": "Runtime",
+      "case_ids": [
+        "gopher_prune_perf_bitcoin_path3_k3",
+        "gopher_prune_perf_bitcoin_path3_k4",
+        "gopher_prune_perf_bitcoin_path3_k5"
+      ],
+      "baseline_algorithm": "gopher_cpu32_prune_off_perf",
+      "variant_algorithms": [
+        "gopher_cpu32_prune_on_perf"
+      ],
+      "cohort": "Ours+Gopher CPU32, statistics off",
+      "backend": "cpu",
+      "metric": "wall_s",
+      "candidate_metric": null,
+      "notes": "Five-repeat timing comparison. Detailed counters are intentionally disabled."
+    },
+    {
+      "id": "gopher_cpu1_early_prune_candidates",
+      "sheet": "Gopher_Prune",
+      "category": "Candidate volume",
+      "case_ids": [
+        "gopher_prune_diag_bitcoin_path3_k3",
+        "gopher_prune_diag_bitcoin_path3_k4",
+        "gopher_prune_diag_bitcoin_path3_k5"
+      ],
+      "baseline_algorithm": "gopher_cpu1_prune_off_diag",
+      "variant_algorithms": [
+        "gopher_cpu1_prune_on_diag"
+      ],
+      "cohort": "Ours+Gopher CPU1, statistics on",
+      "backend": "cpu",
+      "metric": "enumerateMatches_ms",
+      "candidate_metric": "raw_extension_candidates",
+      "notes": "One-repeat diagnostic. Report accepted_extensions and pruned_active_support alongside the common raw counter."
+    },
+    {
+      "id": "gopher_gpu_early_prune_runtime",
+      "sheet": "Gopher_Prune",
+      "category": "Runtime",
+      "case_ids": [
+        "gopher_prune_perf_bitcoin_path3_k3",
+        "gopher_prune_perf_bitcoin_path3_k4",
+        "gopher_prune_perf_bitcoin_path3_k5"
+      ],
+      "baseline_algorithm": "gopher_gpu_prune_off_perf",
+      "variant_algorithms": [
+        "gopher_gpu_prune_on_perf"
+      ],
+      "cohort": "Ours+Gopher-GPU resident, statistics off",
+      "backend": "rocm",
+      "metric": "wall_s",
+      "candidate_metric": null,
+      "notes": "Five-repeat resident-GPU timing comparison at a fixed 4096 MiB cap."
+    },
+    {
+      "id": "gopher_gpu_early_prune_candidates",
+      "sheet": "Gopher_Prune",
+      "category": "Candidate volume",
+      "case_ids": [
+        "gopher_prune_diag_bitcoin_path3_k3",
+        "gopher_prune_diag_bitcoin_path3_k4",
+        "gopher_prune_diag_bitcoin_path3_k5"
+      ],
+      "baseline_algorithm": "gopher_gpu_prune_off_diag",
+      "variant_algorithms": [
+        "gopher_gpu_prune_on_diag"
+      ],
+      "cohort": "Ours+Gopher-GPU resident, statistics on",
+      "backend": "rocm",
+      "metric": "enumerateMatches_ms",
+      "candidate_metric": "raw_extension_candidates",
+      "notes": "One-repeat diagnostic. Report accepted_extensions and pruned_active_support alongside the common raw counter."
+    },
+    {
+      "id": "gpu_resident_memory_cap",
+      "sheet": "GPU_Memory",
+      "category": "Memory cap",
+      "case_ids": [
+        "gpu_memory_bitcoin_path4_k3"
+      ],
+      "baseline_algorithm": "gopher_gpu_mem_4096",
+      "variant_algorithms": [
+        "gopher_gpu_mem_32",
+        "gopher_gpu_mem_64",
+        "gopher_gpu_mem_128",
+        "gopher_gpu_mem_256",
+        "gopher_gpu_mem_1024"
+      ],
+      "cohort": "Ours+Gopher-GPU resident, early-prune on, statistics off",
+      "backend": "rocm",
+      "metric": "wall_s",
+      "candidate_metric": null,
+      "notes": "Five repeats per cap. A cap-induced workspace failure is a controlled resource-bound result and must not be silently replaced by CPU fallback."
+    }
+  ]
+}

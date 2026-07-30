@@ -1,0 +1,19 @@
+{
+  "fixture": true,
+  "os": {
+    "name": "Synthetic Linux",
+    "kernel": "fixture-only"
+  },
+  "cpu": {
+    "model": "Synthetic 8-core CPU",
+    "logical_threads": 8
+  },
+  "gpu": {
+    "available": false,
+    "backend": "ROCm",
+    "reason": "Synthetic fixture; no device execution was performed"
+  },
+  "compiler": {
+    "cxx": "g++ fixture"
+  }
+}

@@ -48,6 +48,9 @@ try {
         if ($fullResult -notmatch "mode: full") {
             throw "full result file does not record its mode"
         }
+        if ($fullResult -notmatch "duration_mode: cardinality") {
+            throw "paper cardinality mode is not the CLI default"
+        }
 
         Invoke-Success ($required + @("--count-only")) "count-only without seed"
         $countResult = [System.IO.File]::ReadAllText(
@@ -66,6 +69,28 @@ try {
             "seed before count-only"
         Invoke-Success ($required + @("--count-only", "42")) `
             "count-only before seed"
+        Invoke-Success ($required + @("--duration-mode", "consecutive")) `
+            "explicit consecutive duration mode"
+        $consecutiveResult = [System.IO.File]::ReadAllText(
+            (Join-Path $tempRoot "matching_results_data.txt"))
+        $consecutiveTiming = [System.IO.File]::ReadAllText(
+            (Join-Path $tempRoot "timing_results_data.txt"))
+        if ($consecutiveResult -notmatch "duration_mode: consecutive" -or
+            $consecutiveTiming -notmatch "(?m)^duration_mode: consecutive\r?$") {
+            throw "consecutive duration mode is not recorded in outputs"
+        }
+        Invoke-Success ($required + @("--duration-mode=cardinality", "42")) `
+            "equals-form cardinality duration mode"
+        Invoke-Success ($required + @(
+            "--count-only", "--threads", "32")) "count-only threads"
+        $threadTiming = [System.IO.File]::ReadAllText(
+            (Join-Path $tempRoot "timing_results_data.txt"))
+        if ($threadTiming -notmatch "(?m)^threads_requested: 32\r?$" -or
+            $threadTiming -notmatch "(?m)^threads_used: 32\r?$") {
+            throw "thread request/effective count is not recorded"
+        }
+        Invoke-Success ($required + @(
+            "--count-only", "--threads=2")) "equals-form threads"
 
         Invoke-Failure ($required + @("--count-only", "--count-only")) `
             "duplicate count-only option"
@@ -73,6 +98,22 @@ try {
         Invoke-Failure ($required + @("--count-only=true")) `
             "malformed count-only option"
         Invoke-Failure ($required + @("42", "43")) "duplicate positional seed"
+        Invoke-Failure ($required + @("--duration-mode", "invalid")) `
+            "invalid duration mode"
+        Invoke-Failure ($required + @("--duration-mode")) `
+            "missing duration mode"
+        Invoke-Failure ($required + @(
+            "--duration-mode", "cardinality",
+            "--duration-mode=consecutive")) "duplicate duration mode"
+        Invoke-Failure ($required + @("--threads", "0")) "zero threads"
+        Invoke-Failure ($required + @("--threads", "-1")) "negative threads"
+        Invoke-Failure ($required + @("--threads", "many")) `
+            "non-integer threads"
+        Invoke-Failure ($required + @("--threads")) "missing threads"
+        Invoke-Failure ($required + @(
+            "--threads", "2", "--threads=3")) "duplicate threads"
+        Invoke-Failure ($required + @("--threads", "1025")) `
+            "excessive threads"
     }
     finally {
         Pop-Location

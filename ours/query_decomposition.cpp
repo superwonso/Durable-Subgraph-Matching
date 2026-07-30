@@ -6,11 +6,40 @@
 #include <limits>
 #include <set>
 
+const char* selectivityModeName(SelectivityMode mode) {
+    switch (mode) {
+        case SelectivityMode::TDTree:
+            return "tdtree";
+        case SelectivityMode::Intended:
+            return "intended";
+        case SelectivityMode::Paper:
+        default:
+            return "paper";
+    }
+}
+
+bool parseSelectivityMode(
+    const std::string& text,
+    SelectivityMode& mode) {
+    if (text == "tdtree") {
+        mode = SelectivityMode::TDTree;
+    } else if (text == "paper") {
+        mode = SelectivityMode::Paper;
+    } else if (text == "intended") {
+        mode = SelectivityMode::Intended;
+    } else {
+        return false;
+    }
+    return true;
+}
+
 QueryDecomposition decomposeQuery(
     const Graph& query_graph,
     const std::array<std::size_t, kLabelCount>& label_vertex_counts,
-    const std::array<double, kLabelCount>& label_average_lifespans) {
+    const std::array<double, kLabelCount>& label_average_lifespans,
+    SelectivityMode selectivity_mode) {
     QueryDecomposition result;
+    result.selectivity_mode = selectivity_mode;
     const int query_vertex_count = query_graph.num_vertices;
     result.vertex_labels = query_graph.vertex_labels;
     result.spanning_tree_adj.resize(static_cast<std::size_t>(query_vertex_count));
@@ -29,12 +58,40 @@ QueryDecomposition decomposeQuery(
 
         const std::size_t candidate_count = label_vertex_counts[label];
         const double average_lifespan = label_average_lifespans[label];
-        if (candidate_count == 0 || average_lifespan <= 0.0) continue;
 
-        // 260408_cdh.pdf, Eq. (3.2):
-        // S_temp(u) = deg_Q(u) / (|V_L(u)| * A_dur(u)), root = argmin.
-        const double score = static_cast<double>(degree) /
-            (static_cast<double>(candidate_count) * average_lifespan);
+        // The PDF's printed equation reverses the TD-Tree numerator and
+        // denominator, while its prose still says to favor fewer candidates
+        // and higher degree. Keep the printed equation as the default and
+        // expose the prose-consistent interpretation as an explicit ablation.
+        double score =
+            std::numeric_limits<double>::infinity();
+        switch (selectivity_mode) {
+            case SelectivityMode::TDTree:
+                score =
+                    static_cast<double>(candidate_count) /
+                    static_cast<double>(degree);
+                break;
+            case SelectivityMode::Intended:
+                if (candidate_count == 0) {
+                    score = 0.0;
+                } else if (average_lifespan > 0.0) {
+                    score =
+                        static_cast<double>(candidate_count) /
+                        (static_cast<double>(degree) *
+                         average_lifespan);
+                }
+                break;
+            case SelectivityMode::Paper:
+            default:
+                if (candidate_count > 0 &&
+                    average_lifespan > 0.0) {
+                    score =
+                        static_cast<double>(degree) /
+                        (static_cast<double>(candidate_count) *
+                         average_lifespan);
+                }
+                break;
+        }
         result.temporal_selectivity[static_cast<std::size_t>(query_vertex)] = score;
 
         const bool smaller = result.root < 0 ||

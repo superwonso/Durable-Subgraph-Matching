@@ -10,6 +10,9 @@
 
 struct QueryDecomposition {
     std::vector<std::vector<int>> spanning_tree_adj;
+    // One original directed query arc for every weak DFS-tree link. If a
+    // reciprocal arc also exists, the other direction remains a non-tree arc.
+    std::vector<std::pair<int, int>> tree_edges;
     std::vector<std::pair<int, int>> non_tree_edges;
     std::vector<Label> vertex_labels;
     std::vector<int> parent;

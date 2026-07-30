@@ -1,0 +1,10 @@
+case_id,semantic_group,algorithms,counts,status
+bitcoin_path3_k3,consecutive,"original_consecutive,ours,ours_gopher","{""original_consecutive"": 11, ""ours"": 11, ""ours_gopher"": 11}",pass
+bitcoin_path4_k3,consecutive,"original_consecutive,ours,ours_gopher,ours_gopher_no_cache,ours_gopher_no_temporal_reuse","{""original_consecutive"": 7, ""ours"": 7, ""ours_gopher"": 7, ""ours_gopher_no_cache"": 7, ""ours_gopher_no_temporal_reuse"": 7}",pass
+bitcoin_path5_k3,consecutive,"original_consecutive,ours,ours_gopher","{""original_consecutive"": 3, ""ours"": 3, ""ours_gopher"": 3}",pass
+bitcoin_path4_k2,consecutive,"original_consecutive,ours,ours_gopher","{""original_consecutive"": 13, ""ours"": 13, ""ours_gopher"": 13}",pass
+bitcoin_path4_k5,consecutive,"original_consecutive,ours,ours_gopher","{""original_consecutive"": 2, ""ours"": 2, ""ours_gopher"": 2}",pass
+bitcoin_path4_card_k3,cardinality,original,"{""original"": 19}",pass
+bitcoin_repeat_path3_k3,consecutive,"original_consecutive,ours","{""original_consecutive"": 11, ""ours"": 10}",fail
+bitcoin_failure_path5_k10,consecutive,"original_consecutive,ours_gopher","{}",missing
+bitcoin_scale_path4_k3,consecutive,ours_gopher,"{""ours_gopher"": 7}",pass

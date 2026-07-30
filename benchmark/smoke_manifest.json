@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "title": "Durable matcher smoke benchmark",
+  "repeats": 1,
+  "timeout_seconds": 120,
+  "algorithms": {
+    "original_cardinality": {
+      "executable": "{root}/original/td_tree",
+      "semantic_group": "cardinality",
+      "threads": 1,
+      "flags": [
+        "--count-only",
+        "--duration-mode",
+        "cardinality"
+      ]
+    },
+    "original_consecutive": {
+      "executable": "{root}/original/td_tree",
+      "semantic_group": "consecutive",
+      "threads": 1,
+      "flags": [
+        "--count-only",
+        "--duration-mode",
+        "consecutive"
+      ]
+    },
+    "ours": {
+      "executable": "{root}/ours/td_tree",
+      "semantic_group": "consecutive",
+      "threads": 1,
+      "flags": [
+        "--count-only",
+        "--selectivity",
+        "paper"
+      ]
+    },
+    "ours_gopher": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--early-prune",
+        "on",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "64",
+        "--threads",
+        "1",
+        "--verify-dag",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "on",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_gpu_verify": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "backend": "rocm",
+      "device": "AMD Radeon(TM) 8060S Graphics (gfx1151)",
+      "role": "gpu_correctness_diagnostic",
+      "flags": [
+        "--backend",
+        "gpu",
+        "--order",
+        "reuse",
+        "--selectivity",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--verify-cpu",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "on",
+        "--gpu-memory-mb",
+        "1024",
+        "--count-only"
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "smoke_reuse_star_small_k3",
+      "suite": "smoke",
+      "data": "{root}/benchmark/data/reuse_star_small.txt",
+      "query": "{root}/benchmark/data/reuse_star_small.qry",
+      "k": 3,
+      "label_seed": 42,
+      "algorithms": [
+        "original_cardinality",
+        "original_consecutive",
+        "ours",
+        "ours_gopher",
+        "ours_gopher_gpu_verify"
+      ]
+    }
+  ]
+}

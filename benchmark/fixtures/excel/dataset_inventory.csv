@@ -1,0 +1,5 @@
+dataset,raw_occurrences,filtered_occurrences,occurrence_reduction,source
+sx-superuser,1088749,130377,0.8803,synthetic report fixture
+wiki-talk,4451622,1050459,0.7640,synthetic report fixture
+sx-stackoverflow,43687034,6412726,0.8532,synthetic report fixture
+bitcoin,94668442,8027213,0.9152,synthetic report fixture

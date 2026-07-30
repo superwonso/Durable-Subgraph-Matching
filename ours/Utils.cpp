@@ -1,7 +1,9 @@
 #include "Utils.h"
 
 #include <algorithm>
+#include <charconv>
 #include <chrono>
+#include <cctype>
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -23,13 +25,53 @@ struct FilteredExternalEdge {
     int u;
     int v;
     std::vector<TimeInterval> active_intervals;
-    int active_snapshot_count;
+    std::int64_t active_snapshot_count;
 };
 
 bool rawEdgeLess(const RawTemporalEdge& lhs, const RawTemporalEdge& rhs) {
     if (lhs.u != rhs.u) return lhs.u < rhs.u;
     if (lhs.v != rhs.v) return lhs.v < rhs.v;
     return lhs.timestamp < rhs.timestamp;
+}
+
+enum class TemporalLineStatus {
+    empty,
+    valid,
+    invalid
+};
+
+TemporalLineStatus parseTemporalLine(
+    const std::string& line,
+    int& u,
+    int& v,
+    int& timestamp) {
+    const char* cursor = line.data();
+    const char* const end = cursor + line.size();
+    auto skip_whitespace = [&]() {
+        while (cursor != end &&
+               std::isspace(static_cast<unsigned char>(*cursor)) != 0) {
+            ++cursor;
+        }
+    };
+    auto parse_integer = [&](int& value) {
+        skip_whitespace();
+        if (cursor == end || *cursor == '#') return false;
+        const auto parsed = std::from_chars(cursor, end, value);
+        if (parsed.ec != std::errc{} || parsed.ptr == cursor) return false;
+        cursor = parsed.ptr;
+        return cursor == end || *cursor == '#' ||
+            std::isspace(static_cast<unsigned char>(*cursor)) != 0;
+    };
+
+    skip_whitespace();
+    if (cursor == end || *cursor == '#') return TemporalLineStatus::empty;
+    if (!parse_integer(u) || !parse_integer(v) || !parse_integer(timestamp)) {
+        return TemporalLineStatus::invalid;
+    }
+    skip_whitespace();
+    return cursor == end || *cursor == '#'
+        ? TemporalLineStatus::valid
+        : TemporalLineStatus::invalid;
 }
 
 int compactId(const std::vector<int>& external_ids, int external_id) {
@@ -68,6 +110,27 @@ int unionDuration(std::vector<TimeInterval>& intervals) {
 }
 
 } // namespace
+
+const char* labelModeName(LabelMode mode) {
+    return mode == LabelMode::StableId ? "stable-id" : "sequential-rng";
+}
+
+Label stableIdLabel(int external_id, std::uint32_t label_seed) {
+    if (external_id < 0) return kInvalidLabel;
+    std::uint64_t mixed =
+        (static_cast<std::uint64_t>(label_seed) << 32U) |
+        static_cast<std::uint32_t>(external_id);
+    mixed += UINT64_C(0x9e3779b97f4a7c15);
+    mixed =
+        (mixed ^ (mixed >> 30U)) *
+        UINT64_C(0xbf58476d1ce4e5b9);
+    mixed =
+        (mixed ^ (mixed >> 27U)) *
+        UINT64_C(0x94d049bb133111eb);
+    mixed ^= mixed >> 31U;
+    return static_cast<Label>(
+        mixed % static_cast<std::uint64_t>(kLabelCount));
+}
 
 Label labelFromString(const std::string& value) {
     if (value.size() != 1 || value[0] < 'A' || value[0] > 'E') {
@@ -131,7 +194,9 @@ std::vector<TimeInterval> intersectTimeIntervals(
     while (i < lhs.size() && j < rhs.size()) {
         const int start = std::max(lhs[i].start, rhs[j].start);
         const int end = std::min(lhs[i].end, rhs[j].end);
-        if (end >= start && end - start + 1 >= required) {
+        const long long intersection_length =
+            static_cast<long long>(end) - static_cast<long long>(start) + 1;
+        if (end >= start && intersection_length >= required) {
             result.push_back({start, end});
         }
 
@@ -182,7 +247,9 @@ bool readTemporalGraph(
     const std::string& filename,
     Graph& graph,
     std::uint32_t label_seed,
-    TemporalGraphLoadTimings* load_timings) {
+    TemporalGraphLoadTimings* load_timings,
+    bool apply_consecutive_pair_filter,
+    LabelMode label_mode) {
     if (load_timings != nullptr) *load_timings = {};
     const auto read_start = std::chrono::steady_clock::now();
     std::ifstream input(filename);
@@ -193,19 +260,30 @@ bool readTemporalGraph(
 
     graph = Graph{};
     std::vector<RawTemporalEdge> raw_edges;
-    int u = 0;
-    int v = 0;
-    int timestamp = 0;
-    while (input >> u >> v >> timestamp) {
+    std::string line;
+    std::size_t line_number = 0;
+    while (std::getline(input, line)) {
+        ++line_number;
+        int u = 0;
+        int v = 0;
+        int timestamp = 0;
+        const TemporalLineStatus status = parseTemporalLine(line, u, v, timestamp);
+        if (status == TemporalLineStatus::empty) continue;
+        if (status == TemporalLineStatus::invalid) {
+            std::cerr << "Error: Temporal graph line " << line_number
+                      << " must contain exactly three integers.\n";
+            return false;
+        }
         ++graph.input_occurrence_count;
         if (u < 0 || v < 0) {
-            std::cerr << "Error: Negative vertex ID in temporal graph.\n";
+            std::cerr << "Error: Negative vertex ID on temporal graph line "
+                      << line_number << ".\n";
             return false;
         }
         raw_edges.push_back({u, v, timestamp});
     }
-    if (!input.eof()) {
-        std::cerr << "Error: Invalid line in temporal graph file " << filename << '\n';
+    if (input.bad()) {
+        std::cerr << "Error: Failed while reading temporal graph file " << filename << '\n';
         return false;
     }
     input.close();
@@ -231,7 +309,7 @@ bool readTemporalGraph(
         all_vertex_ids.push_back(edge_v);
 
         std::vector<TimeInterval> intervals;
-        int active_count = 0;
+        std::int64_t active_count = 0;
         bool has_consecutive_pair = false;
         bool have_timestamp = false;
         int run_start = 0;
@@ -260,7 +338,8 @@ bool readTemporalGraph(
 
         // Algorithm 3.1: retain the entire edge history iff at least one
         // back-to-back snapshot pair exists.
-        if (has_consecutive_pair && edge_u != edge_v) {
+        if (!apply_consecutive_pair_filter ||
+            has_consecutive_pair) {
             filtered_edges.push_back({edge_u, edge_v, std::move(intervals), active_count});
         }
     }
@@ -268,19 +347,28 @@ bool readTemporalGraph(
 
     std::vector<RawTemporalEdge>().swap(raw_edges);
 
-    // The reference implementation assigns random labels to the complete raw
-    // vertex set before filtering. Sorting the IDs makes that assignment stable
-    // under input-line permutations and safe for sparse external IDs.
+    // The legacy mode assigns RNG labels to the complete raw vertex set before
+    // filtering. Sorting preserves that stream under input-line permutations;
+    // StableId additionally makes labels invariant to vertex-set subsets.
     std::sort(all_vertex_ids.begin(), all_vertex_ids.end());
     all_vertex_ids.erase(
         std::unique(all_vertex_ids.begin(), all_vertex_ids.end()),
         all_vertex_ids.end());
     std::vector<Label> all_vertex_labels(all_vertex_ids.size(), kInvalidLabel);
-    std::mt19937 label_generator(label_seed);
-    std::uniform_int_distribution<int> label_distribution(
-        0, static_cast<int>(kLabelCount) - 1);
-    for (auto& label : all_vertex_labels) {
-        label = static_cast<Label>(label_distribution(label_generator));
+    if (label_mode == LabelMode::StableId) {
+        for (std::size_t i = 0; i < all_vertex_ids.size(); ++i) {
+            all_vertex_labels[i] =
+                stableIdLabel(all_vertex_ids[i], label_seed);
+        }
+    } else {
+        std::mt19937 label_generator(label_seed);
+        std::uniform_int_distribution<int> label_distribution(
+            0, static_cast<int>(kLabelCount) - 1);
+        for (auto& label : all_vertex_labels) {
+            label =
+                static_cast<Label>(
+                    label_distribution(label_generator));
+        }
     }
 
     graph.external_ids.reserve(filtered_edges.size() * 2);
@@ -409,13 +497,19 @@ bool readQueryGraph(const std::string& filename, Graph& query_graph) {
     std::unordered_map<std::string, int> vertex_by_key;
     std::vector<std::pair<int, int>> query_edges;
     std::string line;
+    std::size_t line_number = 0;
     while (std::getline(input, line)) {
-        if (line.empty() || line[0] == '#') continue;
+        ++line_number;
+        const std::size_t comment = line.find('#');
+        if (comment != std::string::npos) line.resize(comment);
         std::istringstream parser(line);
         std::string lhs_token;
         std::string rhs_token;
-        if (!(parser >> lhs_token >> rhs_token)) {
-            std::cerr << "Error: Invalid line in query graph file: " << line << '\n';
+        std::string extra_token;
+        if (!(parser >> lhs_token)) continue;
+        if (!(parser >> rhs_token) || (parser >> extra_token)) {
+            std::cerr << "Error: Query graph line " << line_number
+                      << " must contain exactly two vertex tokens.\n";
             return false;
         }
 
@@ -459,11 +553,12 @@ bool readQueryGraph(const std::string& filename, Graph& query_graph) {
             std::cerr << "Error: A query vertex ID was used with conflicting labels.\n";
             return false;
         }
-        if (query_u == query_v) {
-            std::cerr << "Error: Query self-loops are not supported.\n";
-            return false;
-        }
         query_edges.emplace_back(query_u, query_v);
+    }
+    if (input.bad()) {
+        std::cerr << "Error: Failed while reading query graph file "
+                  << filename << '\n';
+        return false;
     }
 
     std::sort(query_edges.begin(), query_edges.end());

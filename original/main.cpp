@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -22,6 +23,8 @@
 #include "query_decomposition.h"
 
 namespace {
+
+constexpr std::size_t kMaxMatchingThreads = 1024;
 
 std::size_t getPeakRSS() {
 #ifdef _WIN32
@@ -46,7 +49,10 @@ int main(int argc, char* argv[]) {
     if (argc < 4) {
         std::cerr << "Usage: " << argv[0]
                   << " <Data Graph> <Query Graph> <Minimum Duration k> "
-                     "[Label Seed] [--count-only]\n";
+                     "[Label Seed] [--count-only] "
+                     "[--label-mode sequential-rng|stable-id] "
+                     "[--duration-mode cardinality|consecutive] "
+                     "[--threads N]\n";
         return 1;
     }
 
@@ -69,7 +75,77 @@ int main(int argc, char* argv[]) {
 
     std::uint32_t label_seed = kDefaultLabelSeed;
     bool label_seed_seen = false;
+    LabelMode label_mode = LabelMode::SequentialRng;
+    bool label_mode_seen = false;
     bool count_only = false;
+    DurationMode duration_mode = DurationMode::Cardinality;
+    bool duration_mode_seen = false;
+    std::size_t threads = 1;
+    bool threads_seen = false;
+    auto set_duration_mode = [&](const std::string& value) {
+        if (duration_mode_seen) {
+            std::cerr << "Error: --duration-mode may be specified only once.\n";
+            return false;
+        }
+        if (value == "cardinality") {
+            duration_mode = DurationMode::Cardinality;
+        } else if (value == "consecutive") {
+            duration_mode = DurationMode::Consecutive;
+        } else {
+            std::cerr << "Error: duration mode must be cardinality or consecutive.\n";
+            return false;
+        }
+        duration_mode_seen = true;
+        return true;
+    };
+    auto set_label_mode = [&](const std::string& value) {
+        if (label_mode_seen) {
+            std::cerr
+                << "Error: --label-mode may be specified only once.\n";
+            return false;
+        }
+        if (value == "sequential-rng") {
+            label_mode = LabelMode::SequentialRng;
+        } else if (value == "stable-id") {
+            label_mode = LabelMode::StableId;
+        } else {
+            std::cerr
+                << "Error: label mode must be sequential-rng or stable-id.\n";
+            return false;
+        }
+        label_mode_seen = true;
+        return true;
+    };
+    auto set_threads = [&](const std::string& value) {
+        if (threads_seen) {
+            std::cerr
+                << "Error: --threads may be specified only once.\n";
+            return false;
+        }
+        try {
+            if (value.empty() || value.front() == '-') {
+                throw std::invalid_argument("threads");
+            }
+            std::size_t parsed_characters = 0;
+            const unsigned long long parsed_threads =
+                std::stoull(value, &parsed_characters);
+            if (parsed_characters != value.size() ||
+                parsed_threads == 0 ||
+                parsed_threads >
+                    std::numeric_limits<std::size_t>::max() ||
+                parsed_threads > kMaxMatchingThreads) {
+                throw std::out_of_range("threads");
+            }
+            threads = static_cast<std::size_t>(parsed_threads);
+            threads_seen = true;
+            return true;
+        } catch (const std::exception&) {
+            std::cerr
+                << "Error: --threads must be an integer from 1 to "
+                << kMaxMatchingThreads << ".\n";
+            return false;
+        }
+    };
     for (int argument_index = 4; argument_index < argc; ++argument_index) {
         const std::string argument = argv[argument_index];
         if (argument == "--count-only") {
@@ -78,6 +154,65 @@ int main(int argc, char* argv[]) {
                 return 1;
             }
             count_only = true;
+            continue;
+        }
+        if (argument == "--duration-mode") {
+            if (argument_index + 1 >= argc) {
+                std::cerr << "Error: --duration-mode requires a value.\n";
+                return 1;
+            }
+            if (!set_duration_mode(argv[++argument_index])) {
+                return 1;
+            }
+            continue;
+        }
+        if (argument == "--label-mode") {
+            if (argument_index + 1 >= argc) {
+                std::cerr << "Error: --label-mode requires a value.\n";
+                return 1;
+            }
+            if (!set_label_mode(argv[++argument_index])) {
+                return 1;
+            }
+            continue;
+        }
+        constexpr const char* label_mode_prefix = "--label-mode=";
+        if (argument.rfind(label_mode_prefix, 0) == 0) {
+            if (!set_label_mode(
+                    argument.substr(
+                        std::char_traits<char>::length(
+                            label_mode_prefix)))) {
+                return 1;
+            }
+            continue;
+        }
+        constexpr const char* duration_mode_prefix = "--duration-mode=";
+        if (argument.rfind(duration_mode_prefix, 0) == 0) {
+            if (!set_duration_mode(
+                    argument.substr(std::char_traits<char>::length(
+                        duration_mode_prefix)))) {
+                return 1;
+            }
+            continue;
+        }
+        if (argument == "--threads") {
+            if (argument_index + 1 >= argc) {
+                std::cerr << "Error: --threads requires a value.\n";
+                return 1;
+            }
+            if (!set_threads(argv[++argument_index])) {
+                return 1;
+            }
+            continue;
+        }
+        constexpr const char* threads_prefix = "--threads=";
+        if (argument.rfind(threads_prefix, 0) == 0) {
+            if (!set_threads(
+                    argument.substr(
+                        std::char_traits<char>::length(
+                            threads_prefix)))) {
+                return 1;
+            }
             continue;
         }
         if (argument.rfind("--", 0) == 0) {
@@ -124,7 +259,11 @@ int main(int argc, char* argv[]) {
     TemporalGraphLoadTimings temporal_load_timings;
     auto stage_start = std::chrono::steady_clock::now();
     if (!readTemporalGraph(
-            temporal_graph_file, temporal_graph, label_seed, &temporal_load_timings)) {
+            temporal_graph_file,
+            temporal_graph,
+            label_seed,
+            &temporal_load_timings,
+            label_mode)) {
         return 2;
     }
     timings["readAndPrepareTemporalGraph"] = elapsedMilliseconds(stage_start);
@@ -134,8 +273,14 @@ int main(int argc, char* argv[]) {
               << " occurrences, " << temporal_graph.input_unique_edge_count
               << " unique directed edges, " << temporal_graph.retained_edge_count
               << " retained edges, " << temporal_graph.num_vertices
-              << " active vertices, random label seed=" << label_seed << ".\n";
+              << " active vertices, label mode="
+              << labelModeName(label_mode)
+              << ", label seed=" << label_seed << ".\n";
     std::cout << "Output mode: " << matchOutputModeName(output_mode) << ".\n";
+    std::cout << "Threads requested: " << threads
+              << " (count-only matching only).\n";
+    std::cout << "Duration mode: " << durationModeName(duration_mode)
+              << " (k=" << minimum_duration << ").\n";
     std::cout << "Temporal preprocessing (ms): read="
               << temporal_load_timings.read_milliseconds
               << ", preprocess=" << temporal_load_timings.preprocess_milliseconds
@@ -176,13 +321,18 @@ int main(int argc, char* argv[]) {
     std::cout << " | non-tree edges=" << decomposition.non_tree_edges.size() << '\n';
 
     stage_start = std::chrono::steady_clock::now();
-    TDTree td_tree(temporal_graph, query_graph, decomposition, minimum_duration);
+    TDTree td_tree(
+        temporal_graph,
+        query_graph,
+        decomposition,
+        minimum_duration,
+        duration_mode);
     timings["buildTDTree"] = elapsedMilliseconds(stage_start);
     td_tree.print_res();
 
     const std::string matching_result_file = "matching_results_" + dataset_name + ".txt";
     const MatchSummary match_summary = td_tree.save_res(
-        matching_result_file, output_mode);
+        matching_result_file, output_mode, threads);
     if (!match_summary.output_written) {
         std::cerr << "Error: Could not write " << matching_result_file << '\n';
         return 4;
@@ -197,8 +347,60 @@ int main(int argc, char* argv[]) {
         return 4;
     }
     timing_output << "mode: " << matchOutputModeName(output_mode) << '\n'
+                  << "label_mode: " << labelModeName(label_mode) << '\n'
+                  << "label_seed: " << label_seed << '\n'
+                  << "selectivity_mode: tdtree\n"
+                  << "query_root: " << decomposition.root << '\n'
+                  << "root_selectivity_score: "
+                  << std::setprecision(17)
+                  << decomposition.topological_selectivity[
+                         static_cast<std::size_t>(
+                             decomposition.root)]
+                  << '\n'
+                  << "duration_mode: " << durationModeName(duration_mode) << '\n'
+                  << "minimum_duration_k: " << minimum_duration << '\n'
+                  << "threads_requested: "
+                  << match_summary.threads_requested << '\n'
+                  << "threads_used: "
+                  << match_summary.threads_used << '\n'
+                  << "workers_with_tasks: "
+                  << match_summary.workers_with_tasks << '\n'
+                  << "root_tasks_claimed: "
+                  << match_summary.root_tasks_claimed << '\n'
+                  << "worker_root_tasks_min: "
+                  << match_summary.worker_root_tasks_min << '\n'
+                  << "worker_root_tasks_max: "
+                  << match_summary.worker_root_tasks_max << '\n'
+                  << "root_candidate_count: "
+                  << match_summary.root_candidate_count << '\n'
+                  << "candidate_relation_entries: "
+                  << td_tree.candidateRelationCount() << '\n'
+                  << "dfs_states: "
+                  << match_summary.dfs_states << '\n'
+                  << "metric_schema_version: logical_extensions_v1\n"
+                  << "raw_extension_candidates: "
+                  << match_summary.generated_candidates << '\n'
+                  << "post_structural_candidates: "
+                  << match_summary.generated_candidates << '\n'
+                  << "generated_candidates: "
+                  << match_summary.generated_candidates << '\n'
+                  << "accepted_candidates: "
+                  << match_summary.accepted_candidates << '\n'
+                  << "accepted_extensions: "
+                  << match_summary.accepted_candidates << '\n'
+                  << "completed_matches: "
+                  << match_summary.completed_matches << '\n'
+                  << "pruned_injectivity: "
+                  << match_summary.pruned_injectivity << '\n'
+                  << "pruned_temporal_support: "
+                  << match_summary.pruned_temporal_support << '\n'
                   << "count_overflow: "
                   << (match_summary.count_overflow ? "true" : "false") << '\n';
+    timing_output << "plan_order:";
+    for (int query_vertex : decomposition.dfs_order) {
+        timing_output << ' ' << query_vertex;
+    }
+    timing_output << '\n';
     const std::array<const char*, 9> timing_order{{
         "readTemporalGraph",
         "preprocessTemporalGraph",
@@ -232,6 +434,41 @@ int main(int argc, char* argv[]) {
     }
     std::cout << "Result file: " << matching_result_file << '\n'
               << "Timing file: " << timing_result_file << '\n'
+              << "threads_requested: "
+              << match_summary.threads_requested << '\n'
+              << "threads_used: "
+              << match_summary.threads_used << '\n'
+              << "workers_with_tasks: "
+              << match_summary.workers_with_tasks << '\n'
+              << "root_tasks_claimed: "
+              << match_summary.root_tasks_claimed << '\n'
+              << "worker_root_tasks_min: "
+              << match_summary.worker_root_tasks_min << '\n'
+              << "worker_root_tasks_max: "
+              << match_summary.worker_root_tasks_max << '\n'
+              << "root_candidate_count: "
+              << match_summary.root_candidate_count << '\n'
+              << "candidate_relation_entries: "
+              << td_tree.candidateRelationCount() << '\n'
+              << "dfs_states: "
+              << match_summary.dfs_states << '\n'
+              << "metric_schema_version: logical_extensions_v1\n"
+              << "raw_extension_candidates: "
+              << match_summary.generated_candidates << '\n'
+              << "post_structural_candidates: "
+              << match_summary.generated_candidates << '\n'
+              << "generated_candidates: "
+              << match_summary.generated_candidates << '\n'
+              << "accepted_candidates: "
+              << match_summary.accepted_candidates << '\n'
+              << "accepted_extensions: "
+              << match_summary.accepted_candidates << '\n'
+              << "completed_matches: "
+              << match_summary.completed_matches << '\n'
+              << "pruned_injectivity: "
+              << match_summary.pruned_injectivity << '\n'
+              << "pruned_temporal_support: "
+              << match_summary.pruned_temporal_support << '\n'
               << "Memory (KiB): graph=" << input_graph_memory / 1024
               << ", TD-tree=" << td_tree_memory / 1024
               << ", other=" << other_memory / 1024

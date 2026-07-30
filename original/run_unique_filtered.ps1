@@ -5,6 +5,8 @@ param(
     [string]$QueryGraph = "..\Dataset\Query5.txt",
     [int]$K = 5,
     [uint32]$LabelSeed = 42,
+    [ValidateSet("cardinality", "consecutive")]
+    [string]$DurationMode = "cardinality",
     [string]$OutputDir = ".\batch_results_original",
     [string]$Compiler = "g++",
     [switch]$CountOnly,
@@ -48,6 +50,7 @@ Write-Host "Data pattern: $DatasetPattern"
 Write-Host "Query graph: $query"
 Write-Host "k          : $K"
 Write-Host "Label seed : $LabelSeed"
+Write-Host "Duration   : $DurationMode"
 Write-Host "Output mode: $(if ($CountOnly) { 'count-only' } else { 'full' })"
 Write-Host "Output dir : $outDir"
 
@@ -62,9 +65,16 @@ try {
         $generatedTiming = "timing_results_{0}.txt" -f $base
 
         Write-Host "`n=== Running: $($dataset.Name) ==="
-        $runArguments = @($dataset.FullName, $query, $K, $LabelSeed)
+        $runArguments = @(
+            $dataset.FullName,
+            $query,
+            $K,
+            $LabelSeed,
+            "--duration-mode",
+            $DurationMode)
         if ($CountOnly) { $runArguments += "--count-only" }
-        $optionText = if ($CountOnly) { " --count-only" } else { "" }
+        $optionText = " --duration-mode $DurationMode"
+        if ($CountOnly) { $optionText += " --count-only" }
         Write-Host "& `"$exe`" `"$($dataset.FullName)`" `"$query`" $K $LabelSeed$optionText"
         if ($DryRun) {
             continue

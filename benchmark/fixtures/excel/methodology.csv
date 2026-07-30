@@ -1,0 +1,3 @@
+category,statement,source,limitation
+Fixture,"All values under benchmark/fixtures/excel are synthetic and test report plumbing only.",fixture README,"Must never be cited as measured performance."
+Uncertainty,"Fixture medians are deterministic examples rather than statistical estimates.",fixture README,"No confidence interval is implied."

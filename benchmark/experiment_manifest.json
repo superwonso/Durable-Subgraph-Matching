@@ -1,0 +1,1510 @@
+{
+  "schema_version": 1,
+  "title": "Durable subgraph matching evaluation matrix",
+  "as_of": "2026-07-29",
+  "description": "Paper-grounded comparison of paper-faithful TD-Tree cardinality semantics, a consecutive-mode TD-Tree baseline, ours, CPU ours_gopher, and the execution-verified ROCm fused Candidate-DAG GPU prototype.",
+  "repeats": 3,
+  "timeout_seconds": 600,
+  "methodology": {
+    "primary_semantic_group": "consecutive",
+    "label_seed": 42,
+    "output_mode": "count-only",
+    "process_isolation": "Each repetition runs in a separate working directory under GNU time and timeout.",
+    "execution_order": "Algorithms are interleaved by repetition with a deterministic case-specific rotation.",
+    "summary_statistic": "Median over successful repetitions; Q1, Q3, IQR, min, max, mean, and sample standard deviation are retained.",
+    "correctness_rule": "Every expected algorithm in a semantic group must finish every repetition, produce a stable count, and agree with the other algorithms in that group.",
+    "cardinality_boundary": "original_cardinality follows the 2022 TD-Tree paper and is reported separately; its counts and timings are not used as a consecutive-semantics speedup denominator.",
+    "prefiltered_boundary": "Full stackoverflow and bitcoin raw inputs remain outside the bounded matching matrix on this 24 GiB WSL host. Their supplied filtered graphs and deterministic edge-history-preserving 5% samples are used instead.",
+    "gpu_boundary": "ROCm 7.2.4 detects the Radeon 8060S (gfx1151) through WSL /dev/dxg and a real transfer-kernel-transfer verification passed. The GPU prototype is a fused device-resident Candidate-DAG frontier executor without CPU runtime memo tables; it is compared with both CPU no-memo 1T and full CPU Gopher.",
+    "single_thread_boundary": "Original and ours are serial implementations and are recorded with threads=1. CPU Gopher single-thread comparisons use --threads 1 and numerical-runtime thread caps.",
+    "provenance": "The runner records SHA-256 for each executable, dataset, query, and used manifest."
+  },
+  "dataset_inventory": [
+    {
+      "id": "sx_superuser_raw",
+      "path": "{root}/Dataset/sx-superuser-temporal-1w-unique.txt",
+      "occurrence_rows": 1088749,
+      "bytes": 18866128,
+      "input_variant": "raw_unique_occurrences"
+    },
+    {
+      "id": "sx_superuser_filtered",
+      "path": "{root}/Dataset/sx-superuser-temporal-1w-unique_filtered.txt",
+      "occurrence_rows": 130377,
+      "bytes": 2109304,
+      "input_variant": "supplied_prefiltered"
+    },
+    {
+      "id": "wiki_talk_raw",
+      "path": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w.txt",
+      "occurrence_rows": 4451622,
+      "bytes": 72804366,
+      "input_variant": "raw_unique_occurrences"
+    },
+    {
+      "id": "wiki_talk_filtered",
+      "path": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w_filtered.txt",
+      "occurrence_rows": 1050459,
+      "bytes": 15425450,
+      "input_variant": "supplied_prefiltered"
+    },
+    {
+      "id": "sx_stackoverflow_raw",
+      "path": "{root}/Dataset/sx-stackoverflow-timeinstance-unique-1w.txt",
+      "occurrence_rows": 43687034,
+      "bytes": 859243488,
+      "input_variant": "raw_unique_occurrences",
+      "included_in_matching_matrix": false,
+      "exclusion_reason": "Resource safety on a 15 GiB host"
+    },
+    {
+      "id": "sx_stackoverflow_filtered",
+      "path": "{root}/Dataset/sx-stackoverflow-timeinstance-unique-1w_filtered.txt",
+      "occurrence_rows": 6412726,
+      "bytes": 119581001,
+      "input_variant": "supplied_prefiltered"
+    },
+    {
+      "id": "sx_stackoverflow_sample_5pct",
+      "path": "{root}/benchmark/data/sx_stackoverflow_edge_sample_5pct.txt",
+      "occurrence_rows": 2183852,
+      "bytes": 40771418,
+      "input_variant": "deterministic_edge_history_sample",
+      "sampling_rate": 0.05
+    },
+    {
+      "id": "bitcoin_raw",
+      "path": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w.txt",
+      "occurrence_rows": 94668442,
+      "bytes": 1925032024,
+      "input_variant": "raw_unique_occurrences",
+      "included_in_matching_matrix": false,
+      "exclusion_reason": "Resource safety on a 15 GiB host"
+    },
+    {
+      "id": "bitcoin_filtered",
+      "path": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "occurrence_rows": 8027213,
+      "bytes": 129812770,
+      "input_variant": "supplied_prefiltered"
+    },
+    {
+      "id": "bitcoin_sample_5pct",
+      "path": "{root}/benchmark/data/bitcoin_edge_sample_5pct.txt",
+      "occurrence_rows": 4735968,
+      "bytes": 91557635,
+      "input_variant": "deterministic_edge_history_sample",
+      "sampling_rate": 0.05
+    },
+    {
+      "id": "reuse_star_small",
+      "path": "{root}/benchmark/data/reuse_star_small.txt",
+      "occurrence_rows": 10042,
+      "bytes": 116902,
+      "input_variant": "synthetic_correctness"
+    },
+    {
+      "id": "reuse_star_medium",
+      "path": "{root}/benchmark/data/reuse_star.txt",
+      "occurrence_rows": 485467,
+      "bytes": 5011387,
+      "input_variant": "synthetic_reuse"
+    },
+    {
+      "id": "reuse_star_scaling",
+      "path": "{root}/benchmark/data/reuse_star_scaling.txt",
+      "occurrence_rows": 4843093,
+      "bytes": 54980909,
+      "input_variant": "synthetic_reuse_scaling",
+      "generator_parameters": {
+        "centers": 5000,
+        "leaves_per_label": 20,
+        "neighbors_per_label": 8,
+        "transient_edges": 100000,
+        "label_seed": 42
+      }
+    }
+  ],
+  "algorithms": {
+    "original_cardinality": {
+      "executable": "{root}/original/td_tree",
+      "semantic_group": "cardinality",
+      "role": "paper_faithful_td_tree",
+      "threads": 1,
+      "flags": [
+        "--count-only",
+        "--duration-mode",
+        "cardinality"
+      ]
+    },
+    "original_consecutive": {
+      "executable": "{root}/original/td_tree",
+      "semantic_group": "consecutive",
+      "role": "fair_td_tree_compatibility_baseline",
+      "threads": 1,
+      "flags": [
+        "--count-only",
+        "--duration-mode",
+        "consecutive"
+      ]
+    },
+    "ours": {
+      "executable": "{root}/ours/td_tree",
+      "semantic_group": "consecutive",
+      "role": "260408_cdh_paper_selectivity_single_thread",
+      "threads": 1,
+      "flags": [
+        "--count-only",
+        "--selectivity",
+        "paper"
+      ]
+    },
+    "ours_intended": {
+      "executable": "{root}/ours/td_tree",
+      "semantic_group": "consecutive",
+      "role": "selectivity_ablation_intended_single_thread",
+      "threads": 1,
+      "flags": [
+        "--count-only",
+        "--selectivity",
+        "intended"
+      ]
+    },
+    "ours_gopher_no_prune_paper_t1": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "gopher_pruning_factor_off_dag_executor_no_runtime_memo",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--early-prune",
+        "off",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_none_paper_t1": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "gopher_pruning_factor_on_gpu_closest_cpu_reference_no_runtime_memo",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_structural_paper_t1": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "gopher_memo_factor_structural_only",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "structural",
+        "--cache-mb",
+        "256",
+        "--threads",
+        "1",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_temporal_paper_t1": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "gopher_memo_factor_temporal_longest_only",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "temporal",
+        "--cache-mb",
+        "256",
+        "--threads",
+        "1",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_paper_t1": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "gopher_memo_factor_both_paper_order",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "256",
+        "--threads",
+        "1",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_reuse_t1": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "gopher_primary_both_memo_reuse_order_cpu_single_thread",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--early-prune",
+        "on",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "256",
+        "--threads",
+        "1",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_reuse_intended_t1": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "selectivity_ablation_intended_gopher_cpu_single_thread",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--selectivity",
+        "intended",
+        "--early-prune",
+        "on",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "256",
+        "--threads",
+        "1",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_paper_stats_t1": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "gopher_memo_factor_both_paper_order_diagnostics",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--early-prune",
+        "on",
+        "--order",
+        "paper",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "256",
+        "--threads",
+        "1",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_reuse_stats_t1": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "gopher_reuse_order_and_cache256_diagnostics",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--early-prune",
+        "on",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "256",
+        "--threads",
+        "1",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_reuse_t2": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "cpu_scaling",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "256",
+        "--threads",
+        "2",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_reuse_t4": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "cpu_scaling",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "256",
+        "--threads",
+        "4",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_reuse_t8": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "cpu_scaling",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "256",
+        "--threads",
+        "8",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_reuse_t16": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "cpu_scaling_best_host_physical",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "256",
+        "--threads",
+        "16",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_reuse_t32": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "cpu_scaling_host_logical",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "256",
+        "--threads",
+        "32",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_reuse_cache0_t1": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "cache_capacity",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "0",
+        "--threads",
+        "1",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_reuse_cache64_t1": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "cache_capacity",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "64",
+        "--threads",
+        "1",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_reuse_cache1024_t1": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "cache_capacity",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "1024",
+        "--threads",
+        "1",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_reuse_no_cost_t1": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "cache_admission_ablation",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "256",
+        "--no-cost-aware",
+        "--threads",
+        "1",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "off",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_gpu_paper": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "role": "gpu_primary_fused_candidate_dag_no_runtime_memo_paper_order",
+      "backend": "rocm",
+      "device": "AMD Radeon(TM) 8060S Graphics (gfx1151)",
+      "flags": [
+        "--backend",
+        "gpu",
+        "--order",
+        "paper",
+        "--selectivity",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--early-prune",
+        "on",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--gpu-memory-mb",
+        "4096",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_gpu_reuse": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "role": "gpu_primary_fused_candidate_dag_no_runtime_memo_reuse_order",
+      "backend": "rocm",
+      "device": "AMD Radeon(TM) 8060S Graphics (gfx1151)",
+      "flags": [
+        "--backend",
+        "gpu",
+        "--order",
+        "reuse",
+        "--selectivity",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--early-prune",
+        "on",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--gpu-memory-mb",
+        "4096",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_gpu_paper_verify": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "role": "gpu_correctness_diagnostic_paper_order",
+      "backend": "rocm",
+      "device": "AMD Radeon(TM) 8060S Graphics (gfx1151)",
+      "flags": [
+        "--backend",
+        "gpu",
+        "--order",
+        "paper",
+        "--selectivity",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--early-prune",
+        "on",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "on",
+        "--verify-cpu",
+        "--gpu-memory-mb",
+        "4096",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_gpu_reuse_verify": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "role": "gpu_correctness_diagnostic_reuse_order",
+      "backend": "rocm",
+      "device": "AMD Radeon(TM) 8060S Graphics (gfx1151)",
+      "flags": [
+        "--backend",
+        "gpu",
+        "--order",
+        "reuse",
+        "--selectivity",
+        "paper",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--early-prune",
+        "on",
+        "--statistics",
+        "on",
+        "--result-digest",
+        "on",
+        "--verify-cpu",
+        "--gpu-memory-mb",
+        "4096",
+        "--count-only"
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "correctness_reuse_star_small_k3",
+      "suite": "correctness",
+      "axes": [
+        "semantics",
+        "implementation"
+      ],
+      "dataset_id": "reuse_star_small",
+      "input_variant": "synthetic_correctness",
+      "query_shape": "reuse_star_4edge",
+      "query_edges": 4,
+      "data": "{root}/benchmark/data/reuse_star_small.txt",
+      "query": "{root}/benchmark/data/reuse_star_small.qry",
+      "k": 3,
+      "repeats": 3,
+      "timeout_seconds": 120,
+      "algorithms": [
+        "original_cardinality",
+        "original_consecutive",
+        "ours",
+        "ours_intended",
+        "ours_gopher_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_intended_t1",
+        "ours_gopher_gpu_paper_verify",
+        "ours_gopher_gpu_reuse_verify"
+      ]
+    },
+    {
+      "id": "gopher_reuse_star_ablation_k3",
+      "suite": "gopher_diagnostics",
+      "axes": [
+        "ablation",
+        "cache_capacity",
+        "cache_admission"
+      ],
+      "dataset_id": "reuse_star_scaling",
+      "input_variant": "synthetic_reuse_scaling",
+      "query_shape": "reuse_star_4edge",
+      "query_edges": 4,
+      "data": "{root}/benchmark/data/reuse_star_scaling.txt",
+      "query": "{root}/benchmark/data/reuse_star_scaling.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 600,
+      "algorithm_flags": {
+        "ours_gopher_no_prune_paper_t1": [
+          "--metrics",
+          "gopher_metrics.json"
+        ],
+        "ours_gopher_none_paper_t1": [
+          "--metrics",
+          "gopher_metrics.json"
+        ],
+        "ours_gopher_structural_paper_t1": [
+          "--metrics",
+          "gopher_metrics.json"
+        ],
+        "ours_gopher_temporal_paper_t1": [
+          "--metrics",
+          "gopher_metrics.json"
+        ],
+        "ours_gopher_paper_stats_t1": [
+          "--metrics",
+          "gopher_metrics.json"
+        ],
+        "ours_gopher_reuse_stats_t1": [
+          "--metrics",
+          "gopher_metrics.json"
+        ],
+        "ours_gopher_reuse_cache0_t1": [
+          "--metrics",
+          "gopher_metrics.json"
+        ],
+        "ours_gopher_reuse_cache64_t1": [
+          "--metrics",
+          "gopher_metrics.json"
+        ],
+        "ours_gopher_reuse_cache1024_t1": [
+          "--metrics",
+          "gopher_metrics.json"
+        ],
+        "ours_gopher_reuse_no_cost_t1": [
+          "--metrics",
+          "gopher_metrics.json"
+        ]
+      },
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_no_prune_paper_t1",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_structural_paper_t1",
+        "ours_gopher_temporal_paper_t1",
+        "ours_gopher_paper_stats_t1",
+        "ours_gopher_reuse_stats_t1",
+        "ours_gopher_reuse_cache0_t1",
+        "ours_gopher_reuse_cache64_t1",
+        "ours_gopher_reuse_cache1024_t1",
+        "ours_gopher_reuse_no_cost_t1"
+      ]
+    },
+    {
+      "id": "gopher_reuse_star_cpu_scaling_k3",
+      "suite": "gopher_cpu_scaling",
+      "axes": [
+        "cpu_scaling"
+      ],
+      "dataset_id": "reuse_star_scaling",
+      "input_variant": "synthetic_reuse_scaling",
+      "query_shape": "reuse_star_4edge",
+      "query_edges": 4,
+      "data": "{root}/benchmark/data/reuse_star_scaling.txt",
+      "query": "{root}/benchmark/data/reuse_star_scaling.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 600,
+      "algorithms": [
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_t2",
+        "ours_gopher_reuse_t4",
+        "ours_gopher_reuse_t8",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32"
+      ]
+    },
+    {
+      "id": "real_sx_superuser_filtered_tailed4_k3",
+      "suite": "real_dataset_comparison",
+      "axes": [
+        "dataset",
+        "query_shape"
+      ],
+      "dataset_id": "sx_superuser_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "tailed4",
+      "query_edges": 4,
+      "data": "{root}/Dataset/sx-superuser-temporal-1w-unique_filtered.txt",
+      "query": "{root}/benchmark/queries/sx_superuser/tailed4_k3.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 300,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_intended",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_intended_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "real_wiki_talk_filtered_tailed4_k3",
+      "suite": "real_dataset_comparison",
+      "axes": [
+        "dataset",
+        "query_shape"
+      ],
+      "dataset_id": "wiki_talk_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "tailed4",
+      "query_edges": 4,
+      "data": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/wiki_talk/tailed4_k3.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 300,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_intended",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_intended_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "real_sx_stackoverflow_filtered_tailed4_k3",
+      "suite": "real_dataset_comparison",
+      "axes": [
+        "dataset",
+        "query_shape"
+      ],
+      "dataset_id": "sx_stackoverflow_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "tailed4",
+      "query_edges": 4,
+      "data": "{root}/Dataset/sx-stackoverflow-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/sx_stackoverflow/tailed4_k3.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 900,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_intended",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_intended_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "real_bitcoin_filtered_tailed4_k3",
+      "suite": "real_dataset_comparison",
+      "axes": [
+        "dataset",
+        "query_shape"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "tailed4",
+      "query_edges": 4,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/tailed4_k3.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 900,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_intended",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_intended_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "preprocess_sx_superuser_raw_tailed4_k3",
+      "suite": "raw_preprocessing",
+      "axes": [
+        "filtering",
+        "raw_input"
+      ],
+      "dataset_id": "sx_superuser_raw",
+      "input_variant": "raw_unique_occurrences",
+      "query_shape": "tailed4",
+      "query_edges": 4,
+      "data": "{root}/Dataset/sx-superuser-temporal-1w-unique.txt",
+      "query": "{root}/benchmark/queries/raw/sx_superuser_raw_tailed4_k3.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 600,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_intended",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_intended_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "preprocess_wiki_talk_raw_tailed4_k3",
+      "suite": "raw_preprocessing",
+      "axes": [
+        "filtering",
+        "raw_input"
+      ],
+      "dataset_id": "wiki_talk_raw",
+      "input_variant": "raw_unique_occurrences",
+      "query_shape": "tailed4",
+      "query_edges": 4,
+      "data": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w.txt",
+      "query": "{root}/benchmark/queries/raw/wiki_talk_raw_tailed4_k3.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 900,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_intended",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_intended_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "preprocess_sx_stackoverflow_sample5_path3_k3",
+      "suite": "raw_preprocessing",
+      "axes": [
+        "filtering",
+        "sample_scale"
+      ],
+      "dataset_id": "sx_stackoverflow_sample_5pct",
+      "input_variant": "deterministic_edge_history_sample",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/benchmark/data/sx_stackoverflow_edge_sample_5pct.txt",
+      "query": "{root}/benchmark/queries/samples/sx_stackoverflow_5pct_path3_k3.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 600,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "preprocess_bitcoin_sample5_path3_k3",
+      "suite": "raw_preprocessing",
+      "axes": [
+        "filtering",
+        "sample_scale"
+      ],
+      "dataset_id": "bitcoin_sample_5pct",
+      "input_variant": "deterministic_edge_history_sample",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/benchmark/data/bitcoin_edge_sample_5pct.txt",
+      "query": "{root}/benchmark/queries/samples/bitcoin_5pct_path3_k3.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 600,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "tdtree_cardinality_sx_superuser_raw_path3_k3",
+      "suite": "paper_faithful_original",
+      "axes": [
+        "cardinality_semantics"
+      ],
+      "dataset_id": "sx_superuser_raw",
+      "input_variant": "raw_unique_occurrences",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/sx-superuser-temporal-1w-unique.txt",
+      "query": "{root}/benchmark/queries/raw/sx_superuser_raw_path3_k3.qry",
+      "k": 3,
+      "timeout_seconds": 900,
+      "algorithms": [
+        "original_cardinality"
+      ]
+    },
+    {
+      "id": "paper_wiki_path3_k3",
+      "suite": "paper_axes",
+      "axes": [
+        "query_size",
+        "k_sensitivity",
+        "query_shape"
+      ],
+      "dataset_id": "wiki_talk_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/wiki_talk/path3_k5.qry",
+      "k": 3,
+      "timeout_seconds": 300,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_paper_t1",
+        "ours_gopher_reuse_t1"
+      ]
+    },
+    {
+      "id": "paper_wiki_path4_k3",
+      "suite": "paper_axes",
+      "axes": [
+        "query_size"
+      ],
+      "dataset_id": "wiki_talk_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path4",
+      "query_edges": 4,
+      "data": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/wiki_talk/path4_k3.qry",
+      "k": 3,
+      "timeout_seconds": 600,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_paper_t1",
+        "ours_gopher_reuse_t1"
+      ]
+    },
+    {
+      "id": "paper_wiki_path5_k3",
+      "suite": "paper_axes",
+      "axes": [
+        "query_size"
+      ],
+      "dataset_id": "wiki_talk_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path5",
+      "query_edges": 5,
+      "data": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/wiki_talk/path5_k3.qry",
+      "k": 3,
+      "timeout_seconds": 900,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_paper_t1",
+        "ours_gopher_reuse_t1"
+      ]
+    },
+    {
+      "id": "paper_wiki_path3_k4",
+      "suite": "paper_axes",
+      "axes": [
+        "k_sensitivity"
+      ],
+      "dataset_id": "wiki_talk_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/wiki_talk/path3_k5.qry",
+      "k": 4,
+      "timeout_seconds": 300,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_paper_t1",
+        "ours_gopher_reuse_t1"
+      ]
+    },
+    {
+      "id": "paper_wiki_path3_k5",
+      "suite": "paper_axes",
+      "axes": [
+        "k_sensitivity"
+      ],
+      "dataset_id": "wiki_talk_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/wiki_talk/path3_k5.qry",
+      "k": 5,
+      "timeout_seconds": 300,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_paper_t1",
+        "ours_gopher_reuse_t1"
+      ]
+    },
+    {
+      "id": "paper_wiki_path4_k4",
+      "suite": "paper_axes",
+      "axes": [
+        "combined_query_size_k"
+      ],
+      "dataset_id": "wiki_talk_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path4",
+      "query_edges": 4,
+      "data": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/wiki_talk/path4_k4.qry",
+      "k": 4,
+      "timeout_seconds": 600,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_paper_t1",
+        "ours_gopher_reuse_t1"
+      ]
+    },
+    {
+      "id": "paper_wiki_path5_k5",
+      "suite": "paper_axes",
+      "axes": [
+        "combined_query_size_k"
+      ],
+      "dataset_id": "wiki_talk_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path5",
+      "query_edges": 5,
+      "data": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/wiki_talk/path5_k5.qry",
+      "k": 5,
+      "timeout_seconds": 900,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_paper_t1",
+        "ours_gopher_reuse_t1"
+      ]
+    },
+    {
+      "id": "paper_wiki_cycle3_k3",
+      "suite": "paper_axes",
+      "axes": [
+        "query_shape"
+      ],
+      "dataset_id": "wiki_talk_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "cycle3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/wiki_talk/cycle3_k3.qry",
+      "k": 3,
+      "timeout_seconds": 300,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_paper_t1",
+        "ours_gopher_reuse_t1"
+      ]
+    },
+    {
+      "id": "paper_bitcoin_path3_k3",
+      "suite": "paper_axes_bitcoin",
+      "axes": [
+        "query_size",
+        "k_sensitivity",
+        "combined_query_size_k"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path3_k5.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 900,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "paper_bitcoin_path3_k4",
+      "suite": "paper_axes_bitcoin",
+      "axes": [
+        "k_sensitivity"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path3_k5.qry",
+      "k": 4,
+      "repeats": 5,
+      "timeout_seconds": 900,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "paper_bitcoin_path3_k5",
+      "suite": "paper_axes_bitcoin",
+      "axes": [
+        "k_sensitivity"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path3",
+      "query_edges": 3,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path3_k5.qry",
+      "k": 5,
+      "repeats": 5,
+      "timeout_seconds": 900,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "paper_bitcoin_path4_k3",
+      "suite": "paper_axes_bitcoin",
+      "axes": [
+        "query_size"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path4",
+      "query_edges": 4,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path4_k4.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 1800,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "paper_bitcoin_path4_k4",
+      "suite": "paper_axes_bitcoin",
+      "axes": [
+        "combined_query_size_k"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path4",
+      "query_edges": 4,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path4_k4.qry",
+      "k": 4,
+      "repeats": 5,
+      "timeout_seconds": 1800,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "paper_bitcoin_path5_k3",
+      "suite": "paper_axes_bitcoin",
+      "axes": [
+        "query_size"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path5",
+      "query_edges": 5,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path5_k5.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 1800,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "paper_bitcoin_path5_k5",
+      "suite": "paper_axes_bitcoin",
+      "axes": [
+        "combined_query_size_k"
+      ],
+      "dataset_id": "bitcoin_filtered",
+      "input_variant": "supplied_prefiltered_engine_only",
+      "query_shape": "path5",
+      "query_edges": 5,
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "query": "{root}/benchmark/queries/bitcoin/path5_k5.qry",
+      "k": 5,
+      "repeats": 5,
+      "timeout_seconds": 1800,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "gpu_break_even_reuse_star_small_k3",
+      "suite": "gpu_break_even",
+      "axes": [
+        "gpu_break_even",
+        "input_scale"
+      ],
+      "dataset_id": "reuse_star_small",
+      "input_variant": "synthetic_correctness",
+      "query_shape": "reuse_star_4edge",
+      "query_edges": 4,
+      "data": "{root}/benchmark/data/reuse_star_small.txt",
+      "query": "{root}/benchmark/data/reuse_star_small.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 300,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "gpu_break_even_reuse_star_medium_k3",
+      "suite": "gpu_break_even",
+      "axes": [
+        "gpu_break_even",
+        "input_scale"
+      ],
+      "dataset_id": "reuse_star_medium",
+      "input_variant": "synthetic_reuse",
+      "query_shape": "reuse_star_4edge",
+      "query_edges": 4,
+      "data": "{root}/benchmark/data/reuse_star.txt",
+      "query": "{root}/benchmark/data/reuse_star.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 600,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    },
+    {
+      "id": "gpu_break_even_reuse_star_scaling_k3",
+      "suite": "gpu_break_even",
+      "axes": [
+        "gpu_break_even",
+        "input_scale"
+      ],
+      "dataset_id": "reuse_star_scaling",
+      "input_variant": "synthetic_reuse_scaling",
+      "query_shape": "reuse_star_4edge",
+      "query_edges": 4,
+      "data": "{root}/benchmark/data/reuse_star_scaling.txt",
+      "query": "{root}/benchmark/data/reuse_star_scaling.qry",
+      "k": 3,
+      "repeats": 5,
+      "timeout_seconds": 900,
+      "algorithms": [
+        "original_consecutive",
+        "ours",
+        "ours_gopher_none_paper_t1",
+        "ours_gopher_reuse_t1",
+        "ours_gopher_reuse_t16",
+        "ours_gopher_reuse_t32",
+        "ours_gopher_gpu_paper",
+        "ours_gopher_gpu_reuse"
+      ]
+    }
+  ]
+}

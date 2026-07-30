@@ -10,7 +10,7 @@ $cliExe = Join-Path $scriptRoot "tests\td_tree_cli_test.exe"
 
 Push-Location $scriptRoot
 try {
-    & $Compiler -Wall -Wextra -Wpedantic -O3 -std=c++17 `
+    & $Compiler -Wall -Wextra -Wpedantic -O3 -std=c++17 -pthread `
         "tests\test_original.cpp" "query_decomposition.cpp" "TDTree.cpp" "Utils.cpp" `
         -o $testExe
     if ($LASTEXITCODE -ne 0) {
@@ -22,7 +22,7 @@ try {
         throw "Tests failed with exit code $LASTEXITCODE"
     }
 
-    & $Compiler -Wall -Wextra -Wpedantic -O3 -std=c++17 `
+    & $Compiler -Wall -Wextra -Wpedantic -O3 -std=c++17 -pthread `
         "main.cpp" "query_decomposition.cpp" "TDTree.cpp" "Utils.cpp" `
         -o $cliExe
     if ($LASTEXITCODE -ne 0) {

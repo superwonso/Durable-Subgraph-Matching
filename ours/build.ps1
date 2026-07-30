@@ -10,7 +10,7 @@ $output = Join-Path $scriptRoot $OutputPath
 
 Push-Location $scriptRoot
 try {
-    & $Compiler -Wall -Wextra -Wpedantic -O3 -std=c++17 `
+    & $Compiler -Wall -Wextra -Wpedantic -O3 -std=c++17 -pthread `
         "main.cpp" "query_decomposition.cpp" "TDTree.cpp" "Utils.cpp" `
         -o $output
     if ($LASTEXITCODE -ne 0) {

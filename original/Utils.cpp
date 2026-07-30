@@ -25,7 +25,7 @@ struct RetainedExternalEdge {
     int u;
     int v;
     std::vector<TimeInterval> active_intervals;
-    int active_snapshot_count;
+    std::int64_t active_snapshot_count;
 };
 
 bool rawEdgeLess(const RawTemporalEdge& lhs, const RawTemporalEdge& rhs) {
@@ -80,7 +80,7 @@ int compactId(const std::vector<int>& external_ids, int external_id) {
     return static_cast<int>(it - external_ids.begin());
 }
 
-int unionDuration(std::vector<TimeInterval>& intervals) {
+std::int64_t unionDuration(std::vector<TimeInterval>& intervals) {
     if (intervals.empty()) return 0;
 
     std::sort(intervals.begin(), intervals.end(), [](const TimeInterval& lhs, const TimeInterval& rhs) {
@@ -88,7 +88,7 @@ int unionDuration(std::vector<TimeInterval>& intervals) {
         return lhs.end < rhs.end;
     });
 
-    long long total = 0;
+    std::int64_t total = 0;
     int current_start = intervals.front().start;
     int current_end = intervals.front().end;
     for (std::size_t i = 1; i < intervals.size(); ++i) {
@@ -97,19 +97,41 @@ int unionDuration(std::vector<TimeInterval>& intervals) {
             (current_end != std::numeric_limits<int>::max() && interval.start == current_end + 1)) {
             current_end = std::max(current_end, interval.end);
         } else {
-            total += static_cast<long long>(current_end) - current_start + 1;
+            total += static_cast<std::int64_t>(current_end) - current_start + 1;
             current_start = interval.start;
             current_end = interval.end;
         }
     }
-    total += static_cast<long long>(current_end) - current_start + 1;
-
-    return total > std::numeric_limits<int>::max()
-        ? std::numeric_limits<int>::max()
-        : static_cast<int>(total);
+    total += static_cast<std::int64_t>(current_end) - current_start + 1;
+    return total;
 }
 
 } // namespace
+
+const char* labelModeName(LabelMode mode) {
+    return mode == LabelMode::StableId ? "stable-id" : "sequential-rng";
+}
+
+Label stableIdLabel(int external_id, std::uint32_t label_seed) {
+    if (external_id < 0) return kInvalidLabel;
+    std::uint64_t mixed =
+        (static_cast<std::uint64_t>(label_seed) << 32U) |
+        static_cast<std::uint32_t>(external_id);
+    mixed += UINT64_C(0x9e3779b97f4a7c15);
+    mixed =
+        (mixed ^ (mixed >> 30U)) *
+        UINT64_C(0xbf58476d1ce4e5b9);
+    mixed =
+        (mixed ^ (mixed >> 27U)) *
+        UINT64_C(0x94d049bb133111eb);
+    mixed ^= mixed >> 31U;
+    return static_cast<Label>(
+        mixed % static_cast<std::uint64_t>(kLabelCount));
+}
+
+const char* durationModeName(DurationMode mode) {
+    return mode == DurationMode::Consecutive ? "consecutive" : "cardinality";
+}
 
 Label labelFromString(const std::string& value) {
     if (value.size() != 1 || value[0] < 'A' || value[0] > 'E') {
@@ -149,7 +171,7 @@ std::size_t Graph::getMemoryUsage() const {
     for (const auto& neighbors : in_adj) total += neighbors.capacity() * sizeof(Edge);
     total += vertex_labels.capacity() * sizeof(Label);
     total += external_ids.capacity() * sizeof(int);
-    total += vertex_active_durations.capacity() * sizeof(int);
+    total += vertex_active_durations.capacity() * sizeof(std::int64_t);
     total += neighbor_label_counts.capacity() * sizeof(std::array<int, kLabelCount>);
     total += incoming_neighbor_label_counts.capacity() *
         sizeof(std::array<int, kLabelCount>);
@@ -162,9 +184,7 @@ std::size_t Graph::getMemoryUsage() const {
 
 std::vector<TimeInterval> intersectTimeIntervals(
     const std::vector<TimeInterval>& lhs,
-    const std::vector<TimeInterval>& rhs,
-    int minimum_length) {
-    const int required = std::max(1, minimum_length);
+    const std::vector<TimeInterval>& rhs) {
     std::vector<TimeInterval> result;
     result.reserve(std::min(lhs.size(), rhs.size()));
 
@@ -173,7 +193,7 @@ std::vector<TimeInterval> intersectTimeIntervals(
     while (i < lhs.size() && j < rhs.size()) {
         const int start = std::max(lhs[i].start, rhs[j].start);
         const int end = std::min(lhs[i].end, rhs[j].end);
-        if (end >= start && end - start + 1 >= required) {
+        if (end >= start) {
             result.push_back({start, end});
         }
 
@@ -186,13 +206,107 @@ std::vector<TimeInterval> intersectTimeIntervals(
     return result;
 }
 
-bool hasMinimumConsecutiveDuration(
+std::vector<TimeInterval> unionTimeIntervals(
+    const std::vector<TimeInterval>& lhs,
+    const std::vector<TimeInterval>& rhs) {
+    std::vector<TimeInterval> result;
+    result.reserve(lhs.size() + rhs.size());
+    auto append = [&](const TimeInterval& interval) {
+        if (interval.end < interval.start) return;
+        if (result.empty()) {
+            result.push_back(interval);
+            return;
+        }
+        auto& previous = result.back();
+        const bool adjacent =
+            previous.end != std::numeric_limits<int>::max() &&
+            interval.start == previous.end + 1;
+        if (interval.start <= previous.end || adjacent) {
+            previous.end = std::max(previous.end, interval.end);
+        } else {
+            result.push_back(interval);
+        }
+    };
+
+    std::size_t i = 0;
+    std::size_t j = 0;
+    while (i < lhs.size() || j < rhs.size()) {
+        if (j >= rhs.size() ||
+            (i < lhs.size() &&
+             (lhs[i].start < rhs[j].start ||
+              (lhs[i].start == rhs[j].start &&
+               lhs[i].end <= rhs[j].end)))) {
+            append(lhs[i++]);
+        } else {
+            append(rhs[j++]);
+        }
+    }
+    return result;
+}
+
+std::vector<TimeInterval> subtractTimeIntervals(
+    const std::vector<TimeInterval>& lhs,
+    const std::vector<TimeInterval>& rhs) {
+    std::vector<TimeInterval> result;
+    std::size_t j = 0;
+    for (const auto& source : lhs) {
+        std::int64_t current = source.start;
+        const std::int64_t source_end = source.end;
+        while (j < rhs.size() &&
+               static_cast<std::int64_t>(rhs[j].end) < current) {
+            ++j;
+        }
+
+        std::size_t scan = j;
+        while (scan < rhs.size() &&
+               static_cast<std::int64_t>(rhs[scan].start) <= source_end) {
+            const std::int64_t removed_start = rhs[scan].start;
+            const std::int64_t removed_end = rhs[scan].end;
+            if (removed_start > current) {
+                result.push_back({
+                    static_cast<int>(current),
+                    static_cast<int>(std::min(source_end, removed_start - 1))});
+            }
+            current = std::max(current, removed_end + 1);
+            if (current > source_end) break;
+            ++scan;
+        }
+        if (current <= source_end) {
+            result.push_back({
+                static_cast<int>(current),
+                static_cast<int>(source_end)});
+        }
+    }
+    return result;
+}
+
+std::int64_t timeInstanceCardinality(
+    const std::vector<TimeInterval>& intervals) {
+    std::int64_t total = 0;
+    for (const auto& interval : intervals) {
+        const std::int64_t length = interval.length();
+        if (length > std::numeric_limits<std::int64_t>::max() - total) {
+            return std::numeric_limits<std::int64_t>::max();
+        }
+        total += length;
+    }
+    return total;
+}
+
+bool hasMinimumDuration(
     const std::vector<TimeInterval>& intervals,
-    int minimum_duration) {
+    int minimum_duration,
+    DurationMode mode) {
     if (minimum_duration <= 0) return true;
-    return std::any_of(intervals.begin(), intervals.end(), [minimum_duration](const TimeInterval& interval) {
-        return interval.length() >= minimum_duration;
-    });
+    if (mode == DurationMode::Consecutive) {
+        return std::any_of(
+            intervals.begin(),
+            intervals.end(),
+            [minimum_duration](const TimeInterval& interval) {
+                return interval.length() >= minimum_duration;
+            });
+    }
+    return timeInstanceCardinality(intervals) >= minimum_duration;
 }
 
 std::string formatIntervals(const std::vector<TimeInterval>& intervals) {
@@ -224,7 +338,8 @@ bool readTemporalGraph(
     const std::string& filename,
     Graph& graph,
     std::uint32_t label_seed,
-    TemporalGraphLoadTimings* load_timings) {
+    TemporalGraphLoadTimings* load_timings,
+    LabelMode label_mode) {
     if (load_timings != nullptr) *load_timings = {};
     const auto read_start = std::chrono::steady_clock::now();
     std::ifstream input(filename);
@@ -284,7 +399,7 @@ bool readTemporalGraph(
         all_vertex_ids.push_back(edge_v);
 
         std::vector<TimeInterval> intervals;
-        int active_count = 0;
+        std::int64_t active_count = 0;
         bool have_timestamp = false;
         int run_start = 0;
         int previous = 0;
@@ -318,18 +433,28 @@ bool readTemporalGraph(
 
     std::vector<RawTemporalEdge>().swap(raw_edges);
 
-    // Sorting external IDs makes seeded random labels stable under input-line
-    // permutations and avoids max-ID-sized allocations for sparse datasets.
+    // Sorting external IDs preserves the legacy seeded RNG stream under
+    // input-line permutations. StableId instead labels each external ID
+    // independently, while both modes avoid max-ID-sized sparse allocations.
     std::sort(all_vertex_ids.begin(), all_vertex_ids.end());
     all_vertex_ids.erase(
         std::unique(all_vertex_ids.begin(), all_vertex_ids.end()),
         all_vertex_ids.end());
     std::vector<Label> all_vertex_labels(all_vertex_ids.size(), kInvalidLabel);
-    std::mt19937 label_generator(label_seed);
-    std::uniform_int_distribution<int> label_distribution(
-        0, static_cast<int>(kLabelCount) - 1);
-    for (auto& label : all_vertex_labels) {
-        label = static_cast<Label>(label_distribution(label_generator));
+    if (label_mode == LabelMode::StableId) {
+        for (std::size_t i = 0; i < all_vertex_ids.size(); ++i) {
+            all_vertex_labels[i] =
+                stableIdLabel(all_vertex_ids[i], label_seed);
+        }
+    } else {
+        std::mt19937 label_generator(label_seed);
+        std::uniform_int_distribution<int> label_distribution(
+            0, static_cast<int>(kLabelCount) - 1);
+        for (auto& label : all_vertex_labels) {
+            label =
+                static_cast<Label>(
+                    label_distribution(label_generator));
+        }
     }
 
     graph.external_ids.reserve(retained_edges.size() * 2);

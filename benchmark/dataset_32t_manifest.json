@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "title": "Dataset-wise TD-Tree 32T baseline comparison",
+  "as_of": "2026-07-29",
+  "description": "Protocol-corrected comparison: Original (TD-Tree) CPU32 reads each unfiltered graph, while Ours CPU32, Ours+Gopher CPU32, and Ours+Gopher-GPU read the corresponding supplied prefiltered graph.",
+  "repeats": 5,
+  "timeout_seconds": 900,
+  "methodology": {
+    "primary_metric": "Median cold-process online wall time over five isolated, interleaved repetitions. Original includes raw-file loading and TD-Tree preprocessing; proposed methods load a precomputed filtered file.",
+    "semantic_group": "All four configurations require at least k consecutive common snapshots. The TD-Tree baseline therefore uses the explicit consecutive compatibility mode, not the 2022 paper's cardinality default.",
+    "workload": "Each dataset uses the same dataset-specific directed path query across algorithms, with three edges, k=3, stable-ID label mode, label seed 42, and count-only output.",
+    "cpu_threads": "All CPU configurations request 32 threads and are pinned to logical CPUs 0-31. TD-Tree and Ours use true count-only root-task workers; Ours+Gopher uses bounded dynamic-prefix workers.",
+    "gpu": "Ours+Gopher-GPU uses the resident-continuation Candidate-DAG executor on the Radeon 8060S through WSL /dev/dxg. It has no silent CPU fallback and no CPU dependency-key runtime memo tables.",
+    "correctness": "Every configuration must finish every repetition, remain count-stable, and agree on match count within each dataset. Stable-ID labeling is required because the source graphs have no native vertex labels and raw/filtered vertex universes differ.",
+    "input_protocol": "Original (TD-Tree) consumes the file without _filtered. Ours, Ours+Gopher, and Ours+Gopher-GPU consume the paired _filtered file. The runner records and validates the resolved per-algorithm path and SHA-256.",
+    "timing_boundary": "This is the user-requested precomputed-filter online comparison. Section 4.1/4.3 of 260408_cdh.pdf says paper-style total time includes filtering construction; therefore these medians must not be described as a numerical replication of that paper's end-to-end figure.",
+    "output_boundary": "Count-only suppresses materialization of every mapping to a large text file; it does not mean that no matches were found."
+  },
+  "algorithms": {
+    "tdtree_cpu_32t": {
+      "executable": "{root}/original/td_tree",
+      "semantic_group": "consecutive",
+      "role": "td_tree_32_thread_baseline",
+      "comparison_family": "dataset_32t_system_comparison",
+      "implementation_generation": "parallel_root_tasks",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "flags": [
+        "--count-only",
+        "--duration-mode",
+        "consecutive",
+        "--label-mode",
+        "stable-id",
+        "--threads",
+        "32"
+      ]
+    },
+    "ours_cpu_32t": {
+      "executable": "{root}/ours/td_tree",
+      "semantic_group": "consecutive",
+      "role": "ours_32_thread",
+      "comparison_family": "dataset_32t_system_comparison",
+      "implementation_generation": "parallel_root_tasks",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "flags": [
+        "--count-only",
+        "--selectivity",
+        "paper",
+        "--label-mode",
+        "stable-id",
+        "--prefilter",
+        "off",
+        "--threads",
+        "32"
+      ]
+    },
+    "ours_gopher_cpu_32t": {
+      "executable": "{root}/ours_gopher/td_tree_gopher",
+      "semantic_group": "consecutive",
+      "role": "ours_plus_gopher_32_thread",
+      "comparison_family": "dataset_32t_system_comparison",
+      "implementation_generation": "parallel_v2",
+      "threads": 32,
+      "cpu_affinity": "0-31",
+      "flags": [
+        "--engine",
+        "gopher",
+        "--selectivity",
+        "paper",
+        "--label-mode",
+        "stable-id",
+        "--early-prune",
+        "on",
+        "--order",
+        "reuse",
+        "--memo",
+        "dag",
+        "--cache-mb",
+        "256",
+        "--threads",
+        "32",
+        "--parallel",
+        "prefix",
+        "--prefix-depth",
+        "0",
+        "--tasks-per-thread",
+        "8",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    },
+    "ours_gopher_gpu": {
+      "executable": "{root}/ours_gopher_gpu/td_tree_gopher_gpu",
+      "semantic_group": "consecutive",
+      "role": "ours_plus_gopher_gpu_resident",
+      "comparison_family": "dataset_32t_system_comparison",
+      "implementation_generation": "parallel_v2",
+      "threads": 1,
+      "flags": [
+        "--backend",
+        "gpu",
+        "--gpu-variant",
+        "resident",
+        "--selectivity",
+        "paper",
+        "--label-mode",
+        "stable-id",
+        "--order",
+        "reuse",
+        "--memo",
+        "none",
+        "--threads",
+        "1",
+        "--early-prune",
+        "on",
+        "--statistics",
+        "off",
+        "--result-digest",
+        "off",
+        "--gpu-memory-mb",
+        "4096",
+        "--metrics",
+        "gopher_metrics.json",
+        "--count-only"
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "dataset32_sx_superuser_path3_k3",
+      "suite": "dataset_32t_comparison",
+      "dataset_id": "sx_superuser",
+      "input_variant": "supplied_prefiltered_proposed",
+      "input_variant_by_algorithm": {
+        "tdtree_cpu_32t": "raw_unique_occurrences_baseline"
+      },
+      "data": "{root}/Dataset/sx-superuser-temporal-1w-unique_filtered.txt",
+      "data_by_algorithm": {
+        "tdtree_cpu_32t": "{root}/Dataset/sx-superuser-temporal-1w-unique.txt"
+      },
+      "query": "{root}/benchmark/queries/stable_id/sx_superuser_path3_k3.qry",
+      "query_shape": "directed_path",
+      "query_edges": 3,
+      "k": 3,
+      "label_seed": 42,
+      "expected_match_count": 2,
+      "algorithms": [
+        "tdtree_cpu_32t",
+        "ours_cpu_32t",
+        "ours_gopher_cpu_32t",
+        "ours_gopher_gpu"
+      ]
+    },
+    {
+      "id": "dataset32_wiki_talk_path3_k3",
+      "suite": "dataset_32t_comparison",
+      "dataset_id": "wiki_talk",
+      "input_variant": "supplied_prefiltered_proposed",
+      "input_variant_by_algorithm": {
+        "tdtree_cpu_32t": "raw_unique_occurrences_baseline"
+      },
+      "data": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w_filtered.txt",
+      "data_by_algorithm": {
+        "tdtree_cpu_32t": "{root}/Dataset/wiki-talk-temporal-timeinstance-unique-1w.txt"
+      },
+      "query": "{root}/benchmark/queries/stable_id/wiki_talk_path3_k3.qry",
+      "query_shape": "directed_path",
+      "query_edges": 3,
+      "k": 3,
+      "label_seed": 42,
+      "expected_match_count": 48,
+      "algorithms": [
+        "tdtree_cpu_32t",
+        "ours_cpu_32t",
+        "ours_gopher_cpu_32t",
+        "ours_gopher_gpu"
+      ]
+    },
+    {
+      "id": "dataset32_sx_stackoverflow_path3_k3",
+      "suite": "dataset_32t_comparison",
+      "dataset_id": "sx_stackoverflow",
+      "input_variant": "supplied_prefiltered_proposed",
+      "input_variant_by_algorithm": {
+        "tdtree_cpu_32t": "raw_unique_occurrences_baseline"
+      },
+      "data": "{root}/Dataset/sx-stackoverflow-timeinstance-unique-1w_filtered.txt",
+      "data_by_algorithm": {
+        "tdtree_cpu_32t": "{root}/Dataset/sx-stackoverflow-timeinstance-unique-1w.txt"
+      },
+      "query": "{root}/benchmark/queries/stable_id/sx_stackoverflow_path3_k3.qry",
+      "query_shape": "directed_path",
+      "query_edges": 3,
+      "k": 3,
+      "label_seed": 42,
+      "expected_match_count": 15,
+      "algorithms": [
+        "tdtree_cpu_32t",
+        "ours_cpu_32t",
+        "ours_gopher_cpu_32t",
+        "ours_gopher_gpu"
+      ]
+    },
+    {
+      "id": "dataset32_bitcoin_path3_k3",
+      "suite": "dataset_32t_comparison",
+      "dataset_id": "bitcoin",
+      "input_variant": "supplied_prefiltered_proposed",
+      "input_variant_by_algorithm": {
+        "tdtree_cpu_32t": "raw_unique_occurrences_baseline"
+      },
+      "data": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w_filtered.txt",
+      "data_by_algorithm": {
+        "tdtree_cpu_32t": "{root}/Dataset/bitcoin-temporal-timeinstance-unique-1w.txt"
+      },
+      "query": "{root}/benchmark/queries/stable_id/bitcoin_path3_k3.qry",
+      "query_shape": "directed_path",
+      "query_edges": 3,
+      "k": 3,
+      "label_seed": 42,
+      "expected_match_count": 333741,
+      "algorithms": [
+        "tdtree_cpu_32t",
+        "ours_cpu_32t",
+        "ours_gopher_cpu_32t",
+        "ours_gopher_gpu"
+      ]
+    }
+  ]
+}
