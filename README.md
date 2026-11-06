@@ -33,11 +33,9 @@ temporal graph characteristics so that fewer candidates are produced.
 # Evaluation environments
 
 The historical project notes used Windows 11 23H2 and g++ 14.2.0. The audited
-evaluation in `evaluation/` was run under WSL2 on an AMD Ryzen AI MAX+ 395
-(16 cores/32 threads, 23.46 GiB RAM) with g++ 13.3.0, C++17, and `-O3`.
+evaluation in `evaluation/` was run under WSL2 on an AMD Ryzen AI MAX+ 395 
+(using 16 threads, 48 GiB RAM) with g++ 13.3.0, C++17, and `-O3`.
 ROCm 7.2.4 accesses the Radeon 8060S (`gfx1151`) through WSL `/dev/dxg`.
-The exact CPU/GPU environment and execution evidence are recorded in
-[`evaluation/environment.json`](evaluation/environment.json).
 
 # Implementations
 
