@@ -178,6 +178,7 @@ charts is
 # Papers 
 
 An Efficient Durable Subgraph Matching Scheme on Temporal Graphs, D.H. Cha, M.S. dissertation, Dept. of Info. & Comm. Eng., Chungbuk National Univ., Cheongju, Chungbuk, Korea, 2025
+ON PREGRESS
 
 # Compared algorithms
 
