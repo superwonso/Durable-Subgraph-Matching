@@ -1,0 +1,85 @@
+{
+  "campaign": "v8",
+  "records": 5730,
+  "parts": [
+    {
+      "path": "results/v8/observations/part-001.jsonl",
+      "records": 454,
+      "bytes": 948920,
+      "sha256": "632d7118a86c9b7a99d552835351e4a645c35545791eb478cc4870c551848dbb"
+    },
+    {
+      "path": "results/v8/observations/part-002.jsonl",
+      "records": 455,
+      "bytes": 948476,
+      "sha256": "40507219708447dc2d84c7a91df1bbf361f1200713a9f96305823e6ddf5f927b"
+    },
+    {
+      "path": "results/v8/observations/part-003.jsonl",
+      "records": 453,
+      "bytes": 949234,
+      "sha256": "fe3d4cc5ff05a5d7f88cd04659be8ae7feea7035d7d3157e0418fdd7e30d0ac5"
+    },
+    {
+      "path": "results/v8/observations/part-004.jsonl",
+      "records": 449,
+      "bytes": 948947,
+      "sha256": "8ca368bf7f63b28875422e22f89dcd8ae4f04c86b8c6a522dc574c6aa8c857cd"
+    },
+    {
+      "path": "results/v8/observations/part-005.jsonl",
+      "records": 447,
+      "bytes": 948213,
+      "sha256": "606e29a362adb0aac0e6c1062a35fcb5a7e26d2c6a5bb69f0f5016baefd65480"
+    },
+    {
+      "path": "results/v8/observations/part-006.jsonl",
+      "records": 447,
+      "bytes": 949251,
+      "sha256": "ca10a6cf04d128d0eabbde0fd3858692dd0f60ab5660595c4ae8214b4ee44036"
+    },
+    {
+      "path": "results/v8/observations/part-007.jsonl",
+      "records": 459,
+      "bytes": 949924,
+      "sha256": "11a308f95c88d33f3bea4178c26400281c81c5b82d82efafaaf5e45210f7fb4c"
+    },
+    {
+      "path": "results/v8/observations/part-008.jsonl",
+      "records": 465,
+      "bytes": 948193,
+      "sha256": "b5bebb6ea2748588c416733a129c117aaa7554b737c4d5b271d7755b483c9a74"
+    },
+    {
+      "path": "results/v8/observations/part-009.jsonl",
+      "records": 466,
+      "bytes": 948581,
+      "sha256": "5f0aabc23b83f3d5e6dd4d7e2bce4dbef639950bfb5158e841132145115b9b7f"
+    },
+    {
+      "path": "results/v8/observations/part-010.jsonl",
+      "records": 465,
+      "bytes": 948951,
+      "sha256": "f469b1a3e355c1ea4c2757d034e2030defdc868e6f1c2531e50e193c56469399"
+    },
+    {
+      "path": "results/v8/observations/part-011.jsonl",
+      "records": 468,
+      "bytes": 948783,
+      "sha256": "73b089606f4930e5274484c5bdad32381c1d53f61131bddd8be95f8badb40d87"
+    },
+    {
+      "path": "results/v8/observations/part-012.jsonl",
+      "records": 471,
+      "bytes": 947932,
+      "sha256": "fac8c38e368b9921feefc7d871f85d5056637df39ce0bdcb64417c60f150c30a"
+    },
+    {
+      "path": "results/v8/observations/part-013.jsonl",
+      "records": 231,
+      "bytes": 603447,
+      "sha256": "dabe64c890fa1f1122d1b0990d640dbe7e2d542fc9f14c86b7280cfb1280510b"
+    }
+  ],
+  "note": "Observation values retained. Paths normalized; repeated full case objects and local machine paths omitted. Null unmeasured counters are absent, not zero."
+}

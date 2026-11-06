@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "threads": 16,
+  "affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "smt": "off",
+  "memory_limit_mib": 28672,
+  "default_timeout_s": 600,
+  "warmup": 0,
+  "process": "fresh",
+  "cache": "OS page cache not flushed",
+  "retries": 0,
+  "repetition": "12 nominal; first wall >60s reduces to 6; first TO suppresses later cell repetitions. E6 small=10 (SuperUser=15); E4A=6; E3/E5 once.",
+  "primary": "search_s = enumeration + query-specific build; baseline system comparison query_s adds query planning and relation/index construction; graph read/filter and reusable W-store load excluded. wall_s is preserved separately.",
+  "statistics": "Report mean and actual valid repeat count; no confidence intervals; historical result tables may also provide medians.",
+  "swap": "Host pswpin/pswpout delta or child ru_nswap rejects observation; no retry."
+}

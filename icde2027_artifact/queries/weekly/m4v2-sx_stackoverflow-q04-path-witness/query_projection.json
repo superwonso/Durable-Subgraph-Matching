@@ -1,0 +1,42 @@
+{
+  "artifact_kind": "dsm-query-label-projection",
+  "global_label_cardinality": 100,
+  "global_label_map_file_sha256": "a6b62dd42b06120a1343ab66890362812d0bae8dde7825d3e1d472e0b5c04133",
+  "global_label_map_mapping_digest": {
+    "algorithm": "sha256",
+    "value": "29edf866d8966e7796b52a087e8a087df8c89abe885c4ee96d33e169a7f60fd7"
+  },
+  "invalid_runtime_class_id": -1,
+  "local_slots": [
+    {
+      "global_class_id": 43,
+      "runtime_class_id": 0,
+      "runtime_label": "A"
+    },
+    {
+      "global_class_id": 30,
+      "runtime_class_id": 1,
+      "runtime_label": "B"
+    },
+    {
+      "global_class_id": 88,
+      "runtime_class_id": 2,
+      "runtime_label": "C"
+    },
+    {
+      "global_class_id": 56,
+      "runtime_class_id": 3,
+      "runtime_label": "D"
+    }
+  ],
+  "nonselected_global_class_policy": "invalid",
+  "query_sha256": "baf7a317523ef551fbb3b4a79e0c7d35af6a996eb15774e73f02361009a5468d",
+  "runtime_slot_count": 5,
+  "schema_version": 1,
+  "selected_global_classes_in_A_to_E_order": [
+    43,
+    30,
+    88,
+    56
+  ]
+}

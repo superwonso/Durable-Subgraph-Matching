@@ -1,0 +1,13 @@
+{
+  "experiments": {
+    "E1": "COMPLETE",
+    "E6": "COMPLETE",
+    "E3": "COMPLETE_WITH_EXCEPTIONS",
+    "E4A": "COMPLETE",
+    "E4B": "SKIPPED_STOP_FEWER_THAN_FOUR_HEAVY",
+    "E5": "COMPLETE",
+    "E2": "COMPLETE",
+    "E7": "COMPLETE"
+  },
+  "native_attempts": 2525
+}

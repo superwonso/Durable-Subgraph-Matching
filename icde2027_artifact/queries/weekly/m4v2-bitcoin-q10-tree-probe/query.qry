@@ -1,0 +1,9 @@
+q0:A q1:B
+q2:C q0:A
+q1:B q3:D
+q4:E q1:B
+q2:C q5:A
+q6:B q2:C
+q3:D q7:C
+q8:D q3:D
+q4:E q9:E

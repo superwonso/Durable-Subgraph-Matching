@@ -1,0 +1,43 @@
+{
+  "campaign": "v9",
+  "records": 2567,
+  "parts": [
+    {
+      "path": "results/v9/observations/part-001.jsonl",
+      "records": 502,
+      "bytes": 949110,
+      "sha256": "746afb6b98fe6a7ec1ee5087c385a2c5d8114d43dfc4eae3c448e396c4ac6bad"
+    },
+    {
+      "path": "results/v9/observations/part-002.jsonl",
+      "records": 270,
+      "bytes": 948492,
+      "sha256": "24727ec5fb9b375e1f5666ad6e6ec6a78f13ff1642781f8fbf84c86ffc5e1d15"
+    },
+    {
+      "path": "results/v9/observations/part-003.jsonl",
+      "records": 566,
+      "bytes": 948240,
+      "sha256": "d71e620e98c0cb2329263921e4d21ad6bddb917680a8e0cd79c731e87a3d4fb6"
+    },
+    {
+      "path": "results/v9/observations/part-004.jsonl",
+      "records": 489,
+      "bytes": 948530,
+      "sha256": "25f15d840f7a92487b29d268fd29a7da1c92b794b94bc72e0c7b20ddee166b46"
+    },
+    {
+      "path": "results/v9/observations/part-005.jsonl",
+      "records": 502,
+      "bytes": 948162,
+      "sha256": "4281f8ec3196e72f6a8f786da8cb8727880737139e8ba46cac27871ca76bb8c6"
+    },
+    {
+      "path": "results/v9/observations/part-006.jsonl",
+      "records": 238,
+      "bytes": 452406,
+      "sha256": "40793972be861f898c02653cfa02b0cdbb09aaf3b695260c101f234f0476ee1a"
+    }
+  ],
+  "note": "Observation values retained. Paths normalized; repeated full case objects and local machine paths omitted. Null unmeasured counters are absent, not zero."
+}

@@ -1,0 +1,15 @@
+/build/
+/data/
+/stores/
+/work/
+/local_runs/
+__pycache__/
+*.pyc
+*.o
+*.a
+*.so
+*.exe
+*.zip
+*.pdf
+.env
+.env.*

@@ -1,0 +1,15 @@
+graph,granularity,stage,vertices,edges,occurrences,active_snapshots,time_min,time_max,time_span,edge_removal_ratio,occurrence_removal_ratio,raw_history_words,eroded_words_k2,eroded_words_k3,eroded_words_k4,eroded_words_k5,word_scope,source_summary
+sx_superuser,weekly,raw,194085,924886,1088749,395,-47,348,396,,,,,,,,not a store input,results/v9/graph_summaries/sx_superuser_weekly.csv
+sx_superuser,weekly,F2,18526,28808,130377,373,-41,348,390,0.96885237748219777,0.8802506362807222,7,7,7,7,7,search F2 graph time span,results/v9/graph_summaries/sx_superuser_weekly.csv
+wiki_talk,weekly,raw,1140149,3309592,4451622,321,-5,325,331,,,,,,,,not a store input,results/v9/graph_summaries/wiki_talk_weekly.csv
+wiki_talk,weekly,F2,73341,202971,1050459,315,10,325,316,0.93867189671717843,0.76402780829100048,5,5,5,5,5,search F2 graph time span,results/v9/graph_summaries/wiki_talk_weekly.csv
+sx_stackoverflow,weekly,raw,2601977,36233450,43687034,397,1,397,397,,,,,,,,not a store input,results/v9/graph_summaries/sx_stackoverflow_weekly.csv
+sx_stackoverflow,weekly,F2,532604,1096532,6412726,397,1,397,397,0.9697370247657896,0.85321214527861977,7,7,7,7,7,search F2 graph time span,results/v9/graph_summaries/sx_stackoverflow_weekly.csv
+bitcoin,weekly,raw,48098591,86798226,94668442,365,1,370,370,,,,,,,,not a store input,results/v9/graph_summaries/bitcoin_weekly.csv
+bitcoin,weekly,F2,875625,1654443,8027213,313,48,370,323,0.98093920721375116,0.91520708664456529,6,6,6,5,5,search F2 graph time span,results/v9/graph_summaries/bitcoin_weekly.csv
+bitcoin,month,raw,48098591,86798226,90493407,86,1,86,86,,,,,,,,not a store input,results/v9/graph_summaries/bitcoin_month.csv
+bitcoin,month,F2,800600,1529464,4766539,79,3,86,84,0.98237908687212105,0.94732722351806253,2,2,2,2,2,search F2 graph time span,results/v9/graph_summaries/bitcoin_month.csv
+sx_stackoverflow,month,raw,2601977,36233450,41084702,92,1,92,92,,,,,,,,not a store input,results/v9/graph_summaries/sx_stackoverflow_month.csv
+sx_stackoverflow,month,F2,463985,963611,4505292,92,1,92,92,0.97340548581490305,0.89034137329266738,2,2,2,2,2,search F2 graph time span,results/v9/graph_summaries/sx_stackoverflow_month.csv
+sx_stackoverflow,day,raw,2601977,36233450,47597796,2775,1,2775,2775,,,,,,,,not a store input,results/v9/graph_summaries/sx_stackoverflow_day.csv
+sx_stackoverflow,day,F2,641573,1451836,9440672,2775,1,2775,2775,0.95993105817966551,0.80165737085809607,44,44,44,44,44,search F2 graph time span,results/v9/graph_summaries/sx_stackoverflow_day.csv

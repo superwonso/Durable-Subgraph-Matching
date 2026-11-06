@@ -1,0 +1,45 @@
+{
+  "experiment": "E5",
+  "slots": [
+    {
+      "slot_id": "E5__m4v2-bitcoin-q06-tailed_cycle-probe__td_f2__r01",
+      "case_id": "m4v2-bitcoin-q06-tailed_cycle-probe",
+      "arm": "td_f2",
+      "repeat": 1,
+      "nominal_repeats": 1,
+      "stage": "diagnostic",
+      "counters": false,
+      "timeout_s": 600,
+      "reduce_60s": false,
+      "snapshot": "profile_v9",
+      "boundary": "prepared"
+    },
+    {
+      "slot_id": "E5__shape__bitcoin__cycle_m5__candidate02__k3__td_f2__r01",
+      "case_id": "shape__bitcoin__cycle_m5__candidate02__k3",
+      "arm": "td_f2",
+      "repeat": 1,
+      "nominal_repeats": 1,
+      "stage": "diagnostic",
+      "counters": false,
+      "timeout_s": 600,
+      "reduce_60s": false,
+      "snapshot": "profile_v9",
+      "boundary": "prepared"
+    },
+    {
+      "slot_id": "E5__shape__bitcoin__path_m5__candidate02__k5__td_f2__r01",
+      "case_id": "shape__bitcoin__path_m5__candidate02__k5",
+      "arm": "td_f2",
+      "repeat": 1,
+      "nominal_repeats": 1,
+      "stage": "diagnostic",
+      "counters": false,
+      "timeout_s": 600,
+      "reduce_60s": false,
+      "snapshot": "profile_v9",
+      "boundary": "prepared"
+    }
+  ],
+  "source": "followup_v9/manifests/E5.json"
+}

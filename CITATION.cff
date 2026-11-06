@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "Please cite this software artifact and the associated paper when available."
+type: software
+title: "WinDur research artifact: window algebra and support-guided consecutive durable subgraph matching"
+authors:
+  - name: "Durable Subgraph Matching contributors"
+repository-code: "https://github.com/superwonso/Durable-Subgraph-Matching"
+url: "https://github.com/superwonso/Durable-Subgraph-Matching/tree/main/icde2027_artifact"
+version: "v9-artifact-2026.11.06"
+date-released: 2026-11-06
+license: MIT
+abstract: "Versioned source, frozen queries, experiment configuration, and recorded evaluation results. No acceptance status or paper DOI is asserted."

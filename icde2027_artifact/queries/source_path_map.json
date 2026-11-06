@@ -1,0 +1,591 @@
+{
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q04-dense-witness/m4v2-bitcoin-q04-dense-witness-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q04-dense-witness/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q04-dense-witness/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q04-dense-witness/m4v2-bitcoin-q04-dense-witness-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q04-dense-witness/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q04-dense-witness.json": [
+    "queries/weekly/m4v2-bitcoin-q04-dense-witness/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q04-path-probe/m4v2-bitcoin-q04-path-probe-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q04-path-probe/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q04-path-probe/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q04-path-probe/m4v2-bitcoin-q04-path-probe-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q04-path-probe/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q04-path-probe.json": [
+    "queries/weekly/m4v2-bitcoin-q04-path-probe/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q04-tree-probe/m4v2-bitcoin-q04-tree-probe-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q04-tree-probe/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q04-tree-probe/m4v2-bitcoin-q04-tree-probe-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q04-tree-probe/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q04-tree-probe.json": [
+    "queries/weekly/m4v2-bitcoin-q04-tree-probe/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q06-cycle-witness/m4v2-bitcoin-q06-cycle-witness-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q06-cycle-witness/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q06-cycle-witness/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q06-cycle-witness/m4v2-bitcoin-q06-cycle-witness-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q06-cycle-witness/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q06-cycle-witness.json": [
+    "queries/weekly/m4v2-bitcoin-q06-cycle-witness/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q06-dense-witness/m4v2-bitcoin-q06-dense-witness-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q06-dense-witness/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q06-dense-witness/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q06-dense-witness/m4v2-bitcoin-q06-dense-witness-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q06-dense-witness/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q06-dense-witness.json": [
+    "queries/weekly/m4v2-bitcoin-q06-dense-witness/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q06-path-probe/m4v2-bitcoin-q06-path-probe-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q06-path-probe/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q06-path-probe/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q06-path-probe/m4v2-bitcoin-q06-path-probe-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q06-path-probe/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q06-path-probe.json": [
+    "queries/weekly/m4v2-bitcoin-q06-path-probe/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q06-tailed_cycle-probe/m4v2-bitcoin-q06-tailed_cycle-probe-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q06-tailed_cycle-probe/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q06-tailed_cycle-probe/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q06-tailed_cycle-probe/m4v2-bitcoin-q06-tailed_cycle-probe-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q06-tailed_cycle-probe/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q06-tailed_cycle-probe.json": [
+    "queries/weekly/m4v2-bitcoin-q06-tailed_cycle-probe/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q08-dense-witness/m4v2-bitcoin-q08-dense-witness-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q08-dense-witness/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q08-dense-witness/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q08-dense-witness/m4v2-bitcoin-q08-dense-witness-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q08-dense-witness/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q08-dense-witness.json": [
+    "queries/weekly/m4v2-bitcoin-q08-dense-witness/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q08-path-probe/m4v2-bitcoin-q08-path-probe-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q08-path-probe/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q08-path-probe/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q08-path-probe/m4v2-bitcoin-q08-path-probe-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q08-path-probe/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q08-path-probe.json": [
+    "queries/weekly/m4v2-bitcoin-q08-path-probe/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q08-tailed_cycle-probe/m4v2-bitcoin-q08-tailed_cycle-probe-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q08-tailed_cycle-probe/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q08-tailed_cycle-probe/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q08-tailed_cycle-probe/m4v2-bitcoin-q08-tailed_cycle-probe-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q08-tailed_cycle-probe/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q08-tailed_cycle-probe.json": [
+    "queries/weekly/m4v2-bitcoin-q08-tailed_cycle-probe/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q10-dense-witness/m4v2-bitcoin-q10-dense-witness-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q10-dense-witness/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q10-dense-witness/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q10-dense-witness/m4v2-bitcoin-q10-dense-witness-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q10-dense-witness/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q10-dense-witness.json": [
+    "queries/weekly/m4v2-bitcoin-q10-dense-witness/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q10-diamond-probe/m4v2-bitcoin-q10-diamond-probe-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q10-diamond-probe/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q10-diamond-probe/m4v2-bitcoin-q10-diamond-probe-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q10-diamond-probe/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q10-diamond-probe.json": [
+    "queries/weekly/m4v2-bitcoin-q10-diamond-probe/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q10-path-probe/m4v2-bitcoin-q10-path-probe-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q10-path-probe/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q10-path-probe/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q10-path-probe/m4v2-bitcoin-q10-path-probe-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q10-path-probe/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q10-path-probe.json": [
+    "queries/weekly/m4v2-bitcoin-q10-path-probe/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q10-path-witness/m4v2-bitcoin-q10-path-witness-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q10-path-witness/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q10-path-witness/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q10-path-witness/m4v2-bitcoin-q10-path-witness-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q10-path-witness/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q10-path-witness.json": [
+    "queries/weekly/m4v2-bitcoin-q10-path-witness/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q10-tailed_cycle-probe/m4v2-bitcoin-q10-tailed_cycle-probe-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q10-tailed_cycle-probe/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q10-tailed_cycle-probe/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q10-tailed_cycle-probe/m4v2-bitcoin-q10-tailed_cycle-probe-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q10-tailed_cycle-probe/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q10-tailed_cycle-probe.json": [
+    "queries/weekly/m4v2-bitcoin-q10-tailed_cycle-probe/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/bitcoin/m4v2-bitcoin-q10-tree-probe/m4v2-bitcoin-q10-tree-probe-a000.qry": [
+    "queries/weekly/m4v2-bitcoin-q10-tree-probe/query.qry",
+    "queries/monthly/e4a__m4v2-bitcoin-q10-tree-probe/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/bitcoin/m4v2-bitcoin-q10-tree-probe/m4v2-bitcoin-q10-tree-probe-a000_query_projection.json": [
+    "queries/weekly/m4v2-bitcoin-q10-tree-probe/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-bitcoin-q10-tree-probe.json": [
+    "queries/weekly/m4v2-bitcoin-q10-tree-probe/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q04-path-witness/m4v2-sx_stackoverflow-q04-path-witness-a000.qry": [
+    "queries/weekly/m4v2-sx_stackoverflow-q04-path-witness/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q04-path-witness/m4v2-sx_stackoverflow-q04-path-witness-a000_query_projection.json": [
+    "queries/weekly/m4v2-sx_stackoverflow-q04-path-witness/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-sx_stackoverflow-q04-path-witness.json": [
+    "queries/weekly/m4v2-sx_stackoverflow-q04-path-witness/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q06-cycle-witness/m4v2-sx_stackoverflow-q06-cycle-witness-a000.qry": [
+    "queries/weekly/m4v2-sx_stackoverflow-q06-cycle-witness/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q06-cycle-witness/m4v2-sx_stackoverflow-q06-cycle-witness-a000_query_projection.json": [
+    "queries/weekly/m4v2-sx_stackoverflow-q06-cycle-witness/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-sx_stackoverflow-q06-cycle-witness.json": [
+    "queries/weekly/m4v2-sx_stackoverflow-q06-cycle-witness/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q08-path-witness/m4v2-sx_stackoverflow-q08-path-witness-a000.qry": [
+    "queries/weekly/m4v2-sx_stackoverflow-q08-path-witness/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q08-path-witness/m4v2-sx_stackoverflow-q08-path-witness-a000_query_projection.json": [
+    "queries/weekly/m4v2-sx_stackoverflow-q08-path-witness/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-sx_stackoverflow-q08-path-witness.json": [
+    "queries/weekly/m4v2-sx_stackoverflow-q08-path-witness/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/sx_superuser/m4v2-sx_superuser-q04-diamond-probe/m4v2-sx_superuser-q04-diamond-probe-a000.qry": [
+    "queries/weekly/m4v2-sx_superuser-q04-diamond-probe/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/sx_superuser/m4v2-sx_superuser-q04-diamond-probe/m4v2-sx_superuser-q04-diamond-probe-a000_query_projection.json": [
+    "queries/weekly/m4v2-sx_superuser-q04-diamond-probe/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-sx_superuser-q04-diamond-probe.json": [
+    "queries/weekly/m4v2-sx_superuser-q04-diamond-probe/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/sx_superuser/m4v2-sx_superuser-q06-tree-probe/m4v2-sx_superuser-q06-tree-probe-a000.qry": [
+    "queries/weekly/m4v2-sx_superuser-q06-tree-probe/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/sx_superuser/m4v2-sx_superuser-q06-tree-probe/m4v2-sx_superuser-q06-tree-probe-a000_query_projection.json": [
+    "queries/weekly/m4v2-sx_superuser-q06-tree-probe/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-sx_superuser-q06-tree-probe.json": [
+    "queries/weekly/m4v2-sx_superuser-q06-tree-probe/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/sx_superuser/m4v2-sx_superuser-q10-diamond-witness/m4v2-sx_superuser-q10-diamond-witness-a000.qry": [
+    "queries/weekly/m4v2-sx_superuser-q10-diamond-witness/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/sx_superuser/m4v2-sx_superuser-q10-diamond-witness/m4v2-sx_superuser-q10-diamond-witness-a000_query_projection.json": [
+    "queries/weekly/m4v2-sx_superuser-q10-diamond-witness/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-sx_superuser-q10-diamond-witness.json": [
+    "queries/weekly/m4v2-sx_superuser-q10-diamond-witness/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/wiki_talk/m4v2-wiki_talk-q06-tailed_cycle-witness/m4v2-wiki_talk-q06-tailed_cycle-witness-a000.qry": [
+    "queries/weekly/m4v2-wiki_talk-q06-tailed_cycle-witness/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/wiki_talk/m4v2-wiki_talk-q06-tailed_cycle-witness/m4v2-wiki_talk-q06-tailed_cycle-witness-a000_query_projection.json": [
+    "queries/weekly/m4v2-wiki_talk-q06-tailed_cycle-witness/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-wiki_talk-q06-tailed_cycle-witness.json": [
+    "queries/weekly/m4v2-wiki_talk-q06-tailed_cycle-witness/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/wiki_talk/m4v2-wiki_talk-q08-path-witness/m4v2-wiki_talk-q08-path-witness-a000.qry": [
+    "queries/weekly/m4v2-wiki_talk-q08-path-witness/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/wiki_talk/m4v2-wiki_talk-q08-path-witness/m4v2-wiki_talk-q08-path-witness-a000_query_projection.json": [
+    "queries/weekly/m4v2-wiki_talk-q08-path-witness/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-wiki_talk-q08-path-witness.json": [
+    "queries/weekly/m4v2-wiki_talk-q08-path-witness/raw_query_projection.json"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/candidates/wiki_talk/m4v2-wiki_talk-q08-tailed_cycle-probe/m4v2-wiki_talk-q08-tailed_cycle-probe-a000.qry": [
+    "queries/weekly/m4v2-wiki_talk-q08-tailed_cycle-probe/query.qry"
+  ],
+  "benchmark/icde2027_m4_candidate_pool_v2/metadata/wiki_talk/m4v2-wiki_talk-q08-tailed_cycle-probe/m4v2-wiki_talk-q08-tailed_cycle-probe-a000_query_projection.json": [
+    "queries/weekly/m4v2-wiki_talk-q08-tailed_cycle-probe/query_projection.json"
+  ],
+  "adaptive_opt_v8/inputs/raw_labels/projections/m4v2-wiki_talk-q08-tailed_cycle-probe.json": [
+    "queries/weekly/m4v2-wiki_talk-q08-tailed_cycle-probe/raw_query_projection.json"
+  ],
+  "shape_run/stage_q0/candidates/bitcoin__cycle_m5__candidate01.qry": [
+    "queries/weekly/shape__bitcoin__cycle_m5__candidate01__k3/query.qry",
+    "queries/monthly/e4a__shape__bitcoin__cycle_m5__candidate01__k3/query.qry"
+  ],
+  "shape_run/stage_q0/candidates/bitcoin__cycle_m5__candidate02.qry": [
+    "queries/weekly/shape__bitcoin__cycle_m5__candidate02__k3/query.qry",
+    "queries/monthly/e4a__shape__bitcoin__cycle_m5__candidate02__k3/query.qry"
+  ],
+  "shape_run/stage_q0/candidates/bitcoin__cycle_m6__candidate01.qry": [
+    "queries/weekly/shape__bitcoin__cycle_m6__candidate01__k3/query.qry",
+    "queries/weekly/shape__bitcoin__cycle_m6__candidate01__k4/query.qry",
+    "queries/weekly/shape__bitcoin__cycle_m6__candidate01__k5/query.qry",
+    "queries/monthly/e4a__shape__bitcoin__cycle_m6__candidate01__k3/query.qry",
+    "queries/monthly/e4a__shape__bitcoin__cycle_m6__candidate01__k4/query.qry",
+    "queries/monthly/e4a__shape__bitcoin__cycle_m6__candidate01__k5/query.qry"
+  ],
+  "shape_run/stage_q0/candidates/bitcoin__path_m5__candidate01.qry": [
+    "queries/weekly/shape__bitcoin__path_m5__candidate01__k3/query.qry",
+    "queries/monthly/e4a__shape__bitcoin__path_m5__candidate01__k3/query.qry"
+  ],
+  "shape_run/stage_q0/candidates/bitcoin__path_m5__candidate02.qry": [
+    "queries/weekly/shape__bitcoin__path_m5__candidate02__k4/query.qry",
+    "queries/weekly/shape__bitcoin__path_m5__candidate02__k5/query.qry",
+    "queries/monthly/e4a__shape__bitcoin__path_m5__candidate02__k4/query.qry",
+    "queries/monthly/e4a__shape__bitcoin__path_m5__candidate02__k5/query.qry"
+  ],
+  "shape_run/stage_q0/candidates/bitcoin__path_m6__candidate01.qry": [
+    "queries/weekly/shape__bitcoin__path_m6__candidate01__k3/query.qry",
+    "queries/weekly/shape__bitcoin__path_m6__candidate01__k4/query.qry",
+    "queries/monthly/e4a__shape__bitcoin__path_m6__candidate01__k3/query.qry",
+    "queries/monthly/e4a__shape__bitcoin__path_m6__candidate01__k4/query.qry"
+  ],
+  "benchmark/queries/paper_parameters_v2/sx_superuser/path3_k3_rank001.qry": [
+    "queries/weekly/system__sx_superuser__path3_k3/query.qry"
+  ],
+  "benchmark/queries/paper_parameters_v2/wiki_talk/path3_k3_rank001.qry": [
+    "queries/weekly/system__wiki_talk__path3_k3/query.qry"
+  ],
+  "benchmark/queries/paper_parameters_v2/sx_stackoverflow/path3_k3_rank001.qry": [
+    "queries/weekly/system__sx_stackoverflow__path3_k3/query.qry"
+  ],
+  "benchmark/queries/paper_parameters_v2/bitcoin/path3_k3_rank001.qry": [
+    "queries/weekly/system__bitcoin__path3_k3/query.qry"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q04-dense-witness.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q04-dense-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q04-path-probe.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q04-path-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q06-cycle-witness.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q06-cycle-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q06-dense-witness.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q06-dense-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q06-path-probe.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q06-path-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q06-tailed_cycle-probe.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q06-tailed_cycle-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q08-dense-witness.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q08-dense-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q08-path-probe.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q08-path-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q08-tailed_cycle-probe.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q08-tailed_cycle-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q10-dense-witness.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q10-dense-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q10-path-probe.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q10-path-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q10-path-witness.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q10-path-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q10-tailed_cycle-probe.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q10-tailed_cycle-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/monthly_projections/m4v2-bitcoin-q10-tree-probe.json": [
+    "queries/monthly/e4a__m4v2-bitcoin-q10-tree-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q04-path-probe/m4v2-sx_stackoverflow-q04-path-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-path-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q04-path-probe/m4v2-sx_stackoverflow-q04-path-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-path-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q04-path-witness/m4v2-sx_stackoverflow-q04-path-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-path-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q04-path-witness/m4v2-sx_stackoverflow-q04-path-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-path-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q04-tree-probe/m4v2-sx_stackoverflow-q04-tree-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-tree-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q04-tree-probe/m4v2-sx_stackoverflow-q04-tree-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-tree-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q04-tree-witness/m4v2-sx_stackoverflow-q04-tree-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-tree-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q04-tree-witness/m4v2-sx_stackoverflow-q04-tree-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-tree-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q04-cycle-probe/m4v2-sx_stackoverflow-q04-cycle-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-cycle-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q04-cycle-probe/m4v2-sx_stackoverflow-q04-cycle-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-cycle-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q04-cycle-witness/m4v2-sx_stackoverflow-q04-cycle-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-cycle-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q04-cycle-witness/m4v2-sx_stackoverflow-q04-cycle-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-cycle-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q04-tailed_cycle-probe/m4v2-sx_stackoverflow-q04-tailed_cycle-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-tailed_cycle-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q04-tailed_cycle-probe/m4v2-sx_stackoverflow-q04-tailed_cycle-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-tailed_cycle-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q04-tailed_cycle-witness/m4v2-sx_stackoverflow-q04-tailed_cycle-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-tailed_cycle-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q04-tailed_cycle-witness/m4v2-sx_stackoverflow-q04-tailed_cycle-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-tailed_cycle-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q04-diamond-probe/m4v2-sx_stackoverflow-q04-diamond-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-diamond-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q04-diamond-probe/m4v2-sx_stackoverflow-q04-diamond-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-diamond-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q04-diamond-witness/m4v2-sx_stackoverflow-q04-diamond-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-diamond-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q04-diamond-witness/m4v2-sx_stackoverflow-q04-diamond-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-diamond-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q04-dense-probe/m4v2-sx_stackoverflow-q04-dense-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-dense-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q04-dense-probe/m4v2-sx_stackoverflow-q04-dense-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-dense-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q04-dense-witness/m4v2-sx_stackoverflow-q04-dense-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-dense-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q04-dense-witness/m4v2-sx_stackoverflow-q04-dense-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q04-dense-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q06-path-probe/m4v2-sx_stackoverflow-q06-path-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-path-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q06-path-probe/m4v2-sx_stackoverflow-q06-path-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-path-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q06-path-witness/m4v2-sx_stackoverflow-q06-path-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-path-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q06-path-witness/m4v2-sx_stackoverflow-q06-path-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-path-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q06-tree-probe/m4v2-sx_stackoverflow-q06-tree-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-tree-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q06-tree-probe/m4v2-sx_stackoverflow-q06-tree-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-tree-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q06-tree-witness/m4v2-sx_stackoverflow-q06-tree-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-tree-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q06-tree-witness/m4v2-sx_stackoverflow-q06-tree-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-tree-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q06-cycle-probe/m4v2-sx_stackoverflow-q06-cycle-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-cycle-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q06-cycle-probe/m4v2-sx_stackoverflow-q06-cycle-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-cycle-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q06-cycle-witness/m4v2-sx_stackoverflow-q06-cycle-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-cycle-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q06-cycle-witness/m4v2-sx_stackoverflow-q06-cycle-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-cycle-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q06-tailed_cycle-probe/m4v2-sx_stackoverflow-q06-tailed_cycle-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-tailed_cycle-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q06-tailed_cycle-probe/m4v2-sx_stackoverflow-q06-tailed_cycle-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-tailed_cycle-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q06-tailed_cycle-witness/m4v2-sx_stackoverflow-q06-tailed_cycle-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-tailed_cycle-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q06-tailed_cycle-witness/m4v2-sx_stackoverflow-q06-tailed_cycle-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-tailed_cycle-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q06-diamond-probe/m4v2-sx_stackoverflow-q06-diamond-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-diamond-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q06-diamond-probe/m4v2-sx_stackoverflow-q06-diamond-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-diamond-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q06-diamond-witness/m4v2-sx_stackoverflow-q06-diamond-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-diamond-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q06-diamond-witness/m4v2-sx_stackoverflow-q06-diamond-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-diamond-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q06-dense-probe/m4v2-sx_stackoverflow-q06-dense-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-dense-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q06-dense-probe/m4v2-sx_stackoverflow-q06-dense-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-dense-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q06-dense-witness/m4v2-sx_stackoverflow-q06-dense-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-dense-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q06-dense-witness/m4v2-sx_stackoverflow-q06-dense-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q06-dense-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q08-path-probe/m4v2-sx_stackoverflow-q08-path-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-path-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q08-path-probe/m4v2-sx_stackoverflow-q08-path-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-path-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q08-path-witness/m4v2-sx_stackoverflow-q08-path-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-path-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q08-path-witness/m4v2-sx_stackoverflow-q08-path-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-path-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q08-tree-probe/m4v2-sx_stackoverflow-q08-tree-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-tree-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q08-tree-probe/m4v2-sx_stackoverflow-q08-tree-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-tree-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q08-tree-witness/m4v2-sx_stackoverflow-q08-tree-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-tree-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q08-tree-witness/m4v2-sx_stackoverflow-q08-tree-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-tree-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q08-cycle-probe/m4v2-sx_stackoverflow-q08-cycle-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-cycle-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q08-cycle-probe/m4v2-sx_stackoverflow-q08-cycle-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-cycle-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q08-cycle-witness/m4v2-sx_stackoverflow-q08-cycle-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-cycle-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q08-cycle-witness/m4v2-sx_stackoverflow-q08-cycle-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-cycle-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q08-tailed_cycle-probe/m4v2-sx_stackoverflow-q08-tailed_cycle-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-tailed_cycle-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q08-tailed_cycle-probe/m4v2-sx_stackoverflow-q08-tailed_cycle-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-tailed_cycle-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q08-tailed_cycle-witness/m4v2-sx_stackoverflow-q08-tailed_cycle-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-tailed_cycle-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q08-tailed_cycle-witness/m4v2-sx_stackoverflow-q08-tailed_cycle-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-tailed_cycle-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q08-diamond-probe/m4v2-sx_stackoverflow-q08-diamond-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-diamond-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q08-diamond-probe/m4v2-sx_stackoverflow-q08-diamond-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-diamond-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q08-diamond-witness/m4v2-sx_stackoverflow-q08-diamond-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-diamond-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q08-diamond-witness/m4v2-sx_stackoverflow-q08-diamond-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-diamond-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q08-dense-probe/m4v2-sx_stackoverflow-q08-dense-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-dense-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q08-dense-probe/m4v2-sx_stackoverflow-q08-dense-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q08-dense-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q10-path-probe/m4v2-sx_stackoverflow-q10-path-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-path-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q10-path-probe/m4v2-sx_stackoverflow-q10-path-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-path-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q10-tree-probe/m4v2-sx_stackoverflow-q10-tree-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-tree-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q10-tree-probe/m4v2-sx_stackoverflow-q10-tree-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-tree-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q10-tree-witness/m4v2-sx_stackoverflow-q10-tree-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-tree-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q10-tree-witness/m4v2-sx_stackoverflow-q10-tree-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-tree-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q10-cycle-probe/m4v2-sx_stackoverflow-q10-cycle-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-cycle-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q10-cycle-probe/m4v2-sx_stackoverflow-q10-cycle-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-cycle-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q10-tailed_cycle-probe/m4v2-sx_stackoverflow-q10-tailed_cycle-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-tailed_cycle-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q10-tailed_cycle-probe/m4v2-sx_stackoverflow-q10-tailed_cycle-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-tailed_cycle-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q10-diamond-probe/m4v2-sx_stackoverflow-q10-diamond-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-diamond-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q10-diamond-probe/m4v2-sx_stackoverflow-q10-diamond-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-diamond-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q10-diamond-witness/m4v2-sx_stackoverflow-q10-diamond-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-diamond-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q10-diamond-witness/m4v2-sx_stackoverflow-q10-diamond-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-diamond-witness/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q10-dense-probe/m4v2-sx_stackoverflow-q10-dense-probe-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-dense-probe/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q10-dense-probe/m4v2-sx_stackoverflow-q10-dense-probe-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-dense-probe/query_projection.json"
+  ],
+  "followup_v9/inputs/so_monthly_pool/candidates/sx_stackoverflow/m4v2-sx_stackoverflow-q10-dense-witness/m4v2-sx_stackoverflow-q10-dense-witness-a000.qry": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-dense-witness/query.qry"
+  ],
+  "followup_v9/inputs/so_monthly_pool/metadata/sx_stackoverflow/m4v2-sx_stackoverflow-q10-dense-witness/m4v2-sx_stackoverflow-q10-dense-witness-a000_query_projection.json": [
+    "queries/monthly/e4b__m4v2-sx_stackoverflow-q10-dense-witness/query_projection.json"
+  ]
+}

@@ -1,3 +1,24 @@
+# Current reproducibility artifact
+
+The current CPU WinDur evaluation and completed v9 follow-up materials are in
+**[icde2027_artifact/](icde2027_artifact/)**: versioned source, build/smoke
+instructions, frozen queries, data-preparation and execution scripts, and
+recorded measurements with their limitations.
+
+The artifact concerns exact direct DFS with F2, P4, W-store, and the
+candidate-block index. The material below is preserved as the repository's
+**historical overview**; its earlier hardware, GPU, Candidate-DAG, and timing
+claims are not the current manuscript evidence. See the artifact's
+[README](icde2027_artifact/README.md),
+[reproduction guide](icde2027_artifact/REPRODUCE.md), and
+[results guide](icde2027_artifact/RESULTS.md).
+
+Unpublished manuscript drafts and third-party paper PDFs are not included.
+Raw datasets and generated stores are obtained or prepared separately; their
+conditions are distinct from the project license.
+
+---
+
 # Abstract
 
 Durable subgraph matching schemes have been proposed to discover subgraph patterns that occur consecutively
@@ -185,3 +206,4 @@ An Efficient Durable Subgraph Matching Scheme on Temporal Graphs, D.H. Cha, M.S.
 | --- | --- |
 | TiNLA | https://github.com/bookug/siep |
 |  |  |
+

@@ -1,0 +1,190 @@
+[
+  {
+    "schema": "v8_baseline_metrics_v1",
+    "system": "tdtree",
+    "match_count": 457388,
+    "count_overflow": false,
+    "threads_requested": 16,
+    "threads_used": 16,
+    "count_only": true,
+    "prefilter": "off",
+    "label_mode": "explicit-projection",
+    "duration_mode": "consecutive",
+    "minimum_duration_k": 4,
+    "filter_scope": "not_applied",
+    "primary_wall_ns": 178050698,
+    "phase_ns": {
+      "enumeration": 178050698,
+      "filter": 0,
+      "graph_construction": 1504220576,
+      "index_relation": 31091537707,
+      "label_assignment": 265354813,
+      "output": 2151933,
+      "planning": 367470,
+      "read_parse": 400414935
+    },
+    "counters": {
+      "accepted_candidates": 478316,
+      "candidate_relation_entries": 37838,
+      "completed_matches": 457388,
+      "dfs_states": 478402,
+      "generated_candidates": 3678859,
+      "leaf_block_candidates_pruned": 4541,
+      "leaf_block_precheck_attempts": 18087,
+      "leaf_blocks_pruned": 358,
+      "pruned_injectivity": 0,
+      "pruned_temporal_support": 3200543,
+      "root_candidate_count": 86,
+      "root_tasks_claimed": 86
+    },
+    "graph": {
+      "content_fingerprint_fnv1a64": 6107072648581376548,
+      "edges": 1654443,
+      "graph_capacity_bytes": 225621377,
+      "index_capacity_bytes": 14510376,
+      "index_logical_bytes": 3590112,
+      "input_occurrences": 8027213,
+      "vertices": 875625
+    },
+    "query_root": 1,
+    "plan_order": [
+      1,
+      4,
+      3,
+      2,
+      0,
+      5
+    ],
+    "label_projection": {
+      "global_label_map_file_sha256": "240bd53eeb397b3bfa751b678d39d20db0f20f29fc4cd48b01796507b59cab50",
+      "query_label_projection_file_sha256": "a02c13d1a810f2c927f5f3a1796be9029efc530442823861af2110654cc9db5e",
+      "query_file_sha256": "c1a32a30d44af80fcbe7676233f27d42d336f42cbb1360674359d999cd8e9a00",
+      "invalid_vertex_count_input": 0
+    }
+  },
+  {
+    "schema": "v8_baseline_metrics_v1",
+    "system": "tdtree",
+    "match_count": 14688,
+    "count_overflow": false,
+    "threads_requested": 16,
+    "threads_used": 16,
+    "count_only": true,
+    "prefilter": "off",
+    "label_mode": "stable-id",
+    "duration_mode": "consecutive",
+    "minimum_duration_k": 3,
+    "filter_scope": "not_applied",
+    "primary_wall_ns": 6159327,
+    "phase_ns": {
+      "enumeration": 6159327,
+      "filter": 0,
+      "graph_construction": 1631872109,
+      "index_relation": 19829880089,
+      "label_assignment": 110368731,
+      "output": 1853340,
+      "planning": 403790,
+      "read_parse": 466078056
+    },
+    "counters": {
+      "accepted_candidates": 31355,
+      "candidate_relation_entries": 41338,
+      "completed_matches": 14688,
+      "dfs_states": 31702,
+      "generated_candidates": 40991,
+      "leaf_block_candidates_pruned": 0,
+      "leaf_block_precheck_attempts": 11960,
+      "leaf_blocks_pruned": 0,
+      "pruned_injectivity": 0,
+      "pruned_temporal_support": 9636,
+      "root_candidate_count": 347,
+      "root_tasks_claimed": 347
+    },
+    "graph": {
+      "content_fingerprint_fnv1a64": 2832097526603979597,
+      "edges": 1654443,
+      "graph_capacity_bytes": 225621377,
+      "index_capacity_bytes": 14925032,
+      "index_logical_bytes": 4157168,
+      "input_occurrences": 8027213,
+      "vertices": 875625
+    },
+    "query_root": 1,
+    "plan_order": [
+      1,
+      0,
+      4,
+      3,
+      2
+    ],
+    "label_projection": {
+      "global_label_map_file_sha256": "",
+      "query_label_projection_file_sha256": "",
+      "query_file_sha256": "",
+      "invalid_vertex_count_input": 0
+    }
+  },
+  {
+    "schema": "v8_baseline_metrics_v1",
+    "system": "tdtree",
+    "match_count": 455685,
+    "count_overflow": false,
+    "threads_requested": 16,
+    "threads_used": 16,
+    "count_only": true,
+    "prefilter": "off",
+    "label_mode": "stable-id",
+    "duration_mode": "consecutive",
+    "minimum_duration_k": 5,
+    "filter_scope": "not_applied",
+    "primary_wall_ns": 74041503,
+    "phase_ns": {
+      "enumeration": 74041503,
+      "filter": 0,
+      "graph_construction": 1638497375,
+      "index_relation": 908081250,
+      "label_assignment": 112033736,
+      "output": 2054910,
+      "planning": 395283,
+      "read_parse": 407645520
+    },
+    "counters": {
+      "accepted_candidates": 676382,
+      "candidate_relation_entries": 28059,
+      "completed_matches": 455685,
+      "dfs_states": 676516,
+      "generated_candidates": 4316440,
+      "leaf_block_candidates_pruned": 2495340,
+      "leaf_block_precheck_attempts": 207093,
+      "leaf_blocks_pruned": 161384,
+      "pruned_injectivity": 6605,
+      "pruned_temporal_support": 3633453,
+      "root_candidate_count": 134,
+      "root_tasks_claimed": 134
+    },
+    "graph": {
+      "content_fingerprint_fnv1a64": 2832097526603979597,
+      "edges": 1654443,
+      "graph_capacity_bytes": 225621377,
+      "index_capacity_bytes": 13590688,
+      "index_logical_bytes": 2757504,
+      "input_occurrences": 8027213,
+      "vertices": 875625
+    },
+    "query_root": 2,
+    "plan_order": [
+      2,
+      3,
+      4,
+      5,
+      1,
+      0
+    ],
+    "label_projection": {
+      "global_label_map_file_sha256": "",
+      "query_label_projection_file_sha256": "",
+      "query_file_sha256": "",
+      "invalid_vertex_count_input": 0
+    }
+  }
+]

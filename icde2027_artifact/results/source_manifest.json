@@ -1,0 +1,362 @@
+{
+  "sources": [
+    {
+      "source": "followup_v8b/QUERY_METADATA.csv",
+      "source_sha256": "35dfc680255e5f78639c9cf0622836245596fe174f5188e0fdddea1e0680b5b7",
+      "source_bytes": 18829,
+      "public": "queries/manuscript_query_metadata.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "results/v9/graph_summaries/wiki_talk_weekly.csv",
+      "source_sha256": "7d3f2ef28e1bcd2def5c710eec6368cc9261461b020d80ef8ac59200843668e1",
+      "source_bytes": 815,
+      "public": "results/v9/graph_summaries/wiki_talk_weekly.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "results/v9/graph_summaries/bitcoin_month.csv",
+      "source_sha256": "d26dab941ebc649d4923eebb874c6dd9e4022a218b4c35b9e26f01f594429f32",
+      "source_bytes": 802,
+      "public": "results/v9/graph_summaries/bitcoin_month.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "results/v9/graph_summaries/sx_stackoverflow_month.csv",
+      "source_sha256": "823921dda4fb5bb28486473a622e9f0a2b565c977c8993a014b917ea20a58337",
+      "source_bytes": 794,
+      "public": "results/v9/graph_summaries/sx_stackoverflow_month.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "results/v9/graph_summaries/bitcoin_weekly.csv",
+      "source_sha256": "81aaa377297225917bb2f086e1556301be4cc864ed90e0e71c2efbec5c0fa5cd",
+      "source_bytes": 802,
+      "public": "results/v9/graph_summaries/bitcoin_weekly.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "results/v9/graph_summaries/sx_stackoverflow_weekly.csv",
+      "source_sha256": "b48e1fd662d45782fd33c84afd0c3dc70478f392e34912283d818e006e7beeae",
+      "source_bytes": 814,
+      "public": "results/v9/graph_summaries/sx_stackoverflow_weekly.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "results/v9/graph_summaries/sx_stackoverflow_day.csv",
+      "source_sha256": "2bdc341155d068a2202da0b2d34d2638b3f4c694016e9018d14c103a5f322159",
+      "source_bytes": 805,
+      "public": "results/v9/graph_summaries/sx_stackoverflow_day.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "results/v9/graph_summaries/sx_superuser_weekly.csv",
+      "source_sha256": "9db4c0600a0ec7f27aa389366f4527d0b13cec7df95179d4e0817d7106d2068d",
+      "source_bytes": 805,
+      "public": "results/v9/graph_summaries/sx_superuser_weekly.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "adaptive_opt_v8/raw_runs.jsonl",
+      "source_sha256": "308dcb1ea1817726fdfc63ad329b27caf9287c423b9482903d9aa589ec8c109d",
+      "source_bytes": 65951,
+      "public": "results/v8/observations/index.json",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "adaptive_opt_v8/lite_v1/raw_runs.jsonl",
+      "source_sha256": "3d64ff8bbbf3e2fe7a3c23faf0bbd8263d617b5aa69a26c92f0d829441d44c16",
+      "source_bytes": 25089426,
+      "public": "results/v8/observations/index.json",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "adaptive_opt_v8/derived/baseline_comparison.csv",
+      "source_sha256": "a7563913d953b42cadaf52c977e29078e1f83a4ea461a6edb954b50ba1d6b1cf",
+      "source_bytes": 516580,
+      "public": "results/v8/baseline_comparison.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "adaptive_opt_v8/derived/bitset_counters.csv",
+      "source_sha256": "0c63833131661e2085d849c8e2cfe51f25581277359447ce48d1e49f97336059",
+      "source_bytes": 13011,
+      "public": "results/v8/bitset_counters.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "adaptive_opt_v8/derived/e2e_breakdown.csv",
+      "source_sha256": "f800bc6859580e0e6a21292044f9e164e9548a6f1a6e4e012b56358e6b07aed2",
+      "source_bytes": 756054,
+      "public": "results/v8/e2e_breakdown.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "adaptive_opt_v8/derived/ladder_heavy.csv",
+      "source_sha256": "90b0eaab76b645077646a7fbd90cc6252c7675e3e2ad7efcff505db4e790d074",
+      "source_bytes": 28790,
+      "public": "results/v8/ladder_heavy.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "adaptive_opt_v8/derived/ladder_small.csv",
+      "source_sha256": "b6d78621b95544ef234b7118788e46ea7cdc839ee4c8992e8967eb484df5b0d7",
+      "source_bytes": 15233,
+      "public": "results/v8/ladder_small.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "adaptive_opt_v8/derived/summary.csv",
+      "source_sha256": "5a37f4d22835cc269cf49193b9908b41e30d32c60624859702016368701e625d",
+      "source_bytes": 674512,
+      "public": "results/v8/summary.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v8b/bitset_counters_v8b.csv",
+      "source_sha256": "ab66dd0587a27f120e443f49a0e4021c6cb97049ea71b8160a6e6de58f39cc92",
+      "source_bytes": 19971,
+      "public": "results/v8/bitset_counters_v8b.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v8b/overhead_existing_runs.csv",
+      "source_sha256": "ded765052c0600a07d55b946c865bc87122d8ada2dcdf79c7a13dccce0c11cc1",
+      "source_bytes": 155440,
+      "public": "results/v8/overhead_existing_runs.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v8b/overhead_existing_summary.csv",
+      "source_sha256": "2501e950edefdc1bf689b8078ec00e5b9bde2d54805c9fe5299bf10cd87847b5",
+      "source_bytes": 6544,
+      "public": "results/v8/overhead_existing_summary.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/runs/E1/raw_runs.jsonl",
+      "source_sha256": "ef4b0443bd13fd703c02477a9d049fa99e870523b22f48b77e0e8348fb96a447",
+      "source_bytes": 4718509,
+      "public": "results/v9/observations/index.json",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/runs/E1_COUNTERS/raw_runs.jsonl",
+      "source_sha256": "b8b3b3ad98884c89830fbcde6cde2a0566b9c2ee846fffed6005bf2fbecda53c",
+      "source_bytes": 723959,
+      "public": "results/v9/observations/index.json",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/runs/E1_REAL_CORRECTNESS/raw_runs.jsonl",
+      "source_sha256": "95fcaee726b94f0a0a29c874d72208e1a42751217f172b4b583c1e6b03c7570a",
+      "source_bytes": 344418,
+      "public": "results/v9/observations/index.json",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/runs/E3/raw_runs.jsonl",
+      "source_sha256": "6edcddabed5cc92ecaa50c8dfa4bd7748b2cb6356bcf16586bd4b8ac19966b95",
+      "source_bytes": 17845,
+      "public": "results/v9/observations/index.json",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/runs/E4A/raw_runs.jsonl",
+      "source_sha256": "8d410421bcfbb420e01656f38f3518a88f5253cae0f3b82b7e9f6fbb81cb020c",
+      "source_bytes": 6417745,
+      "public": "results/v9/observations/index.json",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/runs/E4A_SCREEN/raw_runs.jsonl",
+      "source_sha256": "fb874cb4fe0eac059a9b144c6f0ec96ebb5ec57d55128273ef5b8a27c0d5a444",
+      "source_bytes": 242878,
+      "public": "results/v9/observations/index.json",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/runs/E4B_SCREEN/raw_runs.jsonl",
+      "source_sha256": "c16f40a774fce6038965a5af8824e290040792bcf88c8c5df755afbb0bba8356",
+      "source_bytes": 481564,
+      "public": "results/v9/observations/index.json",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/runs/E5/raw_runs.jsonl",
+      "source_sha256": "5da84edf17266b66ed8b5a559fbbe6726b918fb5f7c97f7c349591337d13d3f2",
+      "source_bytes": 8646,
+      "public": "results/v9/observations/index.json",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/runs/E6/raw_runs.jsonl",
+      "source_sha256": "f19cde554dc83b42280a1fac2d64f8fa820c6da630b9eed545a115c0e0d6c17a",
+      "source_bytes": 11818651,
+      "public": "results/v9/observations/index.json",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/runs/E6_REAL_CORRECTNESS/raw_runs.jsonl",
+      "source_sha256": "240d5625c1e3f0a197db47c58ab4cef9f95220a646d17cb7dfafefb45e4a25f2",
+      "source_bytes": 345183,
+      "public": "results/v9/observations/index.json",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/anomalies.csv",
+      "source_sha256": "bf2913f94a8316f6a1376f7b55a47e247f1e950094dc489c16c71854bd7f2c17",
+      "source_bytes": 1521,
+      "public": "results/v9/anomalies.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e1_width.csv",
+      "source_sha256": "b77c8db8607f2ba0778d02b00230b3e8bce5d3514b215e6ef92779a67a4cd03c",
+      "source_bytes": 22520,
+      "public": "results/v9/e1_width.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e2_table_viii_provenance.csv",
+      "source_sha256": "5af1781f4a7d651a8d16f6a5f811af7599e82ec3dc7b449959e40088bbc65cb3",
+      "source_bytes": 1790,
+      "public": "results/v9/e2_table_viii_provenance.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e2_td_leaf_union.csv",
+      "source_sha256": "bcfa1f218884a2df1af57126eab4851bbb1f8cfdd76071b666d38c7d8f62021f",
+      "source_bytes": 14345,
+      "public": "results/v9/e2_td_leaf_union.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e3_card_vs_con.csv",
+      "source_sha256": "a3b25eeb5ac2e6eb937f0ffabef989a79fe536ba45da2a43f2ec33e3e0eeba00",
+      "source_bytes": 1642,
+      "public": "results/v9/e3_card_vs_con.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e4_graph_stats.csv",
+      "source_sha256": "3d6ab12a51518b7d554108aeec09884561a1bb689809cb234d3091c48b949c7e",
+      "source_bytes": 2521,
+      "public": "results/v9/e4_graph_stats.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e4a_bitcoin_monthly.csv",
+      "source_sha256": "f64930ba6ff8aa48ebe0983f0ac2010b5b022b88aefd8bea76aecaf51f9f485d",
+      "source_bytes": 102120,
+      "public": "results/v9/e4a_bitcoin_monthly.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e4b_so_monthly.csv",
+      "source_sha256": "7703741f562b3f2c276fc35a9aba6f2de114df21e80f56ebf257cdb5ea03115c",
+      "source_bytes": 8,
+      "public": "results/v9/e4b_so_monthly.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e5_build_profile.csv",
+      "source_sha256": "789556e817d990a253ecfd94d62e37f7d587b10f5e5f18dcb029f48b9b65e2fd",
+      "source_bytes": 1436,
+      "public": "results/v9/e5_build_profile.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e6_union.csv",
+      "source_sha256": "7cc046ea4d792f15a7bec09216fd73af391b3aad8ce5543874de358858763d98",
+      "source_bytes": 54852,
+      "public": "results/v9/e6_union.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e6_union_counters.csv",
+      "source_sha256": "09ccdaba667d426949e03e16bd69e8bb43046fd9dd5cb25c5c4934927ba152e7",
+      "source_bytes": 10949,
+      "public": "results/v9/e6_union_counters.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e7_activity_activity_bins.csv",
+      "source_sha256": "de6feaa86c499ff264afdcb2c4cd824ba4eeee6e3c1f85ee02db26d207bc78c3",
+      "source_bytes": 5826,
+      "public": "results/v9/e7_activity_activity_bins.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e7_activity_ccdf.csv",
+      "source_sha256": "d9ca4ac2b50f1afc1b3becaffabcd3ca251f98ec78705270657bcf0fa657846b",
+      "source_bytes": 397966,
+      "public": "results/v9/e7_activity_ccdf.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e7_activity_lmax_bins.csv",
+      "source_sha256": "4e8a0a7819c1d42f02e223c0fb7affaee8ff4f567fdbc838da49f25445ef6291",
+      "source_bytes": 5593,
+      "public": "results/v9/e7_activity_lmax_bins.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e7_activity_summary.csv",
+      "source_sha256": "bea6f40dcfa59fee6f3b0b32e8b55e5bfa845623a4c6d419672074ebebdcb1bd",
+      "source_bytes": 3161,
+      "public": "results/v9/e7_activity_summary.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e7_activity_top_share.csv",
+      "source_sha256": "76364def2af71e8b16588b99fdd031442a350cda6b03ee1ca9f00e9bc19bbe88",
+      "source_bytes": 3236,
+      "public": "results/v9/e7_activity_top_share.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/group_summary.csv",
+      "source_sha256": "e4ced7d43feb6c92d9f2ae55fab185cc2d8af165be2304c3166569a1b0f70eee",
+      "source_bytes": 38285,
+      "public": "results/v9/group_summary.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/totals.csv",
+      "source_sha256": "e4ced7d43feb6c92d9f2ae55fab185cc2d8af165be2304c3166569a1b0f70eee",
+      "source_bytes": 38285,
+      "public": "results/v9/totals.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/weekly_technique_comparison.csv",
+      "source_sha256": "96aa5cee4a85f069554b5b6cb325c2798c11240c88689c5a9e6a8e8493e278cb",
+      "source_bytes": 10456,
+      "public": "results/v9/weekly_technique_comparison.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "adaptive_opt_v6/runs.csv",
+      "source_sha256": "71eeb25e518360c9498f3cfc1391aafb66368c466ef3fe68b80ffbaacb909c70",
+      "source_bytes": 6939598,
+      "public": "results/v6/table_viii_runs.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "adaptive_opt_v6/performance/derived/summary.csv",
+      "source_sha256": "cfc12006067ce835b01a10cd95863b6bfb5adc2fe966e5ddd25893855dae29f3",
+      "source_bytes": 299429,
+      "public": "results/v6/table_viii_cells.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    },
+    {
+      "source": "followup_v9/e2_table_viii_provenance.csv",
+      "source_sha256": "5af1781f4a7d651a8d16f6a5f811af7599e82ec3dc7b449959e40088bbc65cb3",
+      "source_bytes": 1790,
+      "public": "results/v6/table_viii_summary.csv",
+      "transformation": "selected fields/path normalization only; numerical values retained"
+    }
+  ],
+  "export_policy": "No numeric imputation, outlier removal, retry, or new experiment. Public subset; origin locations are historical identifiers, not portable executable paths."
+}

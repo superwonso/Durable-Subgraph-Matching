@@ -1,0 +1,9 @@
+case_id,id,k,status,N_card,N_con,rejected_by_con_ratio,wall_s,interpretation,evidence
+m4v2-bitcoin-q04-tree-probe,Q11,3,ok,2723,830,0.6951891296364304,208.651736518,one count observation; not a timing statistic,followup_v9/runs/E3/E3__m4v2-bitcoin-q04-tree-probe__td_raw__r01/baseline_metrics.json
+system__bitcoin__path3_k3,systemBitcoin,3,ok,2329899,856827,0.6322471489107468,240.494533472,one count observation; not a timing statistic,followup_v9/runs/E3/E3__system__bitcoin__path3_k3__td_raw__r01/baseline_metrics.json
+m4v2-bitcoin-q06-dense-witness,D2,3,ok,81018,31431,0.6120491742575724,1029.71656193,one count observation; not a timing statistic,followup_v9/runs/E3/E3__m4v2-bitcoin-q06-dense-witness__td_raw__r01/baseline_metrics.json
+shape__bitcoin__cycle_m6__candidate01__k5,C3,5,timeout,,34130,,1800.004552809,one count observation; not a timing statistic,NOT_YET_RUN
+shape__bitcoin__path_m5__candidate01__k3,P4,3,ok,9902801,3178507,0.6790294988256353,1081.091202824,one count observation; not a timing statistic,followup_v9/runs/E3/E3__shape__bitcoin__path_m5__candidate01__k3__td_raw__r01/baseline_metrics.json
+m4v2-bitcoin-q06-tailed_cycle-probe,T1,4,timeout,,457388,,1800.025184613,one count observation; not a timing statistic,NOT_YET_RUN
+shape__bitcoin__cycle_m5__candidate02__k3,C1,3,timeout,,14688,,1800.023406533,one count observation; not a timing statistic,NOT_YET_RUN
+shape__bitcoin__path_m5__candidate02__k5,P1,5,ok,2477942,455685,0.8161034439062739,499.367875306,one count observation; not a timing statistic,followup_v9/runs/E3/E3__shape__bitcoin__path_m5__candidate02__k5__td_raw__r01/baseline_metrics.json

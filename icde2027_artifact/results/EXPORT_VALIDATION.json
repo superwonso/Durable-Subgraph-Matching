@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "scope": "Public evidence export arithmetic and query-byte preservation; no new native experiment",
+  "v6_table_viii_cells": 168,
+  "v8_summary_cells": 1380,
+  "v9_metric_cells": 370,
+  "scalar_summary_checks": 23775,
+  "weekly_cases": 39,
+  "monthly_cases": 68,
+  "query_and_projection_bytes": "Verified against frozen SHA-256 references",
+  "path_privacy_scan": "No home-directory or Codex attachment path in exported evidence/query files",
+  "script": "scripts/summarize_results.py --check",
+  "limits": "Arithmetic recomputation of exported measurements does not predict runtimes on another machine. No raw graphs, large label maps, stores, manuscript drafts or private conversation files are distributed here."
+}

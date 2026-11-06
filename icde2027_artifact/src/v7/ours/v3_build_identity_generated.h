@@ -1,0 +1,14 @@
+#ifndef V3_BUILD_IDENTITY_GENERATED_H
+#define V3_BUILD_IDENTITY_GENERATED_H
+
+// Direct unit-test builds use this fail-closed placeholder.  Production
+// ours/build.sh (and build.ps1) put a generated header with the same name
+// earlier on the include path.  Closed execution rejects these zero anchors.
+#define DSM_V3_SOURCE_BUNDLE_SHA256 \
+    "0000000000000000000000000000000000000000000000000000000000000000"
+#define DSM_V3_COMPILER_IDENTITY_SHA256 \
+    "0000000000000000000000000000000000000000000000000000000000000000"
+#define DSM_V3_PARAMETER_BUNDLE_SHA256 \
+    "0000000000000000000000000000000000000000000000000000000000000000"
+
+#endif // V3_BUILD_IDENTITY_GENERATED_H
